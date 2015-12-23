@@ -33,7 +33,7 @@ Notice that in my univerisity we use DHCP to allocate IP address. You can change
 ### Install SDAccel 2015.3
 Just follow the guide from Xilinx, there is no hiccup.
 
-### Make lif easier!
+### Make life easier!
 Since I am going to use this system for a long time, it's time to make life more easier!
 
 ##### Add PATH to root.
