@@ -32,3 +32,15 @@ Notice that in my univerisity we use DHCP to allocate IP address. You can change
 
 ### Install SDAccel 2015.3
 Just follow the guide from Xilinx, there is no hiccup.
+
+### Make life easier!
+Since I am going to use this system for a long time, it's time to make life more easier!
+
+##### Add PATH to root.
+I installed SDAccel with root user, which makes it a little tricky to add the binary folder into the PATH variable. After a litter searching, I found out that `/etc/skel/` is the skeleton for every user's home directory. Thus modifying `/etc/skel/.bashrc` means modifying every new created user's `.bashrc`, including root!
+
+To add the path, open `/etc/skel/.bashrc` and add the following lines:
+```
+export PATH=/opt/Xilinx/SDAccel/2015.3/bin:$PATH
+```
+And now you can start `sdaccel` everywhere!
