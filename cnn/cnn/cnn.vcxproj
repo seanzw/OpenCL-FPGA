@@ -163,6 +163,7 @@
     <Xml Include="convolutional1.xml" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="alpha.tcl" />
     <None Include="convolution.cl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

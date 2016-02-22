@@ -8,54 +8,10 @@
 #include <vector>
 
 #define __CL_ENABLE_EXCEPTIONS
-#include <CL/cl.hpp>
-
+#include <CL\cl.h>
 #include "include/RapidXML/rapidxml.hpp"
 
 namespace cnn {
-
-    std::string fileToString(const std::string &fn) {
-        std::string text;
-        std::ifstream fs(fn.c_str());
-        if (!fs) {
-            std::ostringstream os;
-            os << "There is no file called " << fn;
-            throw std::runtime_error(os.str());
-        }
-        text.assign(std::istreambuf_iterator<char>(fs), std::istreambuf_iterator<char>());
-        return text;
-    }
-
-    cl::Program buildProgram(const std::string& file_name, const cl::Context& context, const std::vector<cl::Device>& devices) {
-        std::string source_code = fileToString(file_name);
-        std::pair<const char *, size_t> source(source_code.c_str(), source_code.size());
-        cl::Program::Sources sources;
-        sources.push_back(source);
-        cl::Program program(context, sources);
-        try {
-            program.build(devices);
-        }
-        catch (cl::Error& e) {
-            std::string msg;
-            program.getBuildInfo<std::string>(devices[0], CL_PROGRAM_BUILD_LOG, &msg);
-            std::cerr << "Your kernel failed to compile" << std::endl;
-            std::cerr << "-----------------------------" << std::endl;
-            std::cerr << msg;
-            throw(e);
-        }
-
-        return program;
-    }
-
-    cl_ulong runAndTimeKernel(const cl::Kernel& kernel, const cl::CommandQueue& queue, const cl::NDRange global, const cl::NDRange& local = cl::NullRange) {
-        cl_ulong t1, t2;
-        cl::Event evt;
-        queue.enqueueNDRangeKernel(kernel, cl::NullRange, global, local, 0, &evt);
-        evt.wait();
-        evt.getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_START, &t1);
-        evt.getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_END, &t2);
-        return t2 - t1;
-    }
 
     const char *readable_status(cl_int status) {
         switch (status) {
@@ -167,6 +123,111 @@ namespace cnn {
             return "CL_UNKNOWN_CODE";
         }
     }
+
+    std::string fileToString(const std::string &fn) {
+        std::string text;
+        std::ifstream fs(fn.c_str());
+        if (!fs) {
+            std::ostringstream os;
+            os << "There is no file called " << fn;
+            throw std::runtime_error(os.str());
+        }
+        text.assign(std::istreambuf_iterator<char>(fs), std::istreambuf_iterator<char>());
+        return text;
+    }
+
+    cl_program buildProgram(const std::string &fileName, const cl_context &context, const cl_device_id &device) {
+        std::string text = fileToString(fileName);
+        const char *source = text.c_str();
+        cl_int err;
+        cl_program program = clCreateProgramWithSource(context, 1, (const char **)&source, NULL, NULL);
+        if (program == NULL) {
+            std::cerr << "Failed to create CL program from source. " << std::endl;
+            exit(-1);
+        }
+        
+        err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
+        if (err != CL_SUCCESS) {
+            char buildLog[16384];
+            clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, sizeof(buildLog), buildLog, NULL);
+            std::cerr << "Error in kernel: " << std::endl;
+            std::cerr << buildLog;
+            clReleaseProgram(program);
+            exit(-1);
+        }
+
+        return program;
+
+    }
+
+    //cl::Program buildProgram(const std::string& file_name, const cl::Context& context, const std::vector<cl::Device>& devices) {
+    //    std::string source_code = fileToString(file_name);
+    //    std::pair<const char *, size_t> source(source_code.c_str(), source_code.size());
+    //    cl::Program::Sources sources;
+    //    sources.push_back(source);
+    //    cl::Program program(context, sources);
+    //    try {
+    //        program.build(devices);
+    //    }
+    //    catch (cl::Error& e) {
+    //        std::string msg;
+    //        program.getBuildInfo<std::string>(devices[0], CL_PROGRAM_BUILD_LOG, &msg);
+    //        std::cerr << "Your kernel failed to compile" << std::endl;
+    //        std::cerr << "-----------------------------" << std::endl;
+    //        std::cerr << msg;
+    //        throw(e);
+    //    }
+
+    //    return program;
+    //}
+
+    cl_ulong runAndTimeKernel(const cl_command_queue &queue,
+        const cl_kernel &kernel,
+        const cl_uint workDim,
+        const size_t *globalSize,
+        const size_t *localSize
+        ) {
+        cl_event event;
+        cl_ulong t1, t2;
+        cl_int err = clEnqueueNDRangeKernel(queue,
+            kernel,
+            workDim,
+            NULL,
+            globalSize,
+            localSize,
+            0,
+            NULL,
+            &event);
+        if (err != CL_SUCCESS) {
+            std::cerr << "Error enqueuing kernel for execution. " << std::endl;
+            std::cerr << readable_status(err);
+            exit(-1);
+        }
+
+        clWaitForEvents(1, &event);
+
+        err = clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &t1, NULL);
+        err = clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &t2, NULL);
+        if (err != CL_SUCCESS) {
+            std::cerr << "Error timing the kernel. " << std::endl;
+            std::cerr << readable_status(err);
+            exit(-1);
+        }
+
+        return t2 - t1;
+    }
+
+    //cl_ulong runAndTimeKernel(const cl::Kernel& kernel, const cl::CommandQueue& queue, const cl::NDRange global, const cl::NDRange& local = cl::NullRange) {
+    //    cl_ulong t1, t2;
+    //    cl::Event evt;
+    //    queue.enqueueNDRangeKernel(kernel, cl::NullRange, global, local, 0, &evt);
+    //    evt.wait();
+    //    evt.getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_START, &t1);
+    //    evt.getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_END, &t2);
+    //    return t2 - t1;
+    //}
+
+   
 
     unsigned int closestMultiple(unsigned int size, unsigned int divisor) {
         unsigned int remainder = size % divisor;

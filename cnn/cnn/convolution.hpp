@@ -62,40 +62,84 @@ namespace cnn {
         // Forward with OpenCL on GPU.
         void forwardGPU(const vec &in) {
 
+            cl_int err;
+
             // Allocate memory on device.
-            cl::Buffer clIn(context, CL_MEM_READ_ONLY, iWidth * iHeight * iDepth * sizeof(cl_float));
-            cl::Buffer clWeight(context, CL_MEM_READ_ONLY, kernelSize * kernelSize * iDepth * oDepth * sizeof(cl_float));
-            cl::Buffer clOffset(context, CL_MEM_READ_ONLY, oDepth * sizeof(cl_float));
-            cl::Buffer clOut(context, CL_MEM_WRITE_ONLY, oWidth * oHeight * oDepth * sizeof(cl_float));
+            cl_mem clIn = clCreateBuffer(
+                context,
+                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                iWidth * iHeight * iDepth * sizeof(cl_float),
+                const_cast<void *>(static_cast<const void *>(&in[0])),
+                &err);
+
+            cl_mem clWeight = clCreateBuffer(
+                context,
+                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                kernelSize * kernelSize * iDepth * oDepth * sizeof(cl_float),
+                const_cast<void *>(static_cast<const void *>(&weight[0])),
+                &err);
+
+            cl_mem clOffset = clCreateBuffer(
+                context,
+                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                oDepth * sizeof(cl_float),
+                const_cast<void *>(static_cast<const void *>(&offset[0])),
+                &err);
+
+            cl_mem clOut = clCreateBuffer(
+                context,
+                CL_MEM_WRITE_ONLY,
+                oDepth * oHeight * oWidth * sizeof(cl_float),
+                NULL,
+                &err);
+
+            if (err != CL_SUCCESS) {
+                std::cerr << "Failed creating the buffer." << std::endl;
+                std::cerr << readable_status(err);
+                exit(-1);
+            }
 
             // Set the arguments for the kernel.
             std::string kernelName = "forwardGPU";
-            cl::Kernel kernel(program, kernelName.c_str());
-            kernel.setArg<cl::Memory>(0, clIn);
-            kernel.setArg<cl::Memory>(1, clWeight);
-            kernel.setArg<cl::Memory>(2, clOffset);
-            kernel.setArg<cl::Memory>(3, clOut);
-            kernel.setArg<int>(4, (int)iWidth);
-            kernel.setArg<int>(5, (int)iHeight);
-            kernel.setArg<int>(6, (int)iDepth);
-            kernel.setArg<int>(7, (int)oWidth);
-            kernel.setArg<int>(8, (int)oHeight);
-            kernel.setArg<int>(9, (int)oDepth);
-            kernel.setArg<int>(10, (int)kernelSize);
-
-            // Copy the data from host to device.
-            queue.enqueueWriteBuffer(clIn, CL_TRUE, 0, iWidth * iHeight * iDepth * sizeof(cl_float), &in[0]);
-            queue.enqueueWriteBuffer(clWeight, CL_TRUE, 0, kernelSize * kernelSize * iDepth * oDepth * sizeof(cl_float), &weight[0]);
-            queue.enqueueWriteBuffer(clOffset, CL_TRUE, 0, oDepth * sizeof(cl_float), &offset[0]);
+            cl_kernel kernel = clCreateKernel(program, kernelName.c_str(), &err);
+            err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clIn);
+            err = clSetKernelArg(kernel, 1, sizeof(cl_mem), &clWeight);
+            err = clSetKernelArg(kernel, 2, sizeof(cl_mem), &clOffset);
+            err = clSetKernelArg(kernel, 3, sizeof(cl_mem), &clOut);
+            err = clSetKernelArg(kernel, 4, sizeof(cl_int), &iWidth);
+            err = clSetKernelArg(kernel, 5, sizeof(cl_int), &iHeight);
+            err = clSetKernelArg(kernel, 6, sizeof(cl_int), &iDepth);
+            err = clSetKernelArg(kernel, 7, sizeof(cl_int), &oWidth);
+            err = clSetKernelArg(kernel, 8, sizeof(cl_int), &oHeight);
+            err = clSetKernelArg(kernel, 9, sizeof(cl_int), &oDepth);
+            err = clSetKernelArg(kernel, 10, sizeof(cl_int), &kernelSize);
 
             // Prepare the NDRange.
             int items = 16;
-            cl::NDRange global(closestMultiple(items, (int)oWidth),
-                closestMultiple(items, (int)(oDepth * oHeight)));
-            cl::NDRange local(items, items);
-            cl_ulong t = runAndTimeKernel(kernel, queue, global, local);
+            size_t global[] = {
+                (size_t)closestMultiple(items, (int)oWidth),
+                (size_t)closestMultiple(items, (int)(oDepth * oHeight))
+            };
+            size_t local[] = {
+                (size_t)items,
+                (size_t)items
+            };
 
-            queue.enqueueReadBuffer(clOut, CL_TRUE, 0, oWidth * oHeight * oDepth * sizeof(cl_float), &output[0]);
+            cl_ulong t = runAndTimeKernel(queue, kernel, 2, global, local);
+            err = clEnqueueReadBuffer(queue,
+                clOut,
+                CL_TRUE,
+                0,
+                oWidth * oHeight * oDepth * sizeof(cl_float),
+                (void *)&output[0],
+                0,
+                NULL,
+                NULL);
+            if (err != CL_SUCCESS) {
+                std::cerr << "Failed reading the output." << std::endl;
+                std::cerr << readable_status(err);
+                exit(-1);
+            }
         }
 
         // Prepare the input buffer.
@@ -133,23 +177,41 @@ namespace cnn {
         vec inputBuffer;
 
         // For OpenCL.
-        cl::Context context;
-        cl::CommandQueue queue;
-        cl::Program program;
+        cl_context context;
+        cl_command_queue queue;
+        cl_program program;
 
         // Initialize the OpenCL.
         void initOpenCL() {
-            std::vector<cl::Platform> platforms;
-            std::vector<cl::Device> devices;
+            cl_platform_id platforms[2];
+            cl_device_id devices[2];
+            cl_int err;
 
-            cl::Platform::get(&platforms);
-            platforms[0].getDevices(CL_DEVICE_TYPE_GPU, &devices);
+            // Choose the first platform.
+            err = clGetPlatformIDs(1, platforms, NULL);
 
-            // Get the first device.
-            context = cl::Context(devices);
-            queue = cl::CommandQueue(context, devices[0], CL_QUEUE_PROFILING_ENABLE);
-            program = buildProgram("convolution.cl", context, devices);
+            // Get the first GPU device.
+            err = clGetDeviceIDs(platforms[0], CL_DEVICE_TYPE_GPU, 1, devices, NULL);
 
+            cl_context_properties properties[] = {
+                CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[0], 0
+            };
+
+            context = clCreateContext(
+                properties,
+                1,
+                devices,
+                NULL,
+                NULL,
+                &err);
+
+            queue = clCreateCommandQueue(
+                context,
+                devices[0],
+                CL_QUEUE_PROFILING_ENABLE,
+                &err);
+
+            program = buildProgram("convolution.cl", context, devices[0]);
         }
     };
 
@@ -157,8 +219,7 @@ namespace cnn {
     ConvolutionLayer createConvolutionLayerFromXML(const std::string &fn) {
         std::string str = fileToString(fn);
         char *text = new char[str.size() + 1];
-        stdext::checked_array_iterator<char *> checked(text, str.size() + 1);
-        std::copy(str.begin(), str.end(), checked);
+        memcpy((void *)text, (void *)(&str[0]), str.size() * sizeof(char));
         text[str.size()] = '\0';
 
         // Parse the xml file.
