@@ -1,3 +1,5 @@
+cnn/cnn/FPGA/
+
 # Object files
 *.o
 *.ko
