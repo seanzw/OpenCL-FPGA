@@ -1,4 +1,5 @@
 cnn/cnn/FPGA/
+cnn/cnn/.Xil/
 
 # Object files
 *.o
