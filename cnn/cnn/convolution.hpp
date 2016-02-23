@@ -11,8 +11,9 @@ namespace cnn {
 
         ConvolutionLayer(size_t iWidth, size_t iHeight, size_t iDepth,
             size_t kernelSize, size_t oDepth,
-            const vec &weight, const vec &offset
-            ) : Layer(iWidth, iHeight, iDepth, iWidth - kernelSize + 1, iHeight - kernelSize + 1, oDepth, weight, offset),
+            const vec &weight, const vec &offset,
+            DeviceType type, const std::string &fn
+            ) : Layer(iWidth, iHeight, iDepth, iWidth - kernelSize + 1, iHeight - kernelSize + 1, oDepth, weight, offset, type),
             kernelSize(kernelSize) {
 
             // Resize the output buffer.
@@ -22,12 +23,26 @@ namespace cnn {
             inputBuffer.resize(kernelSize * kernelSize);
 
             // Initialize OpenCL.
-            initOpenCL();
+            if (type != CPU) {
+                initOpenCL(fn);
+            }
         }
 
         // Forward.
         virtual void forward(const vec &in) {
-            forwardCPU(in);
+            switch (type) {
+            case cnn::CPU:
+                forwardCPU(in);
+                break;
+            case cnn::GPU:
+                forwardGPU(in);
+                break;
+            case cnn::FPGA:
+                forwardGPU(in);
+                break;
+            default:
+                break;
+            }
         }
 
         // Forward with CPU.
@@ -140,6 +155,13 @@ namespace cnn {
                 std::cerr << readable_status(err);
                 exit(-1);
             }
+
+            // Clean up.
+            clReleaseMemObject(clIn);
+            clReleaseMemObject(clWeight);
+            clReleaseMemObject(clOffset);
+            clReleaseMemObject(clOut);
+            clReleaseKernel(kernel);
         }
 
         // Prepare the input buffer.
@@ -182,7 +204,7 @@ namespace cnn {
         cl_program program;
 
         // Initialize the OpenCL.
-        void initOpenCL() {
+        void initOpenCL(const std::string &fn) {
             cl_platform_id platforms[2];
             cl_device_id devices[2];
             cl_int err;
@@ -190,8 +212,12 @@ namespace cnn {
             // Choose the first platform.
             err = clGetPlatformIDs(1, platforms, NULL);
 
-            // Get the first GPU device.
-            err = clGetDeviceIDs(platforms[0], CL_DEVICE_TYPE_GPU, 1, devices, NULL);
+            // Switch between FPGA device and GPU device.
+            err = clGetDeviceIDs(platforms[0],
+                type == FPGA ? CL_DEVICE_TYPE_ACCELERATOR : CL_DEVICE_TYPE_GPU,
+                1,
+                devices,
+                NULL);
 
             cl_context_properties properties[] = {
                 CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[0], 0
@@ -211,12 +237,17 @@ namespace cnn {
                 CL_QUEUE_PROFILING_ENABLE,
                 &err);
 
-            program = buildProgram("convolution.cl", context, devices[0]);
+            if (type == FPGA) {
+                program = buildProgramFromBinary(fn.c_str(), context, devices[0]);
+            }
+            else {
+                program = buildProgramFromSource(fn.c_str(), context, devices[0]);
+            }
         }
     };
 
     // Helper function to create a convolution layer from xml file.
-    ConvolutionLayer createConvolutionLayerFromXML(const std::string &fn) {
+    ConvolutionLayer createConvolutionLayerFromXML(const std::string &fn, DeviceType type, const std::string &clFile) {
         std::string str = fileToString(fn);
         char *text = new char[str.size() + 1];
         memcpy((void *)text, (void *)(&str[0]), str.size() * sizeof(char));
@@ -254,7 +285,7 @@ namespace cnn {
 
         delete[] text;
 
-        cnn::ConvolutionLayer layer(iWidth, iHeight, iDepth, kernelSize, oDepth, weight, offset);
+        cnn::ConvolutionLayer layer(iWidth, iHeight, iDepth, kernelSize, oDepth, weight, offset, type, clFile);
         return layer;
     }
 }

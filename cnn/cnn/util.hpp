@@ -136,7 +136,7 @@ namespace cnn {
         return text;
     }
 
-    cl_program buildProgram(const std::string &fileName, const cl_context &context, const cl_device_id &device) {
+    cl_program buildProgramFromSource(const std::string &fileName, const cl_context &context, const cl_device_id &device) {
         std::string text = fileToString(fileName);
         const char *source = text.c_str();
         cl_int err;
@@ -157,29 +157,37 @@ namespace cnn {
         }
 
         return program;
-
     }
 
-    //cl::Program buildProgram(const std::string& file_name, const cl::Context& context, const std::vector<cl::Device>& devices) {
-    //    std::string source_code = fileToString(file_name);
-    //    std::pair<const char *, size_t> source(source_code.c_str(), source_code.size());
-    //    cl::Program::Sources sources;
-    //    sources.push_back(source);
-    //    cl::Program program(context, sources);
-    //    try {
-    //        program.build(devices);
-    //    }
-    //    catch (cl::Error& e) {
-    //        std::string msg;
-    //        program.getBuildInfo<std::string>(devices[0], CL_PROGRAM_BUILD_LOG, &msg);
-    //        std::cerr << "Your kernel failed to compile" << std::endl;
-    //        std::cerr << "-----------------------------" << std::endl;
-    //        std::cerr << msg;
-    //        throw(e);
-    //    }
+    cl_program buildProgramFromBinary(const std::string &fileName, const cl_context &context, const cl_device_id &device) {
+        std::string text = fileToString(fileName);
+        size_t len = text.size();
+        const char *source = text.c_str();
+        cl_int err;
+        cl_program program = clCreateProgramWithBinary(context,
+            1,
+            &device,
+            &len,
+            (const unsigned char **)&source,
+            NULL,
+            &err);
+        if (program == NULL || err != CL_SUCCESS) {
+            std::cerr << "Failed to create CL program from source. " << std::endl;
+            exit(-1);
+        }
 
-    //    return program;
-    //}
+        err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
+        if (err != CL_SUCCESS) {
+            char buildLog[16384];
+            clGetProgramBuildInfo(program, device, CL_PROGRAM_BUILD_LOG, sizeof(buildLog), buildLog, NULL);
+            std::cerr << "Error in kernel: " << std::endl;
+            std::cerr << buildLog;
+            clReleaseProgram(program);
+            exit(-1);
+        }
+
+        return program;
+    }
 
     cl_ulong runAndTimeKernel(const cl_command_queue &queue,
         const cl_kernel &kernel,
@@ -216,16 +224,6 @@ namespace cnn {
 
         return t2 - t1;
     }
-
-    //cl_ulong runAndTimeKernel(const cl::Kernel& kernel, const cl::CommandQueue& queue, const cl::NDRange global, const cl::NDRange& local = cl::NullRange) {
-    //    cl_ulong t1, t2;
-    //    cl::Event evt;
-    //    queue.enqueueNDRangeKernel(kernel, cl::NullRange, global, local, 0, &evt);
-    //    evt.wait();
-    //    evt.getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_START, &t1);
-    //    evt.getProfilingInfo<cl_ulong>(CL_PROFILING_COMMAND_END, &t2);
-    //    return t2 - t1;
-    //}
 
    
 

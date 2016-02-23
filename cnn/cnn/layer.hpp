@@ -4,15 +4,34 @@
 #include "util.hpp"
 
 namespace cnn {
+
+    enum DeviceType {
+        CPU,
+        GPU,
+        FPGA
+    };
+
     class Layer {
     public:
 
-        Layer(size_t iWidth, size_t iHeight, size_t iDepth,
-            size_t oWidth, size_t oHeight, size_t oDepth,
-            const vec &weight, const vec &offset
-            ) : iWidth(iWidth), iHeight(iHeight), iDepth(iDepth),
-            oWidth(oWidth), oHeight(oHeight), oDepth(oDepth),
-            weight(weight), offset(offset) {}
+        Layer(size_t iWidth,
+            size_t iHeight,
+            size_t iDepth,
+            size_t oWidth,
+            size_t oHeight,
+            size_t oDepth,
+            const vec &weight,
+            const vec &offset,
+            DeviceType type
+            ) : iWidth(iWidth),
+            iHeight(iHeight),
+            iDepth(iDepth),
+            oWidth(oWidth),
+            oHeight(oHeight),
+            oDepth(oDepth),
+            weight(weight),
+            offset(offset),
+            type(type) {}
 
         virtual void forward(const vec &in) = 0;
 
@@ -39,7 +58,8 @@ namespace cnn {
         // Pointer to next layer.
         Layer *next;
 
-
+        // Device type.
+        const DeviceType type;
     };
 }
 
