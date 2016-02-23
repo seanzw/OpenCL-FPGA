@@ -254,7 +254,7 @@ namespace cnn {
     void getAllItem(rapidxml::xml_node<> *root, vec &items) {
         std::string name = root->name();
         if (name == "item") {
-            items.push_back(std::atof(root->value()));
+            items.push_back((float)std::atof(root->value()));
         }
         else {
             for (rapidxml::xml_node<> *node = root->first_node(); node; node = node->next_sibling()) {

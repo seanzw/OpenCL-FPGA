@@ -3,13 +3,14 @@
 
 int main(int argc, char *argv[]) {
 
-    if (argc != 3) {
+    if (argc != 4) {
         std::cout << "Usage: cnn <type> <clFileName>" << std::endl;
         exit(-1);
     }
 
     cnn::DeviceType type;
     std::string clFileName(argv[2]);
+    std::string layerXML(argv[3]);
     if (argv[1] == "fpga") {
         type = cnn::FPGA;
     }
@@ -20,7 +21,7 @@ int main(int argc, char *argv[]) {
         type = cnn::CPU;
     }
 
-    cnn::ConvolutionLayer layer = cnn::createConvolutionLayerFromXML("convolutional1.xml", type, clFileName);
+    cnn::ConvolutionLayer layer = cnn::createConvolutionLayerFromXML(layerXML, type, clFileName);
     cnn::vec input(layer.iWidth * layer.iHeight * layer.iDepth);
     for (int i = 0; i < input.size(); ++i) {
         input[i] = (float)i;

@@ -275,7 +275,7 @@ namespace cnn {
         // Create the offset vector.
         cnn::vec offset;
         for (rapidxml::xml_node<> *node = root->first_node("offset")->first_node(); node; node = node->next_sibling()) {
-            offset.push_back(std::atof(node->value()));
+            offset.push_back((float)std::atof(node->value()));
         }
         assert(offset.size() == oDepth);
 
