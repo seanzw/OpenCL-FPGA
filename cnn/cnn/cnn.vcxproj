@@ -154,6 +154,7 @@
     <ClInclude Include="cnn.hpp" />
     <ClInclude Include="convolution.hpp" />
     <ClInclude Include="layer.hpp" />
+    <ClInclude Include="test.hpp" />
     <ClInclude Include="util.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -161,6 +162,7 @@
   </ItemGroup>
   <ItemGroup>
     <Xml Include="convolutional1.xml" />
+    <Xml Include="result.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="alpha.tcl" />

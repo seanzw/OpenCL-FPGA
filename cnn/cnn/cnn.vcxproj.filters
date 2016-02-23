@@ -27,6 +27,9 @@
     <ClInclude Include="convolution.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="test.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -35,6 +38,9 @@
   </ItemGroup>
   <ItemGroup>
     <Xml Include="convolutional1.xml">
+      <Filter>Resource Files</Filter>
+    </Xml>
+    <Xml Include="result.xml">
       <Filter>Resource Files</Filter>
     </Xml>
   </ItemGroup>

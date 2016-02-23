@@ -34,7 +34,7 @@ namespace cnn {
             offset(offset),
             type(type) {}
 
-        virtual void forward(const vec &in) = 0;
+        virtual unsigned long long forward(const vec &in) = 0;
 
         size_t iWidth;
         size_t iHeight;

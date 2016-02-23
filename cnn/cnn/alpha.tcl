@@ -38,4 +38,4 @@ compile_emulation -flow cpu -opencl_binary [get_opencl_binary alpha]
 report_estimate
 
 # Run the design in CPU emulation mode
-run_emulation -flow cpu -args "fpga alpha.xclbin ../../../../../convolutional1.xml"
+run_emulation -flow cpu -args "fpga alpha.xclbin ../../../../../convolutional1.xml result.xml"

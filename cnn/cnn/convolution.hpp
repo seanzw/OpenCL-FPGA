@@ -30,25 +30,28 @@ namespace cnn {
         }
 
         // Forward.
-        virtual void forward(const vec &in) {
+        virtual unsigned long long forward(const vec &in) {
             switch (type) {
             case cnn::CPU:
-                forwardCPU(in);
+                return forwardCPU(in);
                 break;
             case cnn::GPU:
-                forwardGPU(in);
+                return forwardGPU(in);
                 break;
             case cnn::FPGA:
-                forwardGPU(in);
+                return forwardGPU(in);
                 break;
             default:
+                return forwardCPU(in);
                 break;
             }
         }
 
         // Forward with CPU.
-        void forwardCPU(const vec &in) {
+        unsigned long long forwardCPU(const vec &in) {
 
+            clock_t start = clock(), diff;
+            
             // Clear the output buffer.
             std::fill(output.begin(), output.end(), 0.0f);
 
@@ -73,10 +76,15 @@ namespace cnn {
                     }
                 }
             }
+
+            diff = clock() - start;
+            int msec = diff * 1000 / CLOCKS_PER_SEC;
+
+            return (unsigned long long)msec;
         }
 
         // Forward with OpenCL on GPU.
-        void forwardGPU(const vec &in) {
+        unsigned long long forwardGPU(const vec &in) {
 
             cl_int err;
 
@@ -163,6 +171,8 @@ namespace cnn {
             clReleaseMemObject(clOffset);
             clReleaseMemObject(clOut);
             clReleaseKernel(kernel);
+
+            return t;
         }
 
         // Prepare the input buffer.

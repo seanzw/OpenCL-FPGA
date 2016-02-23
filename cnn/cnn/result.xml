@@ -1,0 +1,8 @@
+<result>
+    <iWidth>4</iWidth>
+    <iHeight>3</iHeight>
+    <iDepth>2</iDepth>
+    <kernelSize>3</kernelSize>
+    <oDepth>3</oDepth>
+    <averageTime>32956</averageTime>
+</result>

@@ -9,6 +9,7 @@
 
 #define __CL_ENABLE_EXCEPTIONS
 #include <CL/cl.h>
+#include <ctime>
 #include "include/RapidXML/rapidxml.hpp"
 
 namespace cnn {
@@ -268,6 +269,29 @@ namespace cnn {
         int remainder = n % base;
         return remainder == 0 ? n : n - remainder + base;
     }
+
+    void writeXMLOpenTag(std::ofstream &o, const std::string &tag) {
+        o << "<" << tag << ">";
+    }
+
+    void writeXMLCloseTag(std::ofstream &o, const std::string &tag) {
+        o << "</" << tag << ">";
+    }
+
+    void writeXMLTag(std::ofstream &o, const std::string &tag, float value) {
+        writeXMLOpenTag(o, tag);
+        o << value;
+        writeXMLCloseTag(o, tag);
+        o << std::endl;
+    }
+
+    void writeXMLTag(std::ofstream &o, const std::string &tag, size_t value) {
+        writeXMLOpenTag(o, tag);
+        o << value;
+        writeXMLCloseTag(o, tag);
+        o << std::endl;
+    }
+
 }
 
 
