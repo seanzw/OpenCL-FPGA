@@ -4,6 +4,7 @@
 #include "layer.hpp"
 
 #include <string>
+#include <cstring>
 
 namespace cnn {
     class ConvolutionLayer : public Layer {
@@ -259,11 +260,6 @@ namespace cnn {
 
         rapidxml::xml_node<> *root = doc.first_node("ConvolutionalLayer");
 
-        auto getInt = [](rapidxml::xml_node<> *root, const char *name) -> int {
-            rapidxml::xml_node<> *node = root->first_node(name);
-            return std::stoi(node->value());
-        };
-
         // Get the parameters for the convolutional layer.
         int iWidth = getInt(root, "iWidth");
         int iHeight = getInt(root, "iHeight");
@@ -279,7 +275,7 @@ namespace cnn {
         // Create the offset vector.
         cnn::vec offset;
         for (rapidxml::xml_node<> *node = root->first_node("offset")->first_node(); node; node = node->next_sibling()) {
-            offset.push_back(std::stof(node->value()));
+            offset.push_back(std::atof(node->value()));
         }
         assert(offset.size() == oDepth);
 

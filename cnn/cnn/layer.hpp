@@ -2,6 +2,7 @@
 #define LAYER_HEADER
 
 #include "util.hpp"
+#include <cmath>
 
 namespace cnn {
 
@@ -45,7 +46,7 @@ namespace cnn {
 
         // Sigmod function.
         float sigmod(float i) {
-            return 1.0f / (1.0f + std::expf(-i));
+            return 1.0f / (1.0f + expf(-i));
         }
 
         // Weight and offset.

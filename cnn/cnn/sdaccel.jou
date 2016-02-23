@@ -2,8 +2,8 @@
 # sdaccel v2015.3 (64-bit)
 # SW Build 1401868 on Wed Nov  4 16:34:39 MST 2015
 # 
-# Start of session at: Mon Feb 22 23:33:29 2016
-# Process ID: 13515
+# Start of session at: Tue Feb 23 18:23:53 2016
+# Process ID: 22178
 # Current directory: /opt/Xilinx/SDAccel/2015.3/workspace/OpenCL-FPGA/cnn/cnn
 # Command line: sdaccel -source alpha.tcl -mode batch -notrace
 # Log file: /opt/Xilinx/SDAccel/2015.3/workspace/OpenCL-FPGA/cnn/cnn/sdaccel.log

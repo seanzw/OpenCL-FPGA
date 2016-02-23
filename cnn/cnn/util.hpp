@@ -8,7 +8,7 @@
 #include <vector>
 
 #define __CL_ENABLE_EXCEPTIONS
-#include <CL\cl.h>
+#include <CL/cl.h>
 #include "include/RapidXML/rapidxml.hpp"
 
 namespace cnn {
@@ -130,7 +130,7 @@ namespace cnn {
         if (!fs) {
             std::ostringstream os;
             os << "There is no file called " << fn;
-            throw std::runtime_error(os.str());
+            exit(-1);
         }
         text.assign(std::istreambuf_iterator<char>(fs), std::istreambuf_iterator<char>());
         return text;
@@ -246,10 +246,15 @@ namespace cnn {
     typedef std::vector<float> vec;
     typedef std::vector<vec> vec2d;
 
+    int getInt(rapidxml::xml_node<> *root, const char *name) {
+        rapidxml::xml_node<> *node = root->first_node(name);
+        return std::atoi(node->value());
+    }
+
     void getAllItem(rapidxml::xml_node<> *root, vec &items) {
         std::string name = root->name();
         if (name == "item") {
-            items.push_back(std::stof(root->value()));
+            items.push_back(std::atof(root->value()));
         }
         else {
             for (rapidxml::xml_node<> *node = root->first_node(); node; node = node->next_sibling()) {
