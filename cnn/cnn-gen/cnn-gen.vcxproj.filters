@@ -15,44 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="cnn.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="util.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="layer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="convolution.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="test.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="convolutional1.xml">
-      <Filter>Resource Files</Filter>
-    </Xml>
-    <Xml Include="result.xml">
-      <Filter>Resource Files</Filter>
-    </Xml>
-    <Xml Include="convolutional2.xml">
-      <Filter>Resource Files</Filter>
-    </Xml>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="convolution.cl">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="alpha.tcl">
-      <Filter>Resource Files</Filter>
-    </None>
+    <ClInclude Include="util.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

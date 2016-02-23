@@ -32,6 +32,7 @@ namespace test {
             exit(-1);
         }
 
+        o << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << std::endl;
         writeXMLOpenTag(o, "result");
         writeXMLTag(o, "iWidth", layer.iWidth);
         writeXMLTag(o, "iHeight", layer.iHeight);
