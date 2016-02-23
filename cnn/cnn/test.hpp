@@ -26,7 +26,7 @@ namespace test {
         std::cout << "Average Time: " << totalTime / NUM_TEST << std::endl;
         std::cout << "Finish testing!" << std::endl;
 
-        std::ofstream o(outFile);
+        std::ofstream o(outFile.c_str());
         if (!o.is_open()) {
             std::cerr << "Can't open file " << outFile << std::endl;
             exit(-1);
@@ -39,7 +39,7 @@ namespace test {
         writeXMLTag(o, "iDepth", layer.iDepth);
         writeXMLTag(o, "kernelSize", layer.kernelSize);
         writeXMLTag(o, "oDepth", layer.oDepth);
-        writeXMLTag(o, "averageTime", totalTime / NUM_TEST);
+        writeXMLTag(o, "averageTime", (float)totalTime / (float)NUM_TEST);
         writeXMLCloseTag(o, "result");
 
         o.close();

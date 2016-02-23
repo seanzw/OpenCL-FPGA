@@ -22,6 +22,9 @@ set_property file_type "c header files" [get_files "layer.hpp"]
 add_files "util.hpp"
 set_property file_type "c header files" [get_files "util.hpp"]
 
+add_files "test.hpp"
+set_property file_type "c header files" [get_files "test.hpp"]
+
 # Create the kernel.
 create_kernel forwardGPU -type clc
 add_files -kernel [get_kernels forwardGPU] "convolution.cl"
@@ -38,4 +41,10 @@ compile_emulation -flow cpu -opencl_binary [get_opencl_binary alpha]
 report_estimate
 
 # Run the design in CPU emulation mode
-run_emulation -flow cpu -args "fpga alpha.xclbin ../../../../../convolutional1.xml result.xml"
+run_emulation -flow cpu -args "fpga alpha.xclbin ../../../../../convolutional2.xml result.xml"
+
+build_system
+
+package_system
+
+run_system -args "fpga alpha.xclbin ../../../../../convolutional2.xml result.xml"
