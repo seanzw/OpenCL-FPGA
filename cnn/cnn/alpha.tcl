@@ -47,4 +47,4 @@ build_system
 
 package_system
 
-run_system -args "fpga alpha.xclbin ../../../../../convolutional2.xml result.xml"
+run_system -args "fpga alpha.xclbin ../../../../convolutional2.xml result.xml"
