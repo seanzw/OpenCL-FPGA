@@ -32,16 +32,25 @@ __kernel void convolution_kernel_opt_1(
 
         float sum = 0.0f;
 
+        float inputBuf[KERNEL_LEN];
+        float weightBuf[KERNEL_LEN];
+
         // For each input feature map.            
         for (int i = 0; i < IDEPTH; ++i) {
             
             // Prepare the input buffer and weight buffer.
             // Copy them into the private memory.
-            float inputBuf[KERNEL_LEN];
-            float weightBuf[KERNEL_LEN];
+
             int idx = 0;
             int weightBase = (o * IDEPTH + i) * KERNEL_LEN;
+
+            #ifdef __xilinx__
+            __attribute__((opencl_unroll_hint))
+            #endif
             for (int x = 0; x < KERNEL_SIZE; ++x) {
+                #ifdef __xilinx__
+                __attribute__((opencl_unroll_hint))
+                #endif
                 for (int y = 0; y < KERNEL_SIZE; ++y) {
                     inputBuf[idx] = in[(i * IHEIGHT + r + x) * IWIDTH + c + y];
                     weightBuf[idx] = weight[weightBase + idx];
@@ -50,6 +59,9 @@ __kernel void convolution_kernel_opt_1(
             }
 
             // Compute the convolution.
+            #ifdef __xilinx__
+            __attribute__((opencl_unroll_hint))
+            #endif
             for (int x = 0; x < KERNEL_LEN; ++x) {
                 sum += inputBuf[x] * weightBuf[x];
             }

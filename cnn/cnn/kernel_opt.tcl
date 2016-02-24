@@ -36,7 +36,7 @@ add_files -kernel [get_kernels convolution_kernel_opt_2] "convolution_kernel_opt
 create_opencl_binary alpha
 set_property region "OCL_REGION_0" [get_opencl_binary alpha]
 create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels convolution_kernel_opt_1] -name ZW
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels convolution_kernel_opt_2] -name ZW
+create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels convolution_kernel_opt_2] -name ZW2
 
 # Compile the design for CPU based emulation.
 compile_emulation -flow cpu -opencl_binary [get_opencl_binary alpha]
