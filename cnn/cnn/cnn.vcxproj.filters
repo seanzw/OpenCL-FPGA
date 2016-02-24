@@ -37,13 +37,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="convolutional1.xml">
-      <Filter>Resource Files</Filter>
-    </Xml>
     <Xml Include="result.xml">
       <Filter>Resource Files</Filter>
     </Xml>
-    <Xml Include="convolutional2.xml">
+    <Xml Include="convolution.xml">
       <Filter>Resource Files</Filter>
     </Xml>
   </ItemGroup>

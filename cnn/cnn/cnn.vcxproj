@@ -161,8 +161,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="convolutional1.xml" />
-    <Xml Include="convolutional2.xml" />
+    <Xml Include="convolution.xml" />
     <Xml Include="result.xml" />
   </ItemGroup>
   <ItemGroup>

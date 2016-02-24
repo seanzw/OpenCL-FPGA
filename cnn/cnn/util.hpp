@@ -252,6 +252,24 @@ namespace cnn {
         return std::atoi(node->value());
     }
 
+    std::string getString(rapidxml::xml_node<> *root, const char *name) {
+        rapidxml::xml_node<> *node = root->first_node(name);
+        return std::string(node->value());
+    }
+
+    void getAllItem(rapidxml::xml_node<> *root, std::vector<std::string> &items) {
+        std::string name = root->name();
+        if (name == "item") {
+            items.push_back(root->value());
+        }
+        else {
+            for (rapidxml::xml_node<> *node = root->first_node(); node; node = node->next_sibling()) {
+                getAllItem(node, items);
+            }
+        }
+        return;
+    }
+
     void getAllItem(rapidxml::xml_node<> *root, vec &items) {
         std::string name = root->name();
         if (name == "item") {

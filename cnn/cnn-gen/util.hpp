@@ -93,6 +93,13 @@ namespace cnn {
         o << std::endl;
     }
 
+    void writeXMLTag(std::ofstream &o, const std::string &tag, const std::string &value) {
+        writeXMLOpenTag(o, tag);
+        o << value;
+        writeXMLCloseTag(o, tag);
+        o << std::endl;
+    }
+
 }
 
 

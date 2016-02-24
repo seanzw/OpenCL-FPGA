@@ -5,7 +5,7 @@
 int main(int argc, char *argv[]) {
 
     if (argc != 5) {
-        std::cout << "Usage: cnn <type> <clFile> <xmlFile>" << std::endl;
+        std::cout << "Usage: cnn <type> <clBinaryFile> <xmlList> <testFile>" << std::endl;
         exit(-1);
     }
 

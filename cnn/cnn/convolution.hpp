@@ -13,9 +13,10 @@ namespace cnn {
         ConvolutionLayer(size_t iWidth, size_t iHeight, size_t iDepth,
             size_t kernelSize, size_t oDepth,
             const vec &weight, const vec &offset,
-            DeviceType type, const std::string &fn
+            DeviceType type, const std::string &fn,
+            const std::string kernelName
             ) : Layer(iWidth, iHeight, iDepth, iWidth - kernelSize + 1, iHeight - kernelSize + 1, oDepth, weight, offset, type),
-            kernelSize(kernelSize) {
+            kernelSize(kernelSize), kernelName(kernelName) {
 
             // Resize the output buffer.
             output.resize(oDepth * oWidth * oHeight);
@@ -124,7 +125,6 @@ namespace cnn {
             }
 
             // Set the arguments for the kernel.
-            std::string kernelName = "forwardGPU";
             cl_kernel kernel = clCreateKernel(program, kernelName.c_str(), &err);
             err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clIn);
             err = clSetKernelArg(kernel, 1, sizeof(cl_mem), &clWeight);
@@ -214,6 +214,8 @@ namespace cnn {
         cl_command_queue queue;
         cl_program program;
 
+        const std::string kernelName;
+
         // Initialize the OpenCL.
         void initOpenCL(const std::string &fn) {
             cl_platform_id platforms[2];
@@ -258,17 +260,7 @@ namespace cnn {
     };
 
     // Helper function to create a convolution layer from xml file.
-    ConvolutionLayer createConvolutionLayerFromXML(const std::string &fn, DeviceType type, const std::string &clFile) {
-        std::string str = fileToString(fn);
-        char *text = new char[str.size() + 1];
-        memcpy((void *)text, (void *)(&str[0]), str.size() * sizeof(char));
-        text[str.size()] = '\0';
-
-        // Parse the xml file.
-        rapidxml::xml_document<> doc;
-        doc.parse<0>(text);
-
-        rapidxml::xml_node<> *root = doc.first_node("ConvolutionalLayer");
+    ConvolutionLayer createConvolutionLayerFromXML(rapidxml::xml_node<> *root, DeviceType type, const std::string &clFile) {
 
         // Get the parameters for the convolutional layer.
         int iWidth = getInt(root, "iWidth");
@@ -276,6 +268,9 @@ namespace cnn {
         int iDepth = getInt(root, "iDepth");
         int kernelSize = getInt(root, "kernelSize");
         int oDepth = getInt(root, "oDepth");
+
+        // Get the kernel name.
+        std::string kernelName = getString(root, "kernelName");
 
         // Create the weight vector.
         cnn::vec weight;
@@ -289,9 +284,17 @@ namespace cnn {
         }
         assert(offset.size() == oDepth);
 
-        delete[] text;
-
-        cnn::ConvolutionLayer layer(iWidth, iHeight, iDepth, kernelSize, oDepth, weight, offset, type, clFile);
+        cnn::ConvolutionLayer layer(iWidth,
+            iHeight,
+            iDepth,
+            kernelSize,
+            oDepth,
+            weight,
+            offset,
+            type,
+            type == FPGA ? clFile : kernelName + ".cl",
+            kernelName
+            );
         return layer;
     }
 }

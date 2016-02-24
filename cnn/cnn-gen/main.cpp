@@ -4,22 +4,19 @@
 using namespace cnn;
 
 void genConvolutionLayer(
+    std::ofstream &o,
+    const std::string &name,
+    const std::string &kernelName,
     size_t iWidth,
     size_t iHeight,
     size_t iDepth,
     size_t oDepth,
-    size_t kernelSize,
-    const std::string &xmlFile
+    size_t kernelSize
     ) {
 
-    std::ofstream o(xmlFile);
-    if (!o.is_open()) {
-        std::cerr << "Can't open file " << xmlFile << std::endl;
-        exit(-1);
-    }
-
-    o << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << std::endl;
     writeXMLOpenTag(o, "ConvolutionalLayer");
+    writeXMLTag(o, "name", name);
+    writeXMLTag(o, "kernelName", kernelName);
     writeXMLTag(o, "iWidth", iWidth);
     writeXMLTag(o, "iHeight", iHeight);
     writeXMLTag(o, "iDepth", iDepth);
@@ -54,13 +51,34 @@ void genConvolutionLayer(
     writeXMLCloseTag(o, "offset");
 
     writeXMLCloseTag(o, "ConvolutionalLayer");
-    o.close();
 }
 
 
 int main(int argc, char *argv[]) {
 
-    genConvolutionLayer(14, 14, 6, 16, 5, "../cnn/convolutional2.xml");
+    std::string base = "../cnn/";
+    std::string names[] = {
+        "convolution1",
+        "convolution2"
+    };
+
+    std::string kernelNames[] = {
+        "convolution",
+        "convolution"
+    };
+
+    std::ofstream o(base + "convolution.xml");
+    if (!o.is_open()) {
+        std::cerr << "Can't open file " << base + "convolution.xml" << std::endl;
+        exit(-1);
+    }
+
+    o << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << std::endl;
+    writeXMLOpenTag(o, "layers");
+    genConvolutionLayer(o, names[0], kernelNames[0], 32, 32, 1, 6, 5);
+    genConvolutionLayer(o, names[1], kernelNames[1], 14, 14, 6, 16, 5);
+    writeXMLCloseTag(o, "layers");
+    o.close();
 
     return 0;
 }
