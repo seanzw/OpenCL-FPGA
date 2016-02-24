@@ -2,7 +2,7 @@
 <layers>
     <ConvolutionalLayer>
         <name>convolution1</name>
-        <kernelName>convolution</kernelName>
+        <kernelName>convolution_kernel_opt</kernelName>
         <iWidth>32</iWidth>
         <iHeight>32</iHeight>
         <iDepth>1</iDepth>
@@ -255,7 +255,7 @@
     </ConvolutionalLayer>
     <ConvolutionalLayer>
         <name>convolution2</name>
-        <kernelName>convolution</kernelName>
+        <kernelName>convolution_kernel_opt</kernelName>
         <iWidth>14</iWidth>
         <iHeight>14</iHeight>
         <iDepth>6</iDepth>

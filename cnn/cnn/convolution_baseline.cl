@@ -4,7 +4,7 @@ float sigmod(float in) {
     return 1.0f / (1.0f + exp(-in));
 }
 
-__kernel void convolution(
+__kernel void convolution_baseline(
     __global float *in,
     __global float *weight,
     __global float *offset,

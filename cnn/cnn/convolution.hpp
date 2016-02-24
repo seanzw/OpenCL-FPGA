@@ -30,6 +30,12 @@ namespace cnn {
             }
         }
 
+        //virtual ~ConvolutionLayer() {
+        //    clReleaseCommandQueue(queue);
+        //    clReleaseProgram(program);
+        //    clReleaseContext(context);
+        //}
+
         // Forward.
         virtual unsigned long long forward(const vec &in) {
             switch (type) {

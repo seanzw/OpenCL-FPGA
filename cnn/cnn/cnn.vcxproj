@@ -161,12 +161,15 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="convolution.xml" />
-    <Xml Include="result.xml" />
+    <Xml Include="convolution.xml">
+      <SubType>Designer</SubType>
+    </Xml>
+    <Xml Include="result_gpu_baseline.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="alpha.tcl" />
-    <None Include="convolution.cl" />
+    <None Include="convolution_baseline.cl" />
+    <None Include="convolution_kernel_opt.cl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

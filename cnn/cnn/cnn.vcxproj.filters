@@ -37,18 +37,21 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="result.xml">
+    <Xml Include="convolution.xml">
       <Filter>Resource Files</Filter>
     </Xml>
-    <Xml Include="convolution.xml">
+    <Xml Include="result_gpu_baseline.xml">
       <Filter>Resource Files</Filter>
     </Xml>
   </ItemGroup>
   <ItemGroup>
-    <None Include="convolution.cl">
+    <None Include="alpha.tcl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="alpha.tcl">
+    <None Include="convolution_kernel_opt.cl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="convolution_baseline.cl">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

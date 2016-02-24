@@ -1,7 +1,7 @@
 # SDAccel command script.
 
 # Define a solution name.
-create_solution -name alpha -dir FPGA -force
+create_solution -name kernel_opt -dir FPGA -force
 
 # Define the target platform of the application
 add_device -vbnv xilinx:adm-pcie-7v3:1ddr:2.0
@@ -26,13 +26,13 @@ add_files "test.hpp"
 set_property file_type "c header files" [get_files "test.hpp"]
 
 # Create the kernel.
-create_kernel convolution_baseline -type clc
-add_files -kernel [get_kernels convolution_baseline] "convolution_baseline.cl"
+create_kernel convolution_kernel_opt -type clc
+add_files -kernel [get_kernels convolution_kernel_opt] "convolution_kernel_opt.cl"
 
 # Define binary containers.
 create_opencl_binary alpha
 set_property region "OCL_REGION_0" [get_opencl_binary alpha]
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels forwardGPU] -name ZW
+create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels convolution_kernel_opt] -name ZW
 
 # Compile the design for CPU based emulation.
 compile_emulation -flow cpu -opencl_binary [get_opencl_binary alpha]
