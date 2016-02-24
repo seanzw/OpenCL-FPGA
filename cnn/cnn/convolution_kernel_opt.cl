@@ -5,7 +5,7 @@ float sigmod(float in) {
 }
 
 #ifdef __xilinx__
-__attribute__ ((reqd_work_group_size(4, 4))
+__attribute__ ((reqd_work_group_size(16, 16, 1)))
 #endif
 __kernel void convolution_kernel_opt(
     __global float *in,

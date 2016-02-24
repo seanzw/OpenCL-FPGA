@@ -148,14 +148,16 @@ namespace cnn {
             int items = 16;
             size_t global[] = {
                 (size_t)closestMultiple(items, (int)oWidth),
-                (size_t)closestMultiple(items, (int)(oDepth * oHeight))
+                (size_t)closestMultiple(items, (int)(oDepth * oHeight)),
+                (size_t)1
             };
             size_t local[] = {
                 (size_t)items,
-                (size_t)items
+                (size_t)items,
+                (size_t)1
             };
 
-            cl_ulong t = runAndTimeKernel(queue, kernel, 2, global, local);
+            cl_ulong t = runAndTimeKernel(queue, kernel, 3, global, local);
             err = clEnqueueReadBuffer(queue,
                 clOut,
                 CL_TRUE,
