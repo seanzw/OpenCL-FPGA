@@ -1,4 +1,11 @@
-#define MAX_KERNEL_LENGTH 25
+#define KERNEL_SIZE 5
+#define KERNEL_LEN 25
+#define IWIDTH 32
+#define IHEIGHT 32
+#define IDEPTH 1
+#define OWIDTH 28
+#define OHEIGHT 28
+#define ODEPTH 6
 
 float sigmod(float in) {
     return 1.0f / (1.0f + exp(-in));
@@ -7,57 +14,49 @@ float sigmod(float in) {
 #ifdef __xilinx__
 __attribute__ ((reqd_work_group_size(16, 16, 1)))
 #endif
-__kernel void convolution_kernel_opt(
+__kernel void convolution_kernel_opt_1(
     __global float *in,
     __global float *weight,
     __global float *offset,
-    __global float *out,
-    int iWidth,
-    int iHeight,
-    int iDepth,
-    int oWidth,
-    int oHeight,
-    int oDepth,
-    int kernelSize
+    __global float *out
     ) {
     
     int c = get_global_id(0);
     int r = get_global_id(1);
     
-    if (c < oWidth && r < oDepth * oHeight) {
+    if (c < OWIDTH && r < ODEPTH * OHEIGHT) {
 
         // Get the index of the element in output feature map.
-        int o = r / oHeight;
-        int r = r % oHeight;
+        int o = r / OHEIGHT;
+        int r = r % OHEIGHT;
 
         float sum = 0.0f;
-        int kernelLength = kernelSize * kernelSize;
 
         // For each input feature map.            
-        for (int i = 0; i < iDepth; ++i) {
+        for (int i = 0; i < IDEPTH; ++i) {
             
             // Prepare the input buffer and weight buffer.
             // Copy them into the private memory.
-            float inputBuf[MAX_KERNEL_LENGTH];
-            float weightBuf[MAX_KERNEL_LENGTH];
+            float inputBuf[KERNEL_LEN];
+            float weightBuf[KERNEL_LEN];
             int idx = 0;
-            int weightBase = (o * iDepth + i) * kernelLength;
-            for (int x = 0; x < kernelSize; ++x) {
-                for (int y = 0; y < kernelSize; ++y) {
-                    inputBuf[idx] = in[(i * iHeight + r + x) * iWidth + c + y];
+            int weightBase = (o * IDEPTH + i) * KERNEL_LEN;
+            for (int x = 0; x < KERNEL_SIZE; ++x) {
+                for (int y = 0; y < KERNEL_SIZE; ++y) {
+                    inputBuf[idx] = in[(i * IHEIGHT + r + x) * IWIDTH + c + y];
                     weightBuf[idx] = weight[weightBase + idx];
                     idx++;
                 }
             }
 
             // Compute the convolution.
-            for (int x = 0; x < kernelLength; ++x) {
+            for (int x = 0; x < KERNEL_LEN; ++x) {
                 sum += inputBuf[x] * weightBuf[x];
             }
         }
 
         // Get the output index.
-        int outIdx = (o * oHeight + r) * oWidth + c;
+        int outIdx = (o * OHEIGHT + r) * OWIDTH + c;
         out[outIdx] = sigmod(sum + offset[outIdx]);
     } 
 }

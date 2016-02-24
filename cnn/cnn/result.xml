@@ -1,14 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<results><result><iWidth>32</iWidth>
-<iHeight>32</iHeight>
-<iDepth>1</iDepth>
-<kernelSize>5</kernelSize>
-<oDepth>6</oDepth>
-<averageTime>282996</averageTime>
-</result><result><iWidth>14</iWidth>
-<iHeight>14</iHeight>
-<iDepth>6</iDepth>
-<kernelSize>5</kernelSize>
-<oDepth>16</oDepth>
-<averageTime>689335</averageTime>
-</result></results>
+<results>
+    <result>
+        <iWidth>32</iWidth>
+        <iHeight>32</iHeight>
+        <iDepth>1</iDepth>
+        <kernelSize>5</kernelSize>
+        <oDepth>6</oDepth>
+        <averageTime>269481</averageTime>
+    </result>
+    <result>
+        <iWidth>14</iWidth>
+        <iHeight>14</iHeight>
+        <iDepth>6</iDepth>
+        <kernelSize>5</kernelSize>
+        <oDepth>16</oDepth>
+        <averageTime>515847</averageTime>
+    </result>
+</results>

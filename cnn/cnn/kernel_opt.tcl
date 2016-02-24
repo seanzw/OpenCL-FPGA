@@ -26,13 +26,17 @@ add_files "test.hpp"
 set_property file_type "c header files" [get_files "test.hpp"]
 
 # Create the kernel.
-create_kernel convolution_kernel_opt -type clc
-add_files -kernel [get_kernels convolution_kernel_opt] "convolution_kernel_opt.cl"
+create_kernel convolution_kernel_opt_1 -type clc
+add_files -kernel [get_kernels convolution_kernel_opt_1] "convolution_kernel_opt_1.cl"
+
+create_kernel convolution_kernel_opt_2 -type clc
+add_files -kernel [get_kernels convolution_kernel_opt_2] "convolution_kernel_opt_2.cl"
 
 # Define binary containers.
 create_opencl_binary alpha
 set_property region "OCL_REGION_0" [get_opencl_binary alpha]
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels convolution_kernel_opt] -name ZW
+create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels convolution_kernel_opt_1] -name ZW
+create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels convolution_kernel_opt_2] -name ZW
 
 # Compile the design for CPU based emulation.
 compile_emulation -flow cpu -opencl_binary [get_opencl_binary alpha]
