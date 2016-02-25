@@ -136,13 +136,6 @@ namespace cnn {
             err = clSetKernelArg(kernel, 1, sizeof(cl_mem), &clWeight);
             err = clSetKernelArg(kernel, 2, sizeof(cl_mem), &clOffset);
             err = clSetKernelArg(kernel, 3, sizeof(cl_mem), &clOut);
-            /*err = clSetKernelArg(kernel, 4, sizeof(cl_int), &iWidth);
-            err = clSetKernelArg(kernel, 5, sizeof(cl_int), &iHeight);
-            err = clSetKernelArg(kernel, 6, sizeof(cl_int), &iDepth);
-            err = clSetKernelArg(kernel, 7, sizeof(cl_int), &oWidth);
-            err = clSetKernelArg(kernel, 8, sizeof(cl_int), &oHeight);
-            err = clSetKernelArg(kernel, 9, sizeof(cl_int), &oDepth);*/
-            //err = clSetKernelArg(kernel, 10, sizeof(cl_int), &kernelSize);
 
             // Prepare the NDRange.
             int items = 16;
@@ -239,6 +232,8 @@ namespace cnn {
                 1,
                 devices,
                 NULL);
+
+            printDeviceInfo(std::cout, devices[0]);
 
             cl_context_properties properties[] = {
                 CL_CONTEXT_PLATFORM, (cl_context_properties)platforms[0], 0

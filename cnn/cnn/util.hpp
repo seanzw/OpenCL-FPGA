@@ -125,6 +125,54 @@ namespace cnn {
         }
     }
 
+    void printDeviceInfo(std::ostream &o, cl_device_id device) {
+
+        cl_device_type type;
+        clGetDeviceInfo(device, CL_DEVICE_TYPE, sizeof(type), &type, NULL);
+        if (type == CL_DEVICE_TYPE_CPU) {
+            o << "CL_DEVICE_TYPE: CPU" << std::endl;
+        }
+        else if (type == CL_DEVICE_TYPE_GPU) {
+            o << "CL_DEVICE_TYPE: GPU" << std::endl;
+        }
+        else if (type == CL_DEVICE_TYPE_ACCELERATOR) {
+            o << "CL_DEVICE_TYPE: ACCELERATOR" << std::endl;
+        }
+        else {
+            o << "CL_DEVICE_TYPE: DEFAULT" << std::endl;
+        }
+
+        size_t nameSize;
+        clGetDeviceInfo(device, CL_DEVICE_NAME, 0, NULL, &nameSize);
+        char *name = new char[nameSize];
+        clGetDeviceInfo(device, CL_DEVICE_NAME, nameSize, name, NULL);
+        o << "CL_DEVICE_NAME: " << name << std::endl;
+        delete[] name;
+
+        cl_uint maxUnits;
+        clGetDeviceInfo(device, CL_DEVICE_MAX_COMPUTE_UNITS, sizeof(maxUnits), &maxUnits, NULL);
+        o << "CL_MAX_COMPUTING_UNITS: " << maxUnits << std::endl;
+
+        cl_uint maxWorkItemDim;
+        clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS, sizeof(maxWorkItemDim), &maxWorkItemDim, NULL);
+        o << "CL_DEVICE_MAX_WORK_ITEM_DIMENSIONS: " << maxWorkItemDim << std::endl;
+
+        size_t *maxWorkItemSize = new size_t[maxWorkItemDim];
+        clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_ITEM_SIZES, sizeof(size_t) * maxWorkItemDim, maxWorkItemSize, NULL);
+        o << "CL_DEVICE_MAX_WORK_ITEM_SIZES: (";
+        for (size_t i = 0; i < maxWorkItemDim; ++i) {
+            o << maxWorkItemSize[i] << ", ";
+        }
+        o << ")" << std::endl;
+        delete[] maxWorkItemSize;
+
+        cl_bool imageSupport;
+        clGetDeviceInfo(device, CL_DEVICE_IMAGE_SUPPORT, sizeof(cl_bool), &imageSupport, NULL);
+        o << "CL_DEVICE_IMAGE_SUPPORT: " << (imageSupport == CL_TRUE ? "TRUE" : "FALSE") << std::endl;
+
+
+    }
+
     std::string fileToString(const std::string &fn) {
         std::string text;
         std::ifstream fs(fn.c_str());
