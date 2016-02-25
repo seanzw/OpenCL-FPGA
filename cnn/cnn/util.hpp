@@ -274,8 +274,6 @@ namespace cnn {
         return t2 - t1;
     }
 
-   
-
     unsigned int closestMultiple(unsigned int size, unsigned int divisor) {
         unsigned int remainder = size % divisor;
         return remainder == 0 ? size : size - remainder + divisor;
@@ -358,6 +356,22 @@ namespace cnn {
         o << std::endl;
     }
 
+    void dumpVec(std::ofstream &o, const vec &out, size_t width, size_t height, size_t depth) {
+        writeXMLOpenTag(o, "vec");
+        size_t idx = 0;
+        for (int i = 0; i < depth; ++i) {
+            writeXMLOpenTag(o, "featureMap");
+            for (int j = 0; j < height; ++j) {
+                writeXMLOpenTag(o, "line");
+                for (int k = 0; k < width; ++k) {
+                    writeXMLTag(o, "item", out[idx++]);
+                }
+                writeXMLCloseTag(o, "line");
+            }
+            writeXMLCloseTag(o, "featureMap");
+        }
+        writeXMLCloseTag(o, "vec");
+    }
 }
 
 

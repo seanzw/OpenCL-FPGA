@@ -46,6 +46,9 @@
     <Xml Include="result.xml">
       <Filter>Resource Files</Filter>
     </Xml>
+    <Xml Include="output.xml">
+      <Filter>Resource Files</Filter>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <None Include="alpha.tcl">

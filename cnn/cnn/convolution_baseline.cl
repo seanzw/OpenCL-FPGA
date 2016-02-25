@@ -25,7 +25,7 @@ __kernel void convolution_baseline(
 
         // Get the index of the element in output feature map.
         int o = r / oHeight;
-        int r = r % oHeight;
+        r = r % oHeight;
 
         float sum = 0.0f;
         int kernelLength = kernelSize * kernelSize;
@@ -55,6 +55,6 @@ __kernel void convolution_baseline(
 
         // Get the output index.
         int outIdx = (o * oHeight + r) * oWidth + c;
-        out[outIdx] = sigmod(sum + offset[outIdx]);
+        out[outIdx] = sigmod(sum + offset[o]);
     } 
 }

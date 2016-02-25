@@ -32,7 +32,7 @@ __kernel void convolution_kernel_opt_1(
 
         // Get the index of the element in output feature map.
         int o = r / OHEIGHT;
-        int r = r % OHEIGHT;
+        r = r % OHEIGHT;
 
         float sum = 0.0f;
 
@@ -76,6 +76,6 @@ __kernel void convolution_kernel_opt_1(
 
         // Get the output index.
         int outIdx = (o * OHEIGHT + r) * OWIDTH + c;
-        out[outIdx] = sigmod(sum + offset[outIdx]);
+        out[outIdx] = sigmod(sum + offset[o]);
     } 
 }

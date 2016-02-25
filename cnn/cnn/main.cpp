@@ -24,7 +24,8 @@ int main(int argc, char *argv[]) {
         type = cnn::CPU;
     }
 
-    test::runTest(xmlFile, clFile, testFile, type);
+    test::runFuncTest(xmlFile, clFile, "output.xml", type);
+    test::runTimeTest(xmlFile, clFile, testFile, type);
 
     return 0;
 }
