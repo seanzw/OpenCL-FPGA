@@ -125,6 +125,14 @@ namespace cnn {
         }
     }
 
+    void handleError(cl_uint err, std::string msg) {
+        if (err != CL_SUCCESS) {
+            std::cerr << msg << std::endl;
+            std::cerr << readable_status(err) << std::endl;
+            exit(-1);
+        }
+    }
+
     void printDeviceInfo(std::ostream &o, cl_device_id device) {
 
         cl_device_type type;

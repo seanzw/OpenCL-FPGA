@@ -30,11 +30,15 @@ namespace cnn {
             }
         }
 
-        //virtual ~ConvolutionLayer() {
-        //    clReleaseCommandQueue(queue);
-        //    clReleaseProgram(program);
-        //    clReleaseContext(context);
-        //}
+        virtual ~ConvolutionLayer() {
+            clReleaseMemObject(clIn);
+            clReleaseMemObject(clWeight);
+            clReleaseMemObject(clOffset);
+            clReleaseMemObject(clOut);
+            //clReleaseCommandQueue(queue);
+            //clReleaseProgram(program);
+            //clReleaseContext(context);
+        }
 
         // Forward.
         virtual unsigned long long forward(const vec &in) {
@@ -43,10 +47,8 @@ namespace cnn {
                 return forwardCPU(in);
                 break;
             case cnn::GPU:
-                return forwardGPU(in);
-                break;
             case cnn::FPGA:
-                return forwardGPU(in);
+                return forwardCL(in);
                 break;
             default:
                 return forwardCPU(in);
@@ -91,51 +93,34 @@ namespace cnn {
         }
 
         // Forward with OpenCL on GPU.
-        unsigned long long forwardGPU(const vec &in) {
+        unsigned long long forwardCL(const vec &in) {
 
             cl_int err;
 
-            // Allocate memory on device.
-            cl_mem clIn = clCreateBuffer(
-                context,
-                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+            err = clEnqueueWriteBuffer(queue,
+                clIn,
+                CL_TRUE,
+                0,
                 iWidth * iHeight * iDepth * sizeof(cl_float),
-                const_cast<void *>(static_cast<const void *>(&in[0])),
-                &err);
-
-            cl_mem clWeight = clCreateBuffer(
-                context,
-                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                kernelSize * kernelSize * iDepth * oDepth * sizeof(cl_float),
-                const_cast<void *>(static_cast<const void *>(&weight[0])),
-                &err);
-
-            cl_mem clOffset = clCreateBuffer(
-                context,
-                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                oDepth * sizeof(cl_float),
-                const_cast<void *>(static_cast<const void *>(&offset[0])),
-                &err);
-
-            cl_mem clOut = clCreateBuffer(
-                context,
-                CL_MEM_WRITE_ONLY,
-                oDepth * oHeight * oWidth * sizeof(cl_float),
+                &in[0],
+                0,
                 NULL,
-                &err);
-
-            if (err != CL_SUCCESS) {
-                std::cerr << "Failed creating the buffer." << std::endl;
-                std::cerr << readable_status(err);
-                exit(-1);
-            }
+                NULL);
+            handleError(err, "Failed writing clIn.");
 
             // Set the arguments for the kernel.
             cl_kernel kernel = clCreateKernel(program, kernelName.c_str(), &err);
             err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clIn);
+            handleError(err, "Failed setting kernel arg: clIn. ");
+
             err = clSetKernelArg(kernel, 1, sizeof(cl_mem), &clWeight);
+            handleError(err, "Failed setting kernel arg: clWeight. ");
+
             err = clSetKernelArg(kernel, 2, sizeof(cl_mem), &clOffset);
+            handleError(err, "Failed setting kernel arg: clOffset. ");
+
             err = clSetKernelArg(kernel, 3, sizeof(cl_mem), &clOut);
+            handleError(err, "Failed setting kernel arg: clOut. ");
 
             // Prepare the NDRange.
             int items = 16;
@@ -167,10 +152,6 @@ namespace cnn {
             }
 
             // Clean up.
-            clReleaseMemObject(clIn);
-            clReleaseMemObject(clWeight);
-            clReleaseMemObject(clOffset);
-            clReleaseMemObject(clOut);
             clReleaseKernel(kernel);
 
             return t;
@@ -215,6 +196,11 @@ namespace cnn {
         cl_command_queue queue;
         cl_program program;
 
+        cl_mem clIn;
+        cl_mem clWeight;
+        cl_mem clOffset;
+        cl_mem clOut;
+
         const std::string kernelName;
 
         // Initialize the OpenCL.
@@ -246,12 +232,16 @@ namespace cnn {
                 NULL,
                 NULL,
                 &err);
+            handleError(err, "Failed creating context. ");
+            clRetainContext(context);
 
             queue = clCreateCommandQueue(
                 context,
                 devices[0],
                 CL_QUEUE_PROFILING_ENABLE,
                 &err);
+            handleError(err, "Failed creating command queue. ");
+            clRetainCommandQueue(queue);
 
             if (type == FPGA) {
                 program = buildProgramFromBinary(fn.c_str(), context, devices[0]);
@@ -259,6 +249,47 @@ namespace cnn {
             else {
                 program = buildProgramFromSource(fn.c_str(), context, devices[0]);
             }
+
+            // Allocate memory on device.
+            clIn = clCreateBuffer(
+                context,
+                CL_MEM_READ_ONLY,
+                iWidth * iHeight * iDepth * sizeof(cl_float),
+                NULL,
+                &err);
+            handleError(err, "Failed creating clIn");
+            err = clRetainMemObject(clIn);
+            handleError(err, "Failed retaining clIn");
+
+            clWeight = clCreateBuffer(
+                context,
+                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                kernelSize * kernelSize * iDepth * oDepth * sizeof(cl_float),
+                const_cast<void *>(static_cast<const void *>(&weight[0])),
+                &err);
+            handleError(err, "Failed creating clWeight");
+            err = clRetainMemObject(clWeight);
+            handleError(err, "Failed retaining clWeight");
+
+            clOffset = clCreateBuffer(
+                context,
+                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                oDepth * sizeof(cl_float),
+                const_cast<void *>(static_cast<const void *>(&offset[0])),
+                &err);
+            handleError(err, "Failed creating clOffset");
+            err = clRetainMemObject(clOffset);
+            handleError(err, "Failed retaining clOffset");
+
+            clOut = clCreateBuffer(
+                context,
+                CL_MEM_WRITE_ONLY,
+                oDepth * oHeight * oWidth * sizeof(cl_float),
+                NULL,
+                &err);
+            handleError(err, "Failed creating clOut");
+            err = clRetainMemObject(clOut);
+            handleError(err, "Failed retaining clOut");
         }
     };
 
