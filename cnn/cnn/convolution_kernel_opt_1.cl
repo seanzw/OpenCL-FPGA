@@ -20,6 +20,10 @@ __kernel void convolution_kernel_opt_1(
     __global float *offset,
     __global float *out
     ) {
+
+    #ifdef __xilinx__
+    __attribute__((xcl_pipeline_workitems))
+    #endif
     
     int c = get_global_id(0);
     int r = get_global_id(1);
@@ -36,6 +40,9 @@ __kernel void convolution_kernel_opt_1(
         float weightBuf[KERNEL_LEN];
 
         // For each input feature map.            
+        #ifdef __xilinx__
+        __attribute__((xcl_pipeline_loop))
+        #endif
         for (int i = 0; i < IDEPTH; ++i) {
             
             // Prepare the input buffer and weight buffer.
