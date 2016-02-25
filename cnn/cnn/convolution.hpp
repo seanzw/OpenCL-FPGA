@@ -35,9 +35,10 @@ namespace cnn {
             clReleaseMemObject(clWeight);
             clReleaseMemObject(clOffset);
             clReleaseMemObject(clOut);
-            //clReleaseCommandQueue(queue);
-            //clReleaseProgram(program);
-            //clReleaseContext(context);
+            clReleaseKernel(kernel);
+            clReleaseProgram(program);
+            clReleaseCommandQueue(queue);
+            clReleaseContext(context);
         }
 
         // Forward.
@@ -97,6 +98,7 @@ namespace cnn {
 
             cl_int err;
 
+            // Copy the input.
             err = clEnqueueWriteBuffer(queue,
                 clIn,
                 CL_TRUE,
@@ -107,20 +109,6 @@ namespace cnn {
                 NULL,
                 NULL);
             handleError(err, "Failed writing clIn.");
-
-            // Set the arguments for the kernel.
-            cl_kernel kernel = clCreateKernel(program, kernelName.c_str(), &err);
-            err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clIn);
-            handleError(err, "Failed setting kernel arg: clIn. ");
-
-            err = clSetKernelArg(kernel, 1, sizeof(cl_mem), &clWeight);
-            handleError(err, "Failed setting kernel arg: clWeight. ");
-
-            err = clSetKernelArg(kernel, 2, sizeof(cl_mem), &clOffset);
-            handleError(err, "Failed setting kernel arg: clOffset. ");
-
-            err = clSetKernelArg(kernel, 3, sizeof(cl_mem), &clOut);
-            handleError(err, "Failed setting kernel arg: clOut. ");
 
             // Prepare the NDRange.
             int items = 16;
@@ -150,9 +138,6 @@ namespace cnn {
                 std::cerr << readable_status(err);
                 exit(-1);
             }
-
-            // Clean up.
-            clReleaseKernel(kernel);
 
             return t;
         }
@@ -195,6 +180,7 @@ namespace cnn {
         cl_context context;
         cl_command_queue queue;
         cl_program program;
+        cl_kernel kernel;
 
         cl_mem clIn;
         cl_mem clWeight;
@@ -249,6 +235,8 @@ namespace cnn {
             else {
                 program = buildProgramFromSource(fn.c_str(), context, devices[0]);
             }
+            err = clRetainProgram(program);
+            handleError(err, "Failed retaining program. ");
 
             // Allocate memory on device.
             clIn = clCreateBuffer(
@@ -290,6 +278,24 @@ namespace cnn {
             handleError(err, "Failed creating clOut");
             err = clRetainMemObject(clOut);
             handleError(err, "Failed retaining clOut");
+
+            // Set the arguments for the kernel.
+            kernel = clCreateKernel(program, kernelName.c_str(), &err);
+            handleError(err, "Failed creating kernel. ");
+            err = clRetainKernel(kernel);
+            handleError(err, "Failed retaining kernel. ");
+
+            err = clSetKernelArg(kernel, 0, sizeof(cl_mem), &clIn);
+            handleError(err, "Failed setting kernel arg: clIn. ");
+
+            err = clSetKernelArg(kernel, 1, sizeof(cl_mem), &clWeight);
+            handleError(err, "Failed setting kernel arg: clWeight. ");
+
+            err = clSetKernelArg(kernel, 2, sizeof(cl_mem), &clOffset);
+            handleError(err, "Failed setting kernel arg: clOffset. ");
+
+            err = clSetKernelArg(kernel, 3, sizeof(cl_mem), &clOut);
+            handleError(err, "Failed setting kernel arg: clOut. ");
         }
     };
 
