@@ -21,6 +21,9 @@ __kernel void convolution_kernel_opt_2(
     __global float *out
     ) {
     
+    #ifdef __xilinx__
+    __attribute__((xcl_pipeline_workitems))
+    #endif
     int c = get_global_id(0);
     int r = get_global_id(1);
     
@@ -32,7 +35,10 @@ __kernel void convolution_kernel_opt_2(
 
         float sum = 0.0f;
 
-        // For each input feature map.            
+        // For each input feature map.
+        #ifdef __xilinx__
+        __attribute__((xcl_pipeline_loop))
+        #endif           
         for (int i = 0; i < IDEPTH; ++i) {
             
             // Prepare the input buffer and weight buffer.
@@ -41,7 +47,13 @@ __kernel void convolution_kernel_opt_2(
             float weightBuf[KERNEL_LEN];
             int idx = 0;
             int weightBase = (o * IDEPTH + i) * KERNEL_LEN;
+            #ifdef __xilinx__
+            __attribute__((opencl_unroll_hint))
+            #endif
             for (int x = 0; x < KERNEL_SIZE; ++x) {
+                #ifdef __xilinx__
+                __attribute__((opencl_unroll_hint))
+                #endif
                 for (int y = 0; y < KERNEL_SIZE; ++y) {
                     inputBuf[idx] = in[(i * IHEIGHT + r + x) * IWIDTH + c + y];
                     weightBuf[idx] = weight[weightBase + idx];
@@ -50,6 +62,9 @@ __kernel void convolution_kernel_opt_2(
             }
 
             // Compute the convolution.
+            #ifdef __xilinx__
+            __attribute__((opencl_unroll_hint))
+            #endif
             for (int x = 0; x < KERNEL_LEN; ++x) {
                 sum += inputBuf[x] * weightBuf[x];
             }

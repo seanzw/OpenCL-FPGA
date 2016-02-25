@@ -263,11 +263,7 @@ namespace cnn {
             0,
             NULL,
             &event);
-        if (err != CL_SUCCESS) {
-            std::cerr << "Error enqueuing kernel for execution. " << std::endl;
-            std::cerr << readable_status(err);
-            exit(-1);
-        }
+        handleError(err, "Failed enqueuing kernel. ");
 
         clWaitForEvents(1, &event);
 

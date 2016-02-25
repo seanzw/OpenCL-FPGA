@@ -24,7 +24,6 @@ __kernel void convolution_kernel_opt_1(
     #ifdef __xilinx__
     __attribute__((xcl_pipeline_workitems))
     #endif
-    
     int c = get_global_id(0);
     int r = get_global_id(1);
     
