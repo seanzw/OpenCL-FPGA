@@ -161,6 +161,7 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Xml Include="conv1.xml" />
     <Xml Include="convolution.xml">
       <SubType>Designer</SubType>
     </Xml>
@@ -170,6 +171,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="alpha.tcl" />
+    <None Include="conv1.cl" />
     <None Include="convolution_baseline.cl" />
     <None Include="convolution_kernel_opt_1.cl" />
     <None Include="convolution_kernel_opt_2.cl" />
