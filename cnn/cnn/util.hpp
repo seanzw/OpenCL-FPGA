@@ -178,7 +178,13 @@ namespace cnn {
         clGetDeviceInfo(device, CL_DEVICE_IMAGE_SUPPORT, sizeof(cl_bool), &imageSupport, NULL);
         o << "CL_DEVICE_IMAGE_SUPPORT: " << (imageSupport == CL_TRUE ? "TRUE" : "FALSE") << std::endl;
 
+        cl_ulong maxConstBufSize;
+        clGetDeviceInfo(device, CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE, sizeof(cl_ulong), &maxConstBufSize, NULL);
+        o << "CL_DEVICE_MAX_CONSTANT_BUFFER_SIZE: " << maxConstBufSize << std::endl;
 
+        cl_uint maxConstArgs;
+        clGetDeviceInfo(device, CL_DEVICE_MAX_CONSTANT_ARGS, sizeof(cl_uint), &maxConstArgs, NULL);
+        o << "CL_DEVICE_MAX_CONSTANT_ARGS: " << maxConstArgs << std::endl;
     }
 
     std::string fileToString(const std::string &fn) {

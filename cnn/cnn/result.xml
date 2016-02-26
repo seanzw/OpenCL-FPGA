@@ -4,11 +4,11 @@
 <iDepth>1</iDepth>
 <kernelSize>5</kernelSize>
 <oDepth>6</oDepth>
-<averageTime>260728</averageTime>
+<averageTime>272496</averageTime>
 </result><result><iWidth>14</iWidth>
 <iHeight>14</iHeight>
 <iDepth>6</iDepth>
 <kernelSize>5</kernelSize>
 <oDepth>16</oDepth>
-<averageTime>455056</averageTime>
+<averageTime>459008</averageTime>
 </result></results>
