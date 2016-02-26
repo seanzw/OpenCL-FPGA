@@ -185,6 +185,10 @@ namespace cnn {
         cl_uint maxConstArgs;
         clGetDeviceInfo(device, CL_DEVICE_MAX_CONSTANT_ARGS, sizeof(cl_uint), &maxConstArgs, NULL);
         o << "CL_DEVICE_MAX_CONSTANT_ARGS: " << maxConstArgs << std::endl;
+
+        cl_command_queue_properties deviceQueueProperties;
+        clGetDeviceInfo(device, CL_DEVICE_QUEUE_PROPERTIES, sizeof(deviceQueueProperties), &deviceQueueProperties, NULL);
+        o << "CL_QUEUE_OUT_OF_ORDER_EXEC: " << (deviceQueueProperties & CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE ? "TRUE" : "FALSE") << std::endl;
     }
 
     std::string fileToString(const std::string &fn) {
@@ -339,8 +343,8 @@ namespace cnn {
         return;
     }
 
-    int closestMultiple(int base, int n) {
-        int remainder = n % base;
+    size_t closestMultiple(size_t base, size_t n) {
+        size_t remainder = n % base;
         return remainder == 0 ? n : n - remainder + base;
     }
 

@@ -12,12 +12,12 @@ float sigmod(float in) {
 }
 
 #ifdef __xilinx__
-__attribute__ ((reqd_work_group_size(16, 16, 1)))
+__attribute__ ((reqd_work_group_size(16, 1, 1)))
 #endif
 __kernel void convolution_kernel_opt_1(
     __global float *in,
-    __global float *weight,
-    __global float *offset,
+    __constant float *weight,
+    __constant float *offset,
     __global float *out
     ) {
 

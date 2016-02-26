@@ -111,16 +111,15 @@ namespace cnn {
             handleError(err, "Failed writing clIn.");
 
             // Prepare the NDRange.
-            int items = 16;
-            size_t global[] = {
-                (size_t)closestMultiple(items, (int)oWidth),
-                (size_t)closestMultiple(items, (int)(oDepth * oHeight)),
-                (size_t)1
-            };
             size_t local[] = {
-                (size_t)items,
-                (size_t)items,
-                (size_t)1
+                16,
+                1,
+                1
+            };
+            size_t global[] = {
+                closestMultiple(local[0], oWidth),
+                closestMultiple(local[1], oDepth * oHeight),
+                1
             };
 
             cl_ulong t = runAndTimeKernel(queue, kernel, 3, global, local);
