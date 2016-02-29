@@ -165,7 +165,6 @@
     <Xml Include="convolution.xml">
       <SubType>Designer</SubType>
     </Xml>
-    <Xml Include="output.xml" />
     <Xml Include="result.xml" />
     <Xml Include="result_gpu_baseline.xml" />
   </ItemGroup>

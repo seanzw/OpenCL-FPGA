@@ -27,16 +27,12 @@ set_property file_type "c header files" [get_files "test.hpp"]
 
 # Create the kernel.
 create_kernel convolution_kernel_opt_1 -type clc
-add_files -kernel [get_kernels convolution_kernel_opt_1] "convolution_kernel_opt_1.cl"
-
-create_kernel convolution_kernel_opt_2 -type clc
-add_files -kernel [get_kernels convolution_kernel_opt_2] "convolution_kernel_opt_2.cl"
+add_files -kernel [get_kernels conv1] "conv1.cl"
 
 # Define binary containers.
 create_opencl_binary alpha
 set_property region "OCL_REGION_0" [get_opencl_binary alpha]
 create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels convolution_kernel_opt_1] -name ZW
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels convolution_kernel_opt_2] -name ZW2
 
 # Compile the design for CPU based emulation.
 compile_emulation -flow cpu -opencl_binary [get_opencl_binary alpha]
@@ -45,10 +41,10 @@ compile_emulation -flow cpu -opencl_binary [get_opencl_binary alpha]
 report_estimate
 
 # Run the design in CPU emulation mode
-run_emulation -flow cpu -args "fpga alpha.xclbin ../../../../../convolution.xml result.xml"
+run_emulation -flow cpu -args "../../../../../convolution.xml result.xml alpha.xclbin"
 
 build_system
 
 package_system
 
-run_system -args "fpga alpha.xclbin ../../../../convolution.xml result.xml"
+run_system -args "../../../../convolution.xml result.xml alpha.xclbin"

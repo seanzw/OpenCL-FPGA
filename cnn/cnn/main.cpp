@@ -4,28 +4,31 @@
 
 int main(int argc, char *argv[]) {
 
-    if (argc != 5) {
-        std::cout << "Usage: cnn <type> <clBinaryFile> <xmlList> <testFile>" << std::endl;
+    if (argc != 3 && argc != 4) {
+        std::cout << "Usage: cnn <xml> <result> [xclbin]" << std::endl;
         exit(-1);
     }
 
-    cnn::DeviceType type;
-    std::string deviceType(argv[1]);
-    std::string clFile(argv[2]);
-    std::string xmlFile(argv[3]);
-    std::string testFile(argv[4]);
-    if (deviceType == "fpga") {
-        type = cnn::FPGA;
-    }
-    else if (deviceType == "gpu") {
-        type = cnn::GPU;
+    CNN *cnn;
+
+    std::string xmlFile(argv[1]);
+    std::string testFile(argv[2]);
+
+    if (argc == 4) {
+        std::string xclbinFile(argv[3]);
+        cnn = new CNN(xmlFile, xclbinFile);
     }
     else {
-        type = cnn::CPU;
+        cnn = new CNN(xmlFile);
     }
 
-    test::runFuncTest(xmlFile, clFile, "output.xml", type);
-    test::runTimeTest(xmlFile, clFile, testFile, type);
+    cnn::vec in(cnn->getInSize());
+    for (int i = 0; i < in.size(); ++i) {
+        in[i] = (float)rand() / (float)RAND_MAX - 0.5f;
+    }
 
+    test::runFuncTest(cnn, in);
+    test::runTimeTest(cnn, in, testFile);
+    
     return 0;
 }

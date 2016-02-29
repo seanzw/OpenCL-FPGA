@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <cnn><kernelFileName>../cnn/conv1.cl</kernelFileName>
-<layer><kernelName>conv1</kernelName>
+<inSize>1024</inSize>
+<layer><type>conv</type>
+<kernelName>conv1</kernelName>
 <workGroupSize><item>16</item>
 <item>1</item>
 <item>1</item>
@@ -8,6 +10,8 @@
 <iHeight>32</iHeight>
 <iDepth>1</iDepth>
 <kernelSize>5</kernelSize>
+<oWidth>28</oWidth>
+<oHeight>28</oHeight>
 <oDepth>6</oDepth>
 <weight><oFeatureMap><iFeatureMap><line><item>0.00125126</item>
 <item>0.563585</item>

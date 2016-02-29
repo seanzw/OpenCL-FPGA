@@ -13,6 +13,11 @@ public:
         FULL
     };
 
+#define INNER (0)
+#define FRONT (1)
+#define BACK  (1 << 1)
+    typedef size_t Flag;
+
     struct LayerParam {
         LayerType type;
         std::string kernelName;
@@ -21,13 +26,15 @@ public:
         size_t iHeight;
         size_t iDepth;
         size_t kernelSize;
+        size_t oWidth;
+        size_t oHeight;
         size_t oDepth;
     };
 
     static void genCNN(const std::string &XMLFileName,
         const std::string &kernelFileName,
         size_t layerNum,
-        const LayerParam *layerParams
+        const LayerParam *params
         ) {
 
         std::ofstream xml(XMLFileName);
@@ -47,12 +54,28 @@ public:
         xml << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << std::endl;
         writeXMLOpenTag(xml, "cnn");
         writeXMLTag(xml, "kernelFileName", kernelFileName);
+        writeXMLTag(xml, "inSize", params[0].iWidth * params[0].iHeight * params[0].iDepth);
 
         // Write some basic information in the cl kernel file.
         fprintf(kernel, "%s\n", activateFunc.c_str());
 
+        // Write the internal buffer.
+        for (size_t i = 1; i < layerNum; ++i) {
+            fprintf(kernel,
+                "__global float buf%zu[%zu];\n",
+                i,
+                params[i].iWidth * params[i].iHeight * params[i].iDepth);
+        }
+
         for (size_t i = 0; i < layerNum; ++i) {
-            genLayer(xml, kernel, layerParams[i]);
+            Flag flag = INNER;
+            if (i == 0) {
+                flag |= FRONT;
+            }
+            if (i == layerNum - 1) {
+                flag |= BACK;
+            }
+            genLayer(xml, kernel, params[i], i, flag);
         }
 
         writeXMLCloseTag(xml, "cnn");
@@ -63,12 +86,12 @@ public:
 
 private:
 
-    static void genLayer(std::ofstream &xml, FILE *kernel, const LayerParam &param) {
+    static void genLayer(std::ofstream &xml, FILE *kernel, const LayerParam &param, size_t idx, Flag flag) {
         writeXMLOpenTag(xml, "layer");
         switch (param.type) {
         case CONV:
             genXMLConvLayer(xml, param);
-            genCLConvLayer(kernel, param);
+            genCLConvLayer(kernel, param, idx, flag);
             break;
         default:
             std::cerr << "Unsupported layer type. " << std::endl;
@@ -79,6 +102,7 @@ private:
 
     // Generate the xml for this layer.
     static void genXMLConvLayer(std::ofstream &xml, const LayerParam &param) {
+        writeXMLTag(xml, "type", "conv");
         writeXMLTag(xml, "kernelName", param.kernelName);
 
         writeXMLOpenTag(xml, "workGroupSize");
@@ -91,6 +115,8 @@ private:
         writeXMLTag(xml, "iHeight", param.iHeight);
         writeXMLTag(xml, "iDepth", param.iDepth);
         writeXMLTag(xml, "kernelSize", param.kernelSize);
+        writeXMLTag(xml, "oWidth", param.oWidth);
+        writeXMLTag(xml, "oHeight", param.oHeight);
         writeXMLTag(xml, "oDepth", param.oDepth);
 
         // Randomly write the weight.
@@ -122,23 +148,46 @@ private:
     }
 
     // Generate the OpenCL kernel for convolution layer.
-    static void genCLConvLayer(FILE *kernel, const LayerParam &param) {
+    static void genCLConvLayer(FILE *kernel, const LayerParam &param, size_t idx, Flag flag) {
 
         writeDefine(kernel, "KERNEL_SIZE", param.kernelSize);
         writeDefine(kernel, "KERNEL_LEN", param.kernelSize * param.kernelSize);
         writeDefine(kernel, "IWIDTH", param.iWidth);
         writeDefine(kernel, "IHEIGHT", param.iHeight);
         writeDefine(kernel, "IDEPTH", param.iDepth);
-        writeDefine(kernel, "OWIDTH", param.iWidth - param.kernelSize + 1);
-        writeDefine(kernel, "OHEIGHT", param.iHeight - param.kernelSize + 1);
+        writeDefine(kernel, "OWIDTH", param.oWidth);
+        writeDefine(kernel, "OHEIGHT", param.oHeight);
         writeDefine(kernel, "ODEPTH", param.oDepth);
+        
+        std::stringstream ss;
+        if (!(flag & FRONT)) {
+            fprintf(kernel, "#define in buf%zu", idx);
+        }
+        else {
+            ss << "__global float *in,\n";
+        }
+
+        if (!(flag & BACK)) {
+            fprintf(kernel, "#define out buf%zu", idx + 1);
+        }
+        else {
+            ss << "    __global float *out,";
+        }
 
         fprintf(kernel, convKernel.c_str(),
             (int)param.workGroupSize[0],
             (int)param.workGroupSize[1],
             (int)param.workGroupSize[2],
-            param.kernelName.c_str());
+            param.kernelName.c_str(),
+            ss.str().c_str()
+            );
 
+        if (!(flag &FRONT)) {
+            writeUndef(kernel, "in");
+        }
+        if (!(flag & BACK)) {
+            writeUndef(kernel, "out");
+        }
         writeUndef(kernel, "KERNEL_SIZE");
         writeUndef(kernel, "KERNEL_LEN");
         writeUndef(kernel, "IWIDTH");
@@ -210,10 +259,9 @@ const std::string CNNGenerator::convKernel = "\
 __attribute__ ((reqd_work_group_size(%d, %d, %d)))\n\
 #endif\n\
 __kernel void %s(\n\
-    __global float *in,\n\
+    %s\n\
     __constant float *weight,\n\
-    __constant float *offset,\n\
-    __global float *out\n\
+    __constant float *offset\n\
     ) {\n\
     \n\
     #ifdef __xilinx__\n\
@@ -280,6 +328,8 @@ int main(int argc, char *argv[]) {
             32,
             1,
             5,
+            28,
+            28,
             6
         }
     };

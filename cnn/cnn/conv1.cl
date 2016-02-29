@@ -14,9 +14,9 @@ __attribute__ ((reqd_work_group_size(16, 1, 1)))
 #endif
 __kernel void conv1(
     __global float *in,
+    __global float *out,
     __constant float *weight,
-    __constant float *offset,
-    __global float *out
+    __constant float *offset
     ) {
     
     #ifdef __xilinx__

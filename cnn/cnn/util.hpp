@@ -191,6 +191,7 @@ namespace cnn {
         o << "CL_QUEUE_OUT_OF_ORDER_EXEC: " << (deviceQueueProperties & CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE ? "TRUE" : "FALSE") << std::endl;
     }
 
+    // Read a file into a string.
     std::string fileToString(const std::string &fn) {
         std::string text;
         std::ifstream fs(fn.c_str());
@@ -201,6 +202,17 @@ namespace cnn {
         }
         text.assign(std::istreambuf_iterator<char>(fs), std::istreambuf_iterator<char>());
         return text;
+    }
+
+    // Read a file into a char buffer.
+    void fileToChar(const std::string &fn, char *buf, size_t bufSize) {
+        std::string str = fileToString(fn);
+        if (str.size() + 1 > bufSize) {
+            std::cerr << "fileToXML: Buffer too small for " << fn << std::endl;
+            exit(-1);
+        }
+        memcpy((void *)buf, (void *)(&str[0]), str.size() * sizeof(char));
+        buf[str.size()] = '\0';
     }
 
     cl_program buildProgramFromSource(const std::string &fileName, const cl_context &context, const cl_device_id &device) {
@@ -279,11 +291,7 @@ namespace cnn {
 
         err = clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &t1, NULL);
         err = clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &t2, NULL);
-        if (err != CL_SUCCESS) {
-            std::cerr << "Error timing the kernel. " << std::endl;
-            std::cerr << readable_status(err);
-            exit(-1);
-        }
+        handleError(err, "Failed timing the kernel. ");
 
         return t2 - t1;
     }
@@ -307,7 +315,7 @@ namespace cnn {
     typedef std::vector<float> vec;
     typedef std::vector<vec> vec2d;
 
-    int getInt(rapidxml::xml_node<> *root, const char *name) {
+    size_t getSizeT(rapidxml::xml_node<> *root, const char *name) {
         rapidxml::xml_node<> *node = root->first_node(name);
         return std::atoi(node->value());
     }
@@ -321,6 +329,19 @@ namespace cnn {
         std::string name = root->name();
         if (name == "item") {
             items.push_back(root->value());
+        }
+        else {
+            for (rapidxml::xml_node<> *node = root->first_node(); node; node = node->next_sibling()) {
+                getAllItem(node, items);
+            }
+        }
+        return;
+    }
+
+    void getAllItem(rapidxml::xml_node<> *root, std::vector<size_t> &items) {
+        std::string name = root->name();
+        if (name == "item") {
+            items.push_back((size_t)std::atol(root->value()));
         }
         else {
             for (rapidxml::xml_node<> *node = root->first_node(); node; node = node->next_sibling()) {

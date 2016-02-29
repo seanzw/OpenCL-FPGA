@@ -49,9 +49,6 @@
     <Xml Include="result.xml">
       <Filter>Resource Files</Filter>
     </Xml>
-    <Xml Include="output.xml">
-      <Filter>Resource Files</Filter>
-    </Xml>
     <Xml Include="conv1.xml">
       <Filter>Resource Files\convolution</Filter>
     </Xml>
