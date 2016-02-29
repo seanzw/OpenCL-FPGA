@@ -26,8 +26,9 @@ namespace test {
         for (size_t i = 0; i < NUM_TEST; ++i) {
             totalTime += cnn->forwardCL(in);
         }
-        std::cout << "Average Time: " << totalTime / NUM_TEST << std::endl;
-        writeXMLTag(o, "averageTime", totalTime / NUM_TEST);
+        size_t averageTime = totalTime / NUM_TEST;
+        std::cout << "Average Time: " << averageTime << std::endl;
+        writeXMLTag(o, "averageTime", averageTime);
         writeXMLCloseTag(o, "result");
         writeXMLCloseTag(o, "results");
         std::cout << "Finish testing!" << std::endl;

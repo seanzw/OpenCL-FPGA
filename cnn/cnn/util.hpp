@@ -6,6 +6,7 @@
 #include <sstream>
 #include <iostream>
 #include <vector>
+#include <cstring>
 
 #define __CL_ENABLE_EXCEPTIONS
 #include <CL/cl.h>

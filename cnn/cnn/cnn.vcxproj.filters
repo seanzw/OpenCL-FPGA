@@ -72,5 +72,8 @@
     <None Include="conv1.cl">
       <Filter>Resource Files\convolution</Filter>
     </None>
+    <None Include="conv1_baseline.cl">
+      <Filter>Resource Files\convolution</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -171,6 +171,7 @@
   <ItemGroup>
     <None Include="alpha.tcl" />
     <None Include="conv1.cl" />
+    <None Include="conv1_baseline.cl" />
     <None Include="convolution_baseline.cl" />
     <None Include="convolution_kernel_opt_1.cl" />
     <None Include="convolution_kernel_opt_2.cl" />

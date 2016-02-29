@@ -174,7 +174,7 @@ private:
             ss << "    __global float *out,";
         }
 
-        fprintf(kernel, convKernel.c_str(),
+        fprintf(kernel, convKernelOptimized.c_str(),
             (int)param.workGroupSize[0],
             (int)param.workGroupSize[1],
             (int)param.workGroupSize[2],
@@ -245,7 +245,8 @@ private:
      Some constant value.
      ********************************************************************************************/
     static const std::string activateFunc;
-    static const std::string convKernel;
+    static const std::string convKernelBaseline;
+    static const std::string convKernelOptimized;
 };
 
 /* Initialize the constant value. */
@@ -254,7 +255,55 @@ float sigmod(float in) {\n\
     return 1.0f / (1.0f + exp(-in)); \n\
 }";
 
-const std::string CNNGenerator::convKernel = "\
+const std::string CNNGenerator::convKernelBaseline = "\
+#ifdef __xilinx__\n\
+__attribute__ ((reqd_work_group_size(%d, %d, %d)))\n\
+#endif\n\
+__kernel void %s(\n\
+    %s\n\
+    __constant float *weight,\n\
+    __constant float *offset\n\
+    ) {\n\
+    \n\
+    int c = get_global_id(0);\n\
+    int r = get_global_id(1);\n\
+    \n\
+    if (c < OWIDTH && r < ODEPTH * OHEIGHT) {\n\
+\n\
+        // Get the index of the element in output feature map.\n\
+        int o = r / OHEIGHT;\n\
+        r = r %% OHEIGHT; \n\
+\n\
+        float sum = 0.0f;\n\
+\n\
+        // For each input feature map.\n\
+        for (int i = 0; i < IDEPTH; ++i) {\n\
+            \n\
+            float inputBuf[KERNEL_LEN];\n\
+            float weightBuf[KERNEL_LEN];\n\
+            int idx = 0;\n\
+            int weightBase = (o * IDEPTH + i) * KERNEL_LEN;\n\
+            for (int x = 0; x < KERNEL_SIZE; ++x) {\n\
+                for (int y = 0; y < KERNEL_SIZE; ++y) {\n\
+                    inputBuf[idx] = in[(i * IHEIGHT + r + x) * IWIDTH + c + y];\n\
+                    weightBuf[idx] = weight[weightBase + idx];\n\
+                    idx++;\n\
+                }\n\
+            }\n\
+\n\
+            for (int x = 0; x < KERNEL_LEN; ++x) {\n\
+                sum += inputBuf[x] * weightBuf[x];\n\
+            }\n\
+        }\n\
+\n\
+        // Get the output index.\n\
+        int outIdx = (o * OHEIGHT + r) * OWIDTH + c;\n\
+        out[outIdx] = sigmod(sum + offset[o]);\n\
+    } \n\
+}\n";
+
+
+const std::string CNNGenerator::convKernelOptimized = "\
 #ifdef __xilinx__\n\
 __attribute__ ((reqd_work_group_size(%d, %d, %d)))\n\
 #endif\n\
@@ -334,7 +383,7 @@ int main(int argc, char *argv[]) {
         }
     };
 
-    CNNGenerator::genCNN("../cnn/conv1.xml", "../cnn/conv1.cl", 1, params);
+    CNNGenerator::genCNN("../cnn/conv1.xml", "../cnn/conv1.cl", sizeof(params) / sizeof(CNNGenerator::LayerParam), params);
 
     return 0;
 }
