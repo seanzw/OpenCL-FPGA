@@ -26,7 +26,7 @@ add_files "test.hpp"
 set_property file_type "c header files" [get_files "test.hpp"]
 
 # Create the kernel.
-create_kernel convolution_kernel_opt_1 -type clc
+create_kernel conv1 -type clc
 add_files -kernel [get_kernels conv1] "conv1.cl"
 
 # Define binary containers.
