@@ -34,6 +34,12 @@
     <Filter Include="Resource Files\convolution\conv1_1_1_1">
       <UniqueIdentifier>{e082c538-b89e-4c6c-9b1b-d9517ffe1ffc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\maxpool">
+      <UniqueIdentifier>{701abdd7-4b29-4051-bdd1-8cbb5e92723f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\maxpool\max1_baseline">
+      <UniqueIdentifier>{74ce80a2-6745-4a0e-beaa-61d5777c967d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cnn.hpp">
@@ -49,6 +55,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="test.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="maxpool.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -81,6 +90,9 @@
     </Xml>
     <Xml Include="conv1_1_1_1.xml">
       <Filter>Resource Files\convolution\conv1_1_1_1</Filter>
+    </Xml>
+    <Xml Include="max1.xml">
+      <Filter>Resource Files\maxpool\max1_baseline</Filter>
     </Xml>
   </ItemGroup>
   <ItemGroup>
@@ -125,6 +137,9 @@
     </None>
     <None Include="conv1_1_1_1.tcl">
       <Filter>Resource Files\convolution\conv1_1_1_1</Filter>
+    </None>
+    <None Include="max1.cl">
+      <Filter>Resource Files\maxpool\max1_baseline</Filter>
     </None>
   </ItemGroup>
 </Project>

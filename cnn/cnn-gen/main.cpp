@@ -9,7 +9,7 @@ class CNNGenerator {
 public:
     enum LayerType {
         CONV,
-        SUB,
+        MAX,
         FULL
     };
 
@@ -93,11 +93,78 @@ private:
             genXMLConvLayer(xml, param);
             genCLConvLayer(kernel, param, idx, flag);
             break;
+        case MAX:
+            genXMLMaxLayer(xml, param);
+            genCLMaxLayer(kernel, param, idx, flag);
+            break;
         default:
             std::cerr << "Unsupported layer type. " << std::endl;
             exit(-1);
         }
         writeXMLCloseTag(xml, "layer");
+    }
+
+    static void genXMLMaxLayer(std::ofstream &xml, const LayerParam &param) {
+        writeXMLTag(xml, "type", "max");
+        writeXMLTag(xml, "kernelName", param.kernelName);
+
+        writeXMLOpenTag(xml, "workGroupSize");
+        for (size_t i = 0; i < sizeof(param.workGroupSize) / sizeof(size_t); ++i) {
+            writeXMLTag(xml, "item", param.workGroupSize[i]);
+        }
+        writeXMLCloseTag(xml, "workGroupSize");
+
+        writeXMLTag(xml, "iWidth", param.iWidth);
+        writeXMLTag(xml, "iHeight", param.iHeight);
+        writeXMLTag(xml, "iDepth", param.iDepth);
+        writeXMLTag(xml, "kernelSize", param.kernelSize);
+    }
+
+    static void genCLMaxLayer(FILE *kernel, const LayerParam &param, size_t idx, Flag flag) {
+        writeDefine(kernel, "KERNEL_SIZE", param.kernelSize);
+        writeDefine(kernel, "IWIDTH", param.iWidth);
+        writeDefine(kernel, "IHEIGHT", param.iHeight);
+        writeDefine(kernel, "IDEPTH", param.iDepth);
+        writeDefine(kernel, "OWIDTH", param.oWidth);
+        writeDefine(kernel, "OHEIGHT", param.oHeight);
+        writeDefine(kernel, "ODEPTH", param.oDepth);
+
+        std::stringstream ss;
+        if (!(flag & FRONT)) {
+            fprintf(kernel, "#define in buf%zu", idx);
+        }
+        else {
+            ss << "__global float *in,\n";
+        }
+
+        if (!(flag & BACK)) {
+            fprintf(kernel, "#define out buf%zu", idx + 1);
+        }
+        else {
+            ss << "    __global float *out";
+        }
+
+        fprintf(kernel, maxKernelBaseline.c_str(),
+            (int)param.workGroupSize[0],
+            (int)param.workGroupSize[1],
+            (int)param.workGroupSize[2],
+            param.kernelName.c_str(),
+            ss.str().c_str()
+            );
+
+        if (!(flag &FRONT)) {
+            writeUndef(kernel, "in");
+        }
+        if (!(flag & BACK)) {
+            writeUndef(kernel, "out");
+        }
+        writeUndef(kernel, "KERNEL_SIZE");
+        writeUndef(kernel, "IWIDTH");
+        writeUndef(kernel, "IHEIGHT");
+        writeUndef(kernel, "IDEPTH");
+        writeUndef(kernel, "OWIDTH");
+        writeUndef(kernel, "OHEIGHT");
+        writeUndef(kernel, "ODEPTH");
     }
 
     // Generate the xml for this layer.
@@ -247,6 +314,7 @@ private:
     static const std::string activateFunc;
     static const std::string convKernelBaseline;
     static const std::string convKernelOptimized;
+    static const std::string maxKernelBaseline;
 };
 
 /* Initialize the constant value. */
@@ -365,25 +433,69 @@ __kernel void %s(\n\
     } \n\
 }\n";
 
+const std::string CNNGenerator::maxKernelBaseline = "\
+#ifdef __xilinx__\n\
+__attribute__ ((reqd_work_group_size(%d, %d, %d)))\n\
+#endif\n\
+__kernel void %s(%s) {\n\
+    int c = get_global_id(0);\n\
+    int r = get_global_id(1);\n\
+    \n\
+    if (c < OWIDTH && r < ODEPTH * OHEIGHT) {\n\
+    \n\
+        // Get the index of the element in output feature map.\n\
+        int o = r / OHEIGHT;\n\
+        r = r %% OHEIGHT;\n\
+    \n\
+        float max = 0.0f;\n\
+    \n\
+        for (int x = 0; x < KERNEL_SIZE; ++x) {\n\
+            for (int y = 0; y < KERNEL_SIZE; ++y) {\n\
+                float tmp = in[(o * IHEIGHT + r * KERNEL_SIZE + x) * IWIDTH + c * KERNEL_SIZE + y];\n\
+                if (tmp > max) {\n\
+                    max = tmp;\n\
+                }\n\
+            }\n\
+        }\n\
+    \n\
+        // Get the output index.\n\
+        int outIdx = (o * OHEIGHT + r) * OWIDTH + c;\n\
+        out[outIdx] = max;\n\
+    }\n\
+}\n\
+\n";
+
 
 int main(int argc, char *argv[]) {
 
     CNNGenerator::LayerParam params[] = {
+        //{
+        //    CNNGenerator::CONV,
+        //    "conv1",
+        //    {16, 1, 1},
+        //    32,
+        //    32,
+        //    1,
+        //    5,
+        //    28,
+        //    28,
+        //    6
+        //}
         {
-            CNNGenerator::CONV,
-            "conv1",
-            {16, 1, 1},
-            32,
-            32,
-            1,
-            5,
+            CNNGenerator::MAX,
+            "max1",
+            { 16, 1, 1 },
             28,
             28,
+            6,
+            2,
+            14,
+            14,
             6
         }
     };
 
-    CNNGenerator::genCNN("../cnn/conv1.xml", "../cnn/conv1.cl", sizeof(params) / sizeof(CNNGenerator::LayerParam), params);
+    CNNGenerator::genCNN("../cnn/max1.xml", "../cnn/max1.cl", sizeof(params) / sizeof(CNNGenerator::LayerParam), params);
 
     return 0;
 }
