@@ -1,7 +1,7 @@
 # SDAccel command script.
 
 # Define a solution name.
-create_solution -name kernel_opt -dir FPGA -force
+create_solution -name conv1 -dir FPGA -force
 
 # Define the target platform of the application
 add_device -vbnv xilinx:adm-pcie-7v3:1ddr:2.0
@@ -32,7 +32,7 @@ add_files -kernel [get_kernels conv1] "conv1.cl"
 # Define binary containers.
 create_opencl_binary alpha
 set_property region "OCL_REGION_0" [get_opencl_binary alpha]
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv1] -name ZW
+create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv1] -name CONV
 
 # Compile the design for CPU based emulation.
 compile_emulation -flow cpu -opencl_binary [get_opencl_binary alpha]
@@ -46,5 +46,3 @@ run_emulation -flow cpu -args "../../../../../conv1.xml result.xml alpha.xclbin"
 build_system
 
 package_system
-
-run_system -args "../../../../conv1.xml result.xml alpha.xclbin"

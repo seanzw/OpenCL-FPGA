@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<cnn><kernelFileName>../cnn/conv1_baseline.cl</kernelFileName>
+<cnn><kernelFileName>../cnn/conv1.cl</kernelFileName>
 <inSize>1024</inSize>
 <layer><type>conv</type>
 <kernelName>conv1</kernelName>
