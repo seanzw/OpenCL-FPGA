@@ -162,21 +162,29 @@
   </ItemGroup>
   <ItemGroup>
     <Xml Include="conv1.xml" />
-    <Xml Include="convolution.xml">
-      <SubType>Designer</SubType>
-    </Xml>
+    <Xml Include="conv1_1_1_1.xml" />
+    <Xml Include="conv1_2_cu.xml" />
+    <Xml Include="conv1_baseline.xml" />
+    <Xml Include="conv1_pipeline.xml" />
+    <Xml Include="conv1_unroll.xml" />
     <Xml Include="result.xml" />
     <Xml Include="result_gpu_baseline.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="alpha.tcl" />
     <None Include="conv1.cl" />
+    <None Include="conv1_1_1_1.cl" />
+    <None Include="conv1_1_1_1.tcl" />
+    <None Include="conv1_2_cu.cl" />
+    <None Include="conv1_2_cu.tcl" />
     <None Include="conv1_baseline.cl" />
     <None Include="conv1_baseline.tcl" />
+    <None Include="conv1_pipeline.cl" />
+    <None Include="conv1_pipeline.tcl" />
+    <None Include="conv1_unroll.cl" />
+    <None Include="conv1_unroll.tcl" />
     <None Include="convolution_baseline.cl" />
-    <None Include="convolution_kernel_opt_1.cl" />
-    <None Include="convolution_kernel_opt_2.cl" />
-    <None Include="kernel_opt.tcl" />
+    <None Include="conv1.tcl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

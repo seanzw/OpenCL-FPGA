@@ -1,7 +1,7 @@
 # SDAccel command script.
 
 # Define a solution name.
-create_solution -name conv1_pipeline -dir FPGA -force
+create_solution -name conv1 -dir FPGA -force
 
 # Define the target platform of the application
 add_device -vbnv xilinx:adm-pcie-7v3:1ddr:2.0
@@ -27,7 +27,7 @@ set_property file_type "c header files" [get_files "test.hpp"]
 
 # Create the kernel.
 create_kernel conv1 -type clc
-add_files -kernel [get_kernels conv1] "conv1_pipeline.cl"
+add_files -kernel [get_kernels conv1] "conv1_1_1_1.cl"
 
 # Define binary containers.
 create_opencl_binary alpha
@@ -41,7 +41,7 @@ compile_emulation -flow cpu -opencl_binary [get_opencl_binary alpha]
 report_estimate
 
 # Run the design in CPU emulation mode
-run_emulation -flow cpu -args "../../../../../conv1_pipeline.xml result.xml alpha.xclbin"
+run_emulation -flow cpu -args "../../../../../conv1_1_1_1.xml result.xml alpha.xclbin"
 
 build_system
 

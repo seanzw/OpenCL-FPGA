@@ -16,6 +16,24 @@
     <Filter Include="Resource Files\convolution">
       <UniqueIdentifier>{6077f578-8052-4f7d-b635-c30dde04a020}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\convolution\conv1">
+      <UniqueIdentifier>{829b2949-3ae5-4566-9bc9-45e61dec27be}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\convolution\conv1_baseline">
+      <UniqueIdentifier>{390564bc-57ea-46c4-b86d-4d91b130c785}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\convolution\conv1_2_cu">
+      <UniqueIdentifier>{a0d682a6-3c27-4097-8202-c1ffc26bc93e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\convolution\conv1_unroll">
+      <UniqueIdentifier>{7025731b-1aaa-4a6e-a730-550460784b6c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\convolution\conv1_pipeline">
+      <UniqueIdentifier>{be1eebab-2796-4b94-b37f-5fb5f4b2b57d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\convolution\conv1_1_1_1">
+      <UniqueIdentifier>{e082c538-b89e-4c6c-9b1b-d9517ffe1ffc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cnn.hpp">
@@ -40,9 +58,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="convolution.xml">
-      <Filter>Resource Files</Filter>
-    </Xml>
     <Xml Include="result_gpu_baseline.xml">
       <Filter>Resource Files</Filter>
     </Xml>
@@ -50,7 +65,22 @@
       <Filter>Resource Files</Filter>
     </Xml>
     <Xml Include="conv1.xml">
-      <Filter>Resource Files\convolution</Filter>
+      <Filter>Resource Files\convolution\conv1</Filter>
+    </Xml>
+    <Xml Include="conv1_baseline.xml">
+      <Filter>Resource Files\convolution\conv1_baseline</Filter>
+    </Xml>
+    <Xml Include="conv1_2_cu.xml">
+      <Filter>Resource Files\convolution\conv1_2_cu</Filter>
+    </Xml>
+    <Xml Include="conv1_unroll.xml">
+      <Filter>Resource Files\convolution\conv1_unroll</Filter>
+    </Xml>
+    <Xml Include="conv1_pipeline.xml">
+      <Filter>Resource Files\convolution\conv1_pipeline</Filter>
+    </Xml>
+    <Xml Include="conv1_1_1_1.xml">
+      <Filter>Resource Files\convolution\conv1_1_1_1</Filter>
     </Xml>
   </ItemGroup>
   <ItemGroup>
@@ -60,23 +90,41 @@
     <None Include="convolution_baseline.cl">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="kernel_opt.tcl">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="convolution_kernel_opt_1.cl">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="convolution_kernel_opt_2.cl">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="conv1.cl">
-      <Filter>Resource Files\convolution</Filter>
+      <Filter>Resource Files\convolution\conv1</Filter>
     </None>
     <None Include="conv1_baseline.cl">
-      <Filter>Resource Files\convolution</Filter>
+      <Filter>Resource Files\convolution\conv1_baseline</Filter>
     </None>
     <None Include="conv1_baseline.tcl">
-      <Filter>Resource Files\convolution</Filter>
+      <Filter>Resource Files\convolution\conv1_baseline</Filter>
+    </None>
+    <None Include="conv1.tcl">
+      <Filter>Resource Files\convolution\conv1</Filter>
+    </None>
+    <None Include="conv1_2_cu.cl">
+      <Filter>Resource Files\convolution\conv1_2_cu</Filter>
+    </None>
+    <None Include="conv1_2_cu.tcl">
+      <Filter>Resource Files\convolution\conv1_2_cu</Filter>
+    </None>
+    <None Include="conv1_unroll.cl">
+      <Filter>Resource Files\convolution\conv1_unroll</Filter>
+    </None>
+    <None Include="conv1_unroll.tcl">
+      <Filter>Resource Files\convolution\conv1_unroll</Filter>
+    </None>
+    <None Include="conv1_pipeline.cl">
+      <Filter>Resource Files\convolution\conv1_pipeline</Filter>
+    </None>
+    <None Include="conv1_pipeline.tcl">
+      <Filter>Resource Files\convolution\conv1_pipeline</Filter>
+    </None>
+    <None Include="conv1_1_1_1.cl">
+      <Filter>Resource Files\convolution\conv1_1_1_1</Filter>
+    </None>
+    <None Include="conv1_1_1_1.tcl">
+      <Filter>Resource Files\convolution\conv1_1_1_1</Filter>
     </None>
   </ItemGroup>
 </Project>
