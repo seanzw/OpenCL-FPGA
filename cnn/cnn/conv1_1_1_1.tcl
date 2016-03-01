@@ -1,7 +1,7 @@
 # SDAccel command script.
 
 # Define a solution name.
-create_solution -name conv1 -dir FPGA -force
+create_solution -name conv1_1_1_1 -dir FPGA -force
 
 # Define the target platform of the application
 add_device -vbnv xilinx:adm-pcie-7v3:1ddr:2.0
