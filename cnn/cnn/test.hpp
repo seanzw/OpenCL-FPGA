@@ -43,7 +43,10 @@ namespace test {
         cnn->forwardCPU(in);
         cnn::vec outCPU(cnn->getOut());
         for (int i = 0; i < outCL.size(); ++i) {
-            assert(abs(outCL[i] - outCPU[i]) < 0.0001f);
+            if (abs(outCL[i] - outCPU[i]) > 0.0001f) {
+                std::cerr << "Failed test: CL kernel works incorrect. " << std::endl;
+                exit(-2);
+            }
         }
 
         std::cout << "CL Kernel works perfect!. " << std::endl;

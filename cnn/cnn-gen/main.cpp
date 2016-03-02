@@ -3,7 +3,6 @@
 #include <fstream>
 #include <sstream>
 #include <cstdio>
-#include "CL/cl.h"
 
 class CNNGenerator {
 public:
