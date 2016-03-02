@@ -134,14 +134,14 @@ private:
 
         std::stringstream ss;
         if (!(flag & FRONT)) {
-            fprintf(kernel, "#define in buf%zu", idx);
+            fprintf(kernel, "#define in buf%zu\n", idx);
         }
         else {
             ss << "__global float *in,\n";
         }
 
         if (!(flag & BACK)) {
-            fprintf(kernel, "#define out buf%zu", idx + 1);
+            fprintf(kernel, "#define out buf%zu\n", idx + 1);
         }
         else {
             ss << "    __global float *out";
@@ -212,14 +212,14 @@ private:
         writeDefine(kernel, "BUF_SIZE", 10);
         std::stringstream ss;
         if (!(flag & FRONT)) {
-            fprintf(kernel, "#define in buf%zu", idx);
+            fprintf(kernel, "#define in buf%zu\n", idx);
         }
         else {
             ss << "__global float *in,\n";
         }
 
         if (!(flag & BACK)) {
-            fprintf(kernel, "#define out buf%zu", idx + 1);
+            fprintf(kernel, "#define out buf%zu\n", idx + 1);
         }
         else {
             ss << "    __global float *out,";
@@ -305,14 +305,14 @@ private:
         
         std::stringstream ss;
         if (!(flag & FRONT)) {
-            fprintf(kernel, "#define in buf%zu", idx);
+            fprintf(kernel, "#define in buf%zu\n", idx);
         }
         else {
             ss << "__global float *in,\n";
         }
 
         if (!(flag & BACK)) {
-            fprintf(kernel, "#define out buf%zu", idx + 1);
+            fprintf(kernel, "#define out buf%zu\n", idx + 1);
         }
         else {
             ss << "    __global float *out,";
@@ -565,45 +565,45 @@ __kernel void %s(\n\
 int main(int argc, char *argv[]) {
 
     CNNGenerator::LayerParam params[] = {
-        //{
-        //    CNNGenerator::CONV,
-        //    "conv1",
-        //    {16, 1, 1},
-        //    32,
-        //    32,
-        //    1,
-        //    5,
-        //    28,
-        //    28,
-        //    6
-        //},
-        //{
-        //    CNNGenerator::MAX,
-        //    "max1",
-        //    { 16, 1, 1 },
-        //    28,
-        //    28,
-        //    6,
-        //    2,
-        //    14,
-        //    14,
-        //    6
-        //},
         {
-            CNNGenerator::FULL,
-            "full1",
+            CNNGenerator::CONV,
+            "conv1",
+            {16, 1, 1},
+            32,
+            32,
+            1,
+            5,
+            28,
+            28,
+            6
+        },
+        {
+            CNNGenerator::MAX,
+            "max1",
             { 16, 1, 1 },
-            5,
-            5,
-            16,
-            1,
-            120,
-            1,
-            1
-        }
+            28,
+            28,
+            6,
+            2,
+            14,
+            14,
+            6
+        },
+        //{
+        //    CNNGenerator::FULL,
+        //    "full1",
+        //    { 16, 1, 1 },
+        //    5,
+        //    5,
+        //    16,
+        //    1,
+        //    120,
+        //    1,
+        //    1
+        //}
     };
 
-    CNNGenerator::genCNN("../cnn/full.xml", "../cnn/full.cl", sizeof(params) / sizeof(CNNGenerator::LayerParam), params);
+    CNNGenerator::genCNN("../cnn/cnn.xml", "../cnn/cnn.cl", sizeof(params) / sizeof(CNNGenerator::LayerParam), params);
 
     return 0;
 }

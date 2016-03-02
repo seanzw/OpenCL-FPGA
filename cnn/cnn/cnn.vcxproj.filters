@@ -52,6 +52,9 @@
     <Filter Include="Resource Files\fullconnect\full">
       <UniqueIdentifier>{f3355685-d362-4ff6-b8b1-667de995554d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\cnn">
+      <UniqueIdentifier>{120bfb6a-da55-4bcd-aa12-01701e163ef4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cnn.hpp">
@@ -118,6 +121,9 @@
     <Xml Include="full.xml">
       <Filter>Resource Files\fullconnect\full</Filter>
     </Xml>
+    <Xml Include="cnn.xml">
+      <Filter>Resource Files\cnn</Filter>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <None Include="alpha.tcl">
@@ -182,6 +188,9 @@
     </None>
     <None Include="full.cl">
       <Filter>Resource Files\fullconnect\full</Filter>
+    </None>
+    <None Include="cnn.cl">
+      <Filter>Resource Files\cnn</Filter>
     </None>
   </ItemGroup>
 </Project>
