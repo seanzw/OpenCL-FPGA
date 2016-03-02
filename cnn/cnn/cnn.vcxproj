@@ -83,6 +83,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <IncludePath>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -148,11 +149,13 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>C:\Program Files\NVIDIA GPU Computing Toolkit\CUDA\v7.5\lib\x64\OpenCL.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="cnn.hpp" />
     <ClInclude Include="convolution.hpp" />
+    <ClInclude Include="fullconnect.hpp" />
     <ClInclude Include="layer.hpp" />
     <ClInclude Include="maxpool.hpp" />
     <ClInclude Include="test.hpp" />
@@ -168,7 +171,8 @@
     <Xml Include="conv1_baseline.xml" />
     <Xml Include="conv1_pipeline.xml" />
     <Xml Include="conv1_unroll.xml" />
-    <Xml Include="max1.xml" />
+    <Xml Include="full.xml" />
+    <Xml Include="max1_baseline.xml" />
     <Xml Include="result.xml" />
     <Xml Include="result_gpu_baseline.xml" />
   </ItemGroup>
@@ -187,7 +191,9 @@
     <None Include="conv1_unroll.tcl" />
     <None Include="convolution_baseline.cl" />
     <None Include="conv1.tcl" />
-    <None Include="max1.cl" />
+    <None Include="full.cl" />
+    <None Include="max1_baseline.cl" />
+    <None Include="max1_baseline.tcl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

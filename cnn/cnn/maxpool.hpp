@@ -58,7 +58,6 @@ namespace cnn {
         }
 
         // Forward with OpenCL.
-        // TODO.
         virtual unsigned long long forwardCL(cl_command_queue &queue) {
             cl_int err;
             cl_event event;

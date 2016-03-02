@@ -40,6 +40,9 @@
     <Filter Include="Resource Files\maxpool\max1_baseline">
       <UniqueIdentifier>{74ce80a2-6745-4a0e-beaa-61d5777c967d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\fullconnect">
+      <UniqueIdentifier>{a1a4e2bb-5659-49b1-a6c9-8acd072c8764}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cnn.hpp">
@@ -58,6 +61,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="maxpool.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="fullconnect.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -91,8 +97,11 @@
     <Xml Include="conv1_1_1_1.xml">
       <Filter>Resource Files\convolution\conv1_1_1_1</Filter>
     </Xml>
-    <Xml Include="max1.xml">
+    <Xml Include="max1_baseline.xml">
       <Filter>Resource Files\maxpool\max1_baseline</Filter>
+    </Xml>
+    <Xml Include="full.xml">
+      <Filter>Resource Files\fullconnect</Filter>
     </Xml>
   </ItemGroup>
   <ItemGroup>
@@ -138,8 +147,14 @@
     <None Include="conv1_1_1_1.tcl">
       <Filter>Resource Files\convolution\conv1_1_1_1</Filter>
     </None>
-    <None Include="max1.cl">
+    <None Include="max1_baseline.cl">
       <Filter>Resource Files\maxpool\max1_baseline</Filter>
+    </None>
+    <None Include="max1_baseline.tcl">
+      <Filter>Resource Files\maxpool\max1_baseline</Filter>
+    </None>
+    <None Include="full.cl">
+      <Filter>Resource Files\fullconnect</Filter>
     </None>
   </ItemGroup>
 </Project>

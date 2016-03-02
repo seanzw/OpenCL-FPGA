@@ -97,6 +97,10 @@ private:
             genXMLMaxLayer(xml, param);
             genCLMaxLayer(kernel, param, idx, flag);
             break;
+        case FULL:
+            genXMLFullLayer(xml, param);
+            genCLFullLayer(kernel, param, idx, flag);
+            break;
         default:
             std::cerr << "Unsupported layer type. " << std::endl;
             exit(-1);
@@ -165,6 +169,79 @@ private:
         writeUndef(kernel, "OWIDTH");
         writeUndef(kernel, "OHEIGHT");
         writeUndef(kernel, "ODEPTH");
+    }
+
+    // Generate the xml for this layer.
+    static void genXMLFullLayer(std::ofstream &xml, const LayerParam &param) {
+        writeXMLTag(xml, "type", "full");
+        writeXMLTag(xml, "kernelName", param.kernelName);
+
+        writeXMLOpenTag(xml, "workGroupSize");
+        for (size_t i = 0; i < sizeof(param.workGroupSize) / sizeof(size_t); ++i) {
+            writeXMLTag(xml, "item", param.workGroupSize[i]);
+        }
+        writeXMLCloseTag(xml, "workGroupSize");
+
+        writeXMLTag(xml, "iWidth", param.iWidth);
+        writeXMLTag(xml, "iHeight", param.iHeight);
+        writeXMLTag(xml, "iDepth", param.iDepth);
+        writeXMLTag(xml, "oWidth", param.oWidth);
+        writeXMLTag(xml, "oHeight", param.oHeight);
+        writeXMLTag(xml, "oDepth", param.oDepth);
+
+        // Randomly write the weight.
+        writeXMLOpenTag(xml, "weight");
+        for (int i = 0; i < param.oWidth * param.oHeight * param.oDepth; ++i) {
+            // For each output feature map.
+            for (int k = 0; k < param.iWidth * param.iHeight * param.iDepth; ++k) {
+                writeXMLTag(xml, "item", static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+            }
+        }
+        writeXMLCloseTag(xml, "weight");
+
+        // Randomly write the offset.
+        writeXMLOpenTag(xml, "offset");
+        for (int i = 0; i < param.oWidth * param.oHeight * param.oDepth; ++i) {
+            writeXMLTag(xml, "item", static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+        }
+        writeXMLCloseTag(xml, "offset");
+    }
+
+    static void genCLFullLayer(FILE *kernel, const LayerParam &param, size_t idx, Flag flag) {
+        writeDefine(kernel, "IN_SIZE", param.iWidth * param.iHeight * param.iDepth);
+        writeDefine(kernel, "OUT_SIZE", param.oWidth * param.oHeight * param.oDepth);
+
+        std::stringstream ss;
+        if (!(flag & FRONT)) {
+            fprintf(kernel, "#define in buf%zu", idx);
+        }
+        else {
+            ss << "__global float *in,\n";
+        }
+
+        if (!(flag & BACK)) {
+            fprintf(kernel, "#define out buf%zu", idx + 1);
+        }
+        else {
+            ss << "    __global float *out,";
+        }
+
+        fprintf(kernel, fullKernel.c_str(),
+            (int)param.workGroupSize[0],
+            (int)param.workGroupSize[1],
+            (int)param.workGroupSize[2],
+            param.kernelName.c_str(),
+            ss.str().c_str()
+            );
+
+        if (!(flag &FRONT)) {
+            writeUndef(kernel, "in");
+        }
+        if (!(flag & BACK)) {
+            writeUndef(kernel, "out");
+        }
+        writeUndef(kernel, "IN_SIZE");
+        writeUndef(kernel, "OUT_SIZE");
     }
 
     // Generate the xml for this layer.
@@ -315,6 +392,7 @@ private:
     static const std::string convKernelBaseline;
     static const std::string convKernelOptimized;
     static const std::string maxKernelBaseline;
+    static const std::string fullKernel;
 };
 
 /* Initialize the constant value. */
@@ -465,6 +543,27 @@ __kernel void %s(%s) {\n\
 }\n\
 \n";
 
+const std::string CNNGenerator::fullKernel = "\
+#ifdef __xilinx__\n\
+__attribute__((reqd_work_group_size(%d, %d, %d)))\n\
+#endif\n\
+__kernel void %s(\n\
+    %s\n\
+    __global float *weight,\n\
+    __global float *offset\n\
+    ) {\n\
+    int o = get_global_id(0);\n\
+    if (o < OUT_SIZE) {\n\
+        float sum = 0;\n\
+        for (int i = 0; i < IN_SIZE; i++) {\n\
+            sum += weight[o * IN_SIZE + i] * in[i];\n\
+        }\n\
+        sum += offset[o];\n\
+        out[o] = sigmod(sum);\n\
+    }\n\
+}\n\
+";
+
 
 int main(int argc, char *argv[]) {
 
@@ -480,22 +579,34 @@ int main(int argc, char *argv[]) {
         //    28,
         //    28,
         //    6
-        //}
+        //},
+        //{
+        //    CNNGenerator::MAX,
+        //    "max1",
+        //    { 16, 1, 1 },
+        //    28,
+        //    28,
+        //    6,
+        //    2,
+        //    14,
+        //    14,
+        //    6
+        //},
         {
-            CNNGenerator::MAX,
-            "max1",
+            CNNGenerator::FULL,
+            "full1",
             { 16, 1, 1 },
-            28,
-            28,
-            6,
-            2,
-            14,
-            14,
-            6
+            5,
+            5,
+            16,
+            1,
+            120,
+            1,
+            1
         }
     };
 
-    CNNGenerator::genCNN("../cnn/max1.xml", "../cnn/max1.cl", sizeof(params) / sizeof(CNNGenerator::LayerParam), params);
+    CNNGenerator::genCNN("../cnn/full.xml", "../cnn/full.cl", sizeof(params) / sizeof(CNNGenerator::LayerParam), params);
 
     return 0;
 }

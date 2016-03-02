@@ -1,66 +1,50 @@
-#ifndef CONVOLUTION_HEADER
-#define CONVOLUTION_HEADER
+#ifndef FULLCONNECT_HEADER
+#define FULLCONNECT_HEADER
 
 #include "layer.hpp"
 
-#include <string>
-#include <cstring>
-
 namespace cnn {
-    class ConvolutionLayer : public Layer {
+    class FullConnectLayer : public Layer {
     public:
 
-        ConvolutionLayer(const LayerParam &params,
-            const vec &weight, 
+        FullConnectLayer(const LayerParam &params,
+            const vec &weight,
             const vec &offset,
             const cl_context &context,
             const cl_program &program,
             const cl_mem &clIn
             ) : Layer(params, context),
             weight(weight),
-            offset(offset),
-            kernelSize(params.kernelSize) {
+            offset(offset) {
 
-            // Resize the input buffer.
-            inputBuffer.resize(kernelSize * kernelSize);
+            assert(weight.size() == (iWidth * iHeight * iDepth * oWidth * oHeight * oDepth));
+            assert(offset.size() == (oWidth * oHeight * oDepth));
 
             // Initialize OpenCL.
             initOpenCL(context, program, clIn, params.kernelName);
         }
 
-        virtual ~ConvolutionLayer() {
+        virtual ~FullConnectLayer() {
             clReleaseMemObject(clWeight);
             clReleaseMemObject(clOffset);
         }
 
-        // Forward with CPU.
         virtual unsigned long long forwardCPU(const vec &in) {
 
             clock_t start = clock(), diff;
-            
+
             // Clear the output buffer.
             std::fill(out.begin(), out.end(), 0.0f);
 
-            // For each output feature map.
-            for (size_t o = 0; o < oDepth; ++o) {
-                // For each input feature map.
-                for (size_t i = 0; i < iDepth; ++i) {
-                    // For each element in the output feature map.
-                    for (size_t r = 0; r < oHeight; ++r) {
-                        for (size_t c = 0; c < oWidth; ++c) {
-                            getInput(i, r, c, in);
-                            out[getOutputIdx(o, r, c)] += convolution(getWeightBase(i, o));
-                        }
-                    }
+            // For each output element.
+            for (size_t o = 0; o < out.size(); ++o) {
+                size_t weightBase = o * iWidth * iHeight * iDepth;
+                // For each input element.
+                float sum = 0.0f;
+                for (size_t i = 0; i < in.size(); ++i) {
+                    sum += weight[weightBase + i] * in[i];
                 }
-
-                // Activate function.
-                for (size_t r = 0; r < oHeight; ++r) {
-                    for (size_t c = 0; c < oWidth; ++c) {
-                        size_t idx = getOutputIdx(o, r, c);
-                        out[idx] = sigmod(out[idx] + offset[o]);
-                    }
-                }
+                out[o] = sigmod(sum + offset[o]);
             }
 
             diff = clock() - start;
@@ -78,8 +62,8 @@ namespace cnn {
 
             // Prepare the NDRange.
             size_t global[] = {
-                closestMultiple(workGroupSize[0], oWidth),
-                closestMultiple(workGroupSize[1], oDepth * oHeight),
+                closestMultiple(workGroupSize[0], oWidth * oDepth * oHeight),
+                workGroupSize[1],
                 workGroupSize[2]
             };
 
@@ -105,43 +89,8 @@ namespace cnn {
         }
 
     private:
-        /*****************************************************************************************
-         For CPU forward.
-         *****************************************************************************************/
-        // Prepare the input buffer.
-        inline void getInput(size_t i, size_t r, size_t c, const vec &in) {
-            size_t idx = 0;
-            for (size_t x = 0; x < kernelSize; ++x) {
-                for (size_t y = 0; y < kernelSize; ++y) {
-                    inputBuffer[idx++] = in[i * iWidth * iHeight + (r + x) * iWidth + c + y];
-                }
-            }
-        }
 
-        // Get the output feature map element index.
-        inline size_t getOutputIdx(size_t o, size_t r, size_t c) {
-            return o * oWidth * oHeight + r * oWidth + c;
-        }
-
-        // Get the base index of the weight.
-        inline size_t getWeightBase(size_t i, size_t o) {
-            return (o * iDepth + i) * kernelSize * kernelSize;
-        }
-
-        // Do the convolution with weight and the input buffer.
-        float convolution(size_t weightBase) {
-            float sum = 0.0f;
-            for (size_t i = 0; i < kernelSize * kernelSize; ++i) {
-                sum += weight[weightBase + i] * inputBuffer[i];
-            }
-            return sum;
-        }
-
-        // Kernel size.
-        size_t kernelSize;
-
-        // Buffer for convolution.
-        vec inputBuffer;
+        // Buffer.
         vec weight;
         vec offset;
 
@@ -155,30 +104,30 @@ namespace cnn {
             const cl_mem &clIn,
             const std::string &kernelName
             ) {
-            
+
             cl_int err;
 
             clWeight = clCreateBuffer(
                 context,
                 CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                kernelSize * kernelSize * iDepth * oDepth * sizeof(cl_float),
+                weight.size() * sizeof(cl_float),
                 const_cast<void *>(static_cast<const void *>(&weight[0])),
                 &err);
-            handleError(err, "Failed creating clWeight.");
+            handleError(err, "Failed creating clWeight. ");
             err = clRetainMemObject(clWeight);
-            handleError(err, "Failed retaining clWeight");
+            handleError(err, "Failed retaining clWeight. ");
 
             clOffset = clCreateBuffer(
                 context,
                 CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                oDepth * sizeof(cl_float),
+                offset.size() * sizeof(cl_float),
                 const_cast<void *>(static_cast<const void *>(&offset[0])),
                 &err);
             handleError(err, "Failed creating clOffset");
             err = clRetainMemObject(clOffset);
             handleError(err, "Failed retaining clOffset");
 
-            // Set the arguments for the kernel.
+            // Create the kernel and set the arguments.
             kernel = clCreateKernel(program, kernelName.c_str(), &err);
             handleError(err, "Failed creating kernel. ");
             err = clRetainKernel(kernel);
@@ -202,7 +151,6 @@ namespace cnn {
             handleError(err, "Failed setting kernel arg: clOffset. ");
         }
     };
-
 }
 
 #endif

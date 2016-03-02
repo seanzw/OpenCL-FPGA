@@ -4,8 +4,9 @@
 #include "util.hpp"
 #include "convolution.hpp"
 #include "maxpool.hpp"
+#include "fullconnect.hpp"
 
-#define BUFSIZE (64 * 1024)
+#define BUFSIZE (64 * 1024 * 1024)
 
 namespace cnn {
     class CNN {
@@ -199,10 +200,57 @@ namespace cnn {
             else if (type == "max") {
                 return createMaxLayer(root, flag);
             }
+            else if (type == "full") {
+                return createFullLayer(root, flag);
+            }
             else {
                 std::cerr << "createLayer: Unsupported layer: " << type << std::endl;
                 exit(-1);
             }
+        }
+
+        Layer *createFullLayer(rapidxml::xml_node<> *root, Flag flag) {
+            LayerParam params;
+
+            params.flag = flag;
+
+            // Get the parameters for the convolutional layer.
+            params.iWidth = getSizeT(root, "iWidth");
+            params.iHeight = getSizeT(root, "iHeight");
+            params.iDepth = getSizeT(root, "iDepth");
+            params.oWidth = getSizeT(root, "oWidth");
+            params.oHeight = getSizeT(root, "oHeight");
+            params.oDepth = getSizeT(root, "oDepth");
+
+            // Get the kernel name.
+            params.kernelName = getString(root, "kernelName");
+
+            // Get the work group size.
+            std::vector<size_t> workGroupSize;
+            getAllItem(root->first_node("workGroupSize"), workGroupSize);
+            for (size_t i = 0; i < workGroupSize.size(); ++i) {
+                params.workGroupSize[i] = workGroupSize[i];
+            }
+
+            // Create the weight vector.
+            cnn::vec weight;
+            getAllItem(root->first_node("weight"), weight);
+            assert(weight.size() == params.oWidth * params.oHeight * params.oDepth * params.iDepth * params.iWidth * params.iHeight);
+
+            // Create the offset vector.
+            cnn::vec offset;
+            for (rapidxml::xml_node<> *node = root->first_node("offset")->first_node(); node; node = node->next_sibling()) {
+                offset.push_back((float)std::atof(node->value()));
+            }
+            assert(offset.size() == params.oWidth * params.oHeight * params.oDepth);
+
+            return new cnn::FullConnectLayer(params,
+                weight,
+                offset,
+                context,
+                program,
+                clIn
+                );
         }
 
         Layer *createMaxLayer(rapidxml::xml_node<> *root, Flag flag) {
