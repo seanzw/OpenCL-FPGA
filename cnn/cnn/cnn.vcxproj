@@ -171,7 +171,9 @@
     <Xml Include="conv1_baseline.xml" />
     <Xml Include="conv1_pipeline.xml" />
     <Xml Include="conv1_unroll.xml" />
+    <Xml Include="full.xml" />
     <Xml Include="full_baseline.xml" />
+    <Xml Include="full_pipeline.xml" />
     <Xml Include="max1_baseline.xml" />
     <Xml Include="result.xml" />
     <Xml Include="result_gpu_baseline.xml" />
@@ -191,8 +193,11 @@
     <None Include="conv1_unroll.tcl" />
     <None Include="convolution_baseline.cl" />
     <None Include="conv1.tcl" />
+    <None Include="full.cl" />
     <None Include="full_baseline.cl" />
     <None Include="full_baseline.tcl" />
+    <None Include="full_pipeline.cl" />
+    <None Include="full_pipeline.tcl" />
     <None Include="max1_baseline.cl" />
     <None Include="max1_baseline.tcl" />
   </ItemGroup>

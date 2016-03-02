@@ -209,7 +209,7 @@ private:
     static void genCLFullLayer(FILE *kernel, const LayerParam &param, size_t idx, Flag flag) {
         writeDefine(kernel, "IN_SIZE", param.iWidth * param.iHeight * param.iDepth);
         writeDefine(kernel, "OUT_SIZE", param.oWidth * param.oHeight * param.oDepth);
-
+        writeDefine(kernel, "BUF_SIZE", 10);
         std::stringstream ss;
         if (!(flag & FRONT)) {
             fprintf(kernel, "#define in buf%zu", idx);
@@ -241,6 +241,7 @@ private:
         }
         writeUndef(kernel, "IN_SIZE");
         writeUndef(kernel, "OUT_SIZE");
+        writeUndef(kernel, "BUF_SIZE");
     }
 
     // Generate the xml for this layer.
@@ -409,42 +410,39 @@ __kernel void %s(\n\
     __constant float *weight,\n\
     __constant float *offset\n\
     ) {\n\
-    \n\
-    int c = get_global_id(0);\n\
-    int r = get_global_id(1);\n\
-    \n\
-    if (c < OWIDTH && r < ODEPTH * OHEIGHT) {\n\
+    #ifdef __xilinx__\n\
+    __attribute__((xcl_pipeline_workitems))\n\
+    #endif\n\
+    int o = get_global_id(0);\n\
 \n\
-        // Get the index of the element in output feature map.\n\
-        int o = r / OHEIGHT;\n\
-        r = r %% OHEIGHT; \n\
+    float inBuf[BUF_SIZE];\n\
+    float weightBuf[BUF_SIZE];\n\
 \n\
-        float sum = 0.0f;\n\
+    if (o < OUT_SIZE) {\n\
+        float sum = 0;\n\
+#ifdef __xilinx__\n\
+        __attribute__((xcl_pipeline_loop))\n\
+#endif\n\
+        for (int i = 0; i < IN_SIZE; i += BUF_SIZE) {\n\
 \n\
-        // For each input feature map.\n\
-        for (int i = 0; i < IDEPTH; ++i) {\n\
-            \n\
-            float inputBuf[KERNEL_LEN];\n\
-            float weightBuf[KERNEL_LEN];\n\
-            int idx = 0;\n\
-            int weightBase = (o * IDEPTH + i) * KERNEL_LEN;\n\
-            for (int x = 0; x < KERNEL_SIZE; ++x) {\n\
-                for (int y = 0; y < KERNEL_SIZE; ++y) {\n\
-                    inputBuf[idx] = in[(i * IHEIGHT + r + x) * IWIDTH + c + y];\n\
-                    weightBuf[idx] = weight[weightBase + idx];\n\
-                    idx++;\n\
-                }\n\
+            #ifdef __xilinx__\n\
+            __attribute__((opencl_unroll_hint))\n\
+            #endif\n\
+            for (int j = 0; j < BUF_SIZE; ++j) {\n\
+                inBuf[j] = in[i + j];\n\
+                weightBuf[j] = weight[o * IN_SIZE + i + j];\n\
             }\n\
 \n\
-            for (int x = 0; x < KERNEL_LEN; ++x) {\n\
-                sum += inputBuf[x] * weightBuf[x];\n\
+            #ifdef __xilinx__\n\
+            __attribute__((opencl_unroll_hint))\n\
+            #endif\n\
+            for (int j = 0; j < BUF_SIZE; ++j) {\n\
+                sum += weightBuf[j] * inBuf[j];\n\
             }\n\
         }\n\
-\n\
-        // Get the output index.\n\
-        int outIdx = (o * OHEIGHT + r) * OWIDTH + c;\n\
-        out[outIdx] = sigmod(sum + offset[o]);\n\
-    } \n\
+        sum += offset[o]; \n\
+        out[o] = sigmod(sum);\n\
+    }\n\
 }\n";
 
 

@@ -46,6 +46,12 @@
     <Filter Include="Resource Files\fullconnect\full_baseline">
       <UniqueIdentifier>{f4ecfa4d-f0c0-4d26-9ef7-a530d710c3f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\fullconnect\full_pipeline">
+      <UniqueIdentifier>{628d54f8-d1bd-45e1-8154-2afefd647234}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\fullconnect\full">
+      <UniqueIdentifier>{f3355685-d362-4ff6-b8b1-667de995554d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cnn.hpp">
@@ -106,6 +112,12 @@
     <Xml Include="full_baseline.xml">
       <Filter>Resource Files\fullconnect\full_baseline</Filter>
     </Xml>
+    <Xml Include="full_pipeline.xml">
+      <Filter>Resource Files\fullconnect\full_pipeline</Filter>
+    </Xml>
+    <Xml Include="full.xml">
+      <Filter>Resource Files\fullconnect\full</Filter>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <None Include="alpha.tcl">
@@ -161,6 +173,15 @@
     </None>
     <None Include="full_baseline.tcl">
       <Filter>Resource Files\fullconnect\full_baseline</Filter>
+    </None>
+    <None Include="full_pipeline.cl">
+      <Filter>Resource Files\fullconnect\full_pipeline</Filter>
+    </None>
+    <None Include="full_pipeline.tcl">
+      <Filter>Resource Files\fullconnect\full_pipeline</Filter>
+    </None>
+    <None Include="full.cl">
+      <Filter>Resource Files\fullconnect\full</Filter>
     </None>
   </ItemGroup>
 </Project>
