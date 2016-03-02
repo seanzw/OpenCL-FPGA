@@ -19,6 +19,9 @@ set_property file_type "c header files" [get_files "convolution.hpp"]
 add_files "maxpool.hpp"
 set_property file_type "c header files" [get_files "maxpool.hpp"]
 
+add_files "fullconnect.hpp"
+set_property file_type "c header files" [get_files "fullconnect.hpp"]
+
 add_files "layer.hpp"
 set_property file_type "c header files" [get_files "layer.hpp"]
 

@@ -1,7 +1,7 @@
 # SDAccel command script.
 
 # Define a solution name.
-create_solution -name conv1_pipeline -dir FPGA -force
+create_solution -name full_baseline -dir FPGA -force
 
 # Define the target platform of the application
 add_device -vbnv xilinx:adm-pcie-7v3:1ddr:2.0
@@ -32,13 +32,13 @@ add_files "test.hpp"
 set_property file_type "c header files" [get_files "test.hpp"]
 
 # Create the kernel.
-create_kernel conv1 -type clc
-add_files -kernel [get_kernels conv1] "conv1_pipeline.cl"
+create_kernel full1 -type clc
+add_files -kernel [get_kernels full1] "full_pipeline.cl"
 
 # Define binary containers.
 create_opencl_binary alpha
 set_property region "OCL_REGION_0" [get_opencl_binary alpha]
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv1] -name CONV
+create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels full1] -name FULL1
 
 # Compile the design for CPU based emulation.
 compile_emulation -flow cpu -opencl_binary [get_opencl_binary alpha]
@@ -47,7 +47,7 @@ compile_emulation -flow cpu -opencl_binary [get_opencl_binary alpha]
 report_estimate
 
 # Run the design in CPU emulation mode
-run_emulation -flow cpu -args "../../../../../conv1_pipeline.xml result.xml alpha.xclbin"
+run_emulation -flow cpu -args "../../../../../full_baseline.xml result.xml alpha.xclbin"
 
 build_system
 
