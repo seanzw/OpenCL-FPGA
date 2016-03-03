@@ -280,7 +280,7 @@ namespace cnn {
             // Create the weight vector.
             cnn::vec weight;
             getAllItem(root->first_node("weight"), weight);
-            assert(weight.size() == params.oWidth * params.oHeight * params.oDepth * params.iDepth * params.iWidth * params.iHeight);
+            assert(weight.size() == params.oDepth);
 
             // Create the offset vector.
             cnn::vec offset;
