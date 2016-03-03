@@ -8,23 +8,31 @@ namespace cnn {
     public:
 
         MaxPoolLayer(const LayerParam &params,
+            const vec &weight,
+            const vec &offset,
             const cl_context &context,
             const cl_program &program,
             const cl_mem &clIn
-            ) : Layer(params, context), poolSize(params.kernelSize) {
+            ) : Layer(params, context),
+            weight(weight),
+            offset(offset),
+            poolSize(params.kernelSize) {
 
             assert(params.iDepth == params.oDepth);
             assert((params.iWidth / params.kernelSize) == params.oWidth);
             assert((params.iHeight / params.kernelSize) == params.oHeight);
             assert((params.iWidth % params.kernelSize) == 0);
             assert((params.iHeight % params.kernelSize) == 0);
+            assert(offset.size() == params.oDepth);
+            assert(offset.size() == params.oDepth);
 
             //Initialize OpenCL.
             initOpenCL(context, program, clIn, params.kernelName);
         }
 
         virtual ~MaxPoolLayer() {
-
+            clReleaseMemObject(clWeight);
+            clReleaseMemObject(clOffset);
         }
 
         virtual unsigned long long forwardCPU(const vec &in) {
@@ -36,16 +44,13 @@ namespace cnn {
                 // For each element in the output feature map.
                 for (size_t r = 0; r < oHeight; ++r) {
                     for (size_t c = 0; c < oWidth; ++c) {
-                        float max = 0.0f;
+                        float sum = 0.0f;
                         for (size_t x = 0; x < poolSize; ++x) {
                             for (size_t y = 0; y < poolSize; ++y) {
-                                float tmp = in[(o * iHeight + r * poolSize + x) * iWidth + c * poolSize + y];
-                                if (tmp > max) {
-                                    max = tmp;
-                                }
+                                sum += in[(o * iHeight + r * poolSize + x) * iWidth + c * poolSize + y];
                             }
                         }
-                        out[(o * oHeight + r) * oWidth + c] = max;
+                        out[(o * oHeight + r) * oWidth + c] = sigmod(sum * weight[o] + offset[o]);
                     }
                 }
             }
@@ -96,6 +101,13 @@ namespace cnn {
         // Pool size.
         size_t poolSize;
 
+        vec weight;
+        vec offset;
+
+        // For OpenCL.
+        cl_mem clWeight;
+        cl_mem clOffset;
+
         void initOpenCL(const cl_context &context,
             const cl_program &program,
             const cl_mem &clIn,
@@ -103,6 +115,26 @@ namespace cnn {
             ) {
 
             cl_int err;
+
+            clWeight = clCreateBuffer(
+                context,
+                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                oDepth * sizeof(cl_float),
+                const_cast<void *>(static_cast<const void *>(&weight[0])),
+                &err);
+            handleError(err, "Failed creating clWeight.");
+            err = clRetainMemObject(clWeight);
+            handleError(err, "Failed retaining clWeight");
+
+            clOffset = clCreateBuffer(
+                context,
+                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
+                oDepth * sizeof(cl_float),
+                const_cast<void *>(static_cast<const void *>(&offset[0])),
+                &err);
+            handleError(err, "Failed creating clOffset");
+            err = clRetainMemObject(clOffset);
+            handleError(err, "Failed retaining clOffset");
 
             // Set the arguments for the kernel.
             kernel = clCreateKernel(program, kernelName.c_str(), &err);
@@ -120,6 +152,12 @@ namespace cnn {
                 err = clSetKernelArg(kernel, i++, sizeof(cl_mem), &clOut);
                 handleError(err, "Failed setting kernel arg: clOut. ");
             }
+
+            err = clSetKernelArg(kernel, i++, sizeof(cl_mem), &clWeight);
+            handleError(err, "Failed setting kernel arg: clWeight. ");
+
+            err = clSetKernelArg(kernel, i++, sizeof(cl_mem), &clOffset);
+            handleError(err, "Failed setting kernel arg: clOffset. ");
         }
     };
 }

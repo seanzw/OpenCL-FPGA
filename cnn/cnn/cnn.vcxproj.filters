@@ -55,6 +55,9 @@
     <Filter Include="Resource Files\cnn">
       <UniqueIdentifier>{120bfb6a-da55-4bcd-aa12-01701e163ef4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\cnn\lenet5">
+      <UniqueIdentifier>{8ae4cf24-95fb-4adb-a6dc-825e2bd0a952}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cnn.hpp">
@@ -124,6 +127,12 @@
     <Xml Include="cnn.xml">
       <Filter>Resource Files\cnn</Filter>
     </Xml>
+    <Xml Include="max1.xml">
+      <Filter>Resource Files\maxpool</Filter>
+    </Xml>
+    <Xml Include="lenet5.xml">
+      <Filter>Resource Files\cnn\lenet5</Filter>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <None Include="alpha.tcl">
@@ -191,6 +200,21 @@
     </None>
     <None Include="cnn.cl">
       <Filter>Resource Files\cnn</Filter>
+    </None>
+    <None Include="cnn.tcl">
+      <Filter>Resource Files\cnn</Filter>
+    </None>
+    <None Include="max1.cl">
+      <Filter>Resource Files\maxpool</Filter>
+    </None>
+    <None Include="cnn.vcxproj.user">
+      <Filter>Resource Files\cnn\lenet5</Filter>
+    </None>
+    <None Include="lenet5.cl">
+      <Filter>Resource Files\cnn\lenet5</Filter>
+    </None>
+    <None Include="lenet5.tcl">
+      <Filter>Resource Files\cnn\lenet5</Filter>
     </None>
   </ItemGroup>
 </Project>

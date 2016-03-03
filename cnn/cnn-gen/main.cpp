@@ -121,6 +121,20 @@ private:
         writeXMLTag(xml, "iHeight", param.iHeight);
         writeXMLTag(xml, "iDepth", param.iDepth);
         writeXMLTag(xml, "kernelSize", param.kernelSize);
+
+        // Randomly write the weight.
+        writeXMLOpenTag(xml, "weight");
+        for (int i = 0; i < param.oDepth; ++i) {
+            writeXMLTag(xml, "item", static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+        }
+        writeXMLCloseTag(xml, "weight");
+
+        // Randomly write the offset.
+        writeXMLOpenTag(xml, "offset");
+        for (int i = 0; i < param.oDepth; ++i) {
+            writeXMLTag(xml, "item", static_cast<float>(rand()) / static_cast<float>(RAND_MAX));
+        }
+        writeXMLCloseTag(xml, "offset");
     }
 
     static void genCLMaxLayer(FILE *kernel, const LayerParam &param, size_t idx, Flag flag) {
@@ -144,7 +158,7 @@ private:
             fprintf(kernel, "#define out buf%zu\n", idx + 1);
         }
         else {
-            ss << "    __global float *out";
+            ss << "    __global float *out,\n";
         }
 
         fprintf(kernel, maxKernelBaseline.c_str(),
@@ -512,30 +526,31 @@ const std::string CNNGenerator::maxKernelBaseline = "\
 #ifdef __xilinx__\n\
 __attribute__ ((reqd_work_group_size(%d, %d, %d)))\n\
 #endif\n\
-__kernel void %s(%s) {\n\
+__kernel void %s(%s\n\
+    __global float *weight,\n\
+    __global float *offset) {\n\
     int c = get_global_id(0);\n\
     int r = get_global_id(1);\n\
-    \n\
+\n\
     if (c < OWIDTH && r < ODEPTH * OHEIGHT) {\n\
-    \n\
+\n\
         // Get the index of the element in output feature map.\n\
         int o = r / OHEIGHT;\n\
         r = r %% OHEIGHT;\n\
-    \n\
-        float max = 0.0f;\n\
-    \n\
+\n\
+        float sum = 0.0f;\n\
+\n\
         for (int x = 0; x < KERNEL_SIZE; ++x) {\n\
             for (int y = 0; y < KERNEL_SIZE; ++y) {\n\
-                float tmp = in[(o * IHEIGHT + r * KERNEL_SIZE + x) * IWIDTH + c * KERNEL_SIZE + y];\n\
-                if (tmp > max) {\n\
-                    max = tmp;\n\
-                }\n\
+                sum += in[(o * IHEIGHT + r * KERNEL_SIZE + x) * IWIDTH + c * KERNEL_SIZE + y];\n\
             }\n\
         }\n\
-    \n\
+\n\
+        sum = sum * weight[o] + offset[o];\n\
+\n\
         // Get the output index.\n\
         int outIdx = (o * OHEIGHT + r) * OWIDTH + c;\n\
-        out[outIdx] = max;\n\
+        out[outIdx] = sigmod(sum);\n\
     }\n\
 }\n\
 \n";
@@ -579,7 +594,7 @@ int main(int argc, char *argv[]) {
         },
         {
             CNNGenerator::MAX,
-            "max1",
+            "max2",
             { 16, 1, 1 },
             28,
             28,
@@ -589,21 +604,57 @@ int main(int argc, char *argv[]) {
             14,
             6
         },
-        //{
-        //    CNNGenerator::FULL,
-        //    "full1",
-        //    { 16, 1, 1 },
-        //    5,
-        //    5,
-        //    16,
-        //    1,
-        //    120,
-        //    1,
-        //    1
-        //}
+        {
+            CNNGenerator::CONV,
+            "conv3",
+            { 16, 1, 1 },
+            14,
+            14,
+            6,
+            5,
+            10,
+            10,
+            16
+        },
+        {
+            CNNGenerator::MAX,
+            "max4",
+            { 16, 1, 1 },
+            10,
+            10,
+            16,
+            2,
+            5,
+            5,
+            16
+        },
+        {
+            CNNGenerator::CONV,
+            "conv5",
+            { 16, 1, 1 },
+            5,
+            5,
+            16,
+            5,
+            1,
+            1,
+            120
+        },
+        {
+            CNNGenerator::FULL,
+            "full6",
+            { 16, 1, 1 },
+            1,
+            1,
+            120,
+            1,
+            84,
+            1,
+            1
+        }
     };
 
-    CNNGenerator::genCNN("../cnn/cnn.xml", "../cnn/cnn.cl", sizeof(params) / sizeof(CNNGenerator::LayerParam), params);
+    CNNGenerator::genCNN("../cnn/lenet5.xml", "../cnn/lenet5.cl", sizeof(params) / sizeof(CNNGenerator::LayerParam), params);
 
     return 0;
 }

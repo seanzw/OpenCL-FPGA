@@ -175,6 +175,8 @@
     <Xml Include="full.xml" />
     <Xml Include="full_baseline.xml" />
     <Xml Include="full_pipeline.xml" />
+    <Xml Include="lenet5.xml" />
+    <Xml Include="max1.xml" />
     <Xml Include="max1_baseline.xml" />
     <Xml Include="result.xml" />
     <Xml Include="result_gpu_baseline.xml" />
@@ -182,6 +184,8 @@
   <ItemGroup>
     <None Include="alpha.tcl" />
     <None Include="cnn.cl" />
+    <None Include="cnn.tcl" />
+    <None Include="cnn.vcxproj.user" />
     <None Include="conv1.cl" />
     <None Include="conv1_1_1_1.cl" />
     <None Include="conv1_1_1_1.tcl" />
@@ -200,6 +204,9 @@
     <None Include="full_baseline.tcl" />
     <None Include="full_pipeline.cl" />
     <None Include="full_pipeline.tcl" />
+    <None Include="lenet5.cl" />
+    <None Include="lenet5.tcl" />
+    <None Include="max1.cl" />
     <None Include="max1_baseline.cl" />
     <None Include="max1_baseline.tcl" />
   </ItemGroup>

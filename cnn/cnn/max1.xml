@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<cnn><kernelFileName>../cnn/max1.cl</kernelFileName>
+<inSize>4704</inSize>
+<layer><type>max</type>
+<kernelName>max1</kernelName>
+<workGroupSize><item>16</item>
+<item>1</item>
+<item>1</item>
+</workGroupSize><iWidth>28</iWidth>
+<iHeight>28</iHeight>
+<iDepth>6</iDepth>
+<kernelSize>2</kernelSize>
+<weight><item>0.00125126</item>
+<item>0.563585</item>
+<item>0.193304</item>
+<item>0.80874</item>
+<item>0.585009</item>
+<item>0.479873</item>
+</weight><offset><item>0.350291</item>
+<item>0.895962</item>
+<item>0.82284</item>
+<item>0.746605</item>
+<item>0.174108</item>
+<item>0.858943</item>
+</offset></layer></cnn>

@@ -277,7 +277,20 @@ namespace cnn {
                 params.workGroupSize[i] = workGroupSize[i];
             }
 
+            // Create the weight vector.
+            cnn::vec weight;
+            getAllItem(root->first_node("weight"), weight);
+            assert(weight.size() == params.oWidth * params.oHeight * params.oDepth * params.iDepth * params.iWidth * params.iHeight);
+
+            // Create the offset vector.
+            cnn::vec offset;
+            for (rapidxml::xml_node<> *node = root->first_node("offset")->first_node(); node; node = node->next_sibling()) {
+                offset.push_back((float)std::atof(node->value()));
+            }
+
             return new cnn::MaxPoolLayer(params,
+                weight,
+                offset,
                 context,
                 program,
                 clIn
