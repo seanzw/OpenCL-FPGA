@@ -34,15 +34,15 @@ set_property file_type "c header files" [get_files "test.hpp"]
 # Create the kernel.
 create_kernel conv1 -type clc
 add_files -kernel [get_kernels conv1] "lenet5.cl"
-create_kernel conv1 -type clc
+create_kernel max2 -type clc
 add_files -kernel [get_kernels max2] "lenet5.cl"
-create_kernel conv1 -type clc
+create_kernel conv3 -type clc
 add_files -kernel [get_kernels conv3] "lenet5.cl"
-create_kernel conv1 -type clc
+create_kernel max4 -type clc
 add_files -kernel [get_kernels max4] "lenet5.cl"
-create_kernel conv1 -type clc
+create_kernel conv5 -type clc
 add_files -kernel [get_kernels conv5] "lenet5.cl"
-create_kernel conv1 -type clc
+create_kernel full6 -type clc
 add_files -kernel [get_kernels full6] "lenet5.cl"
 
 # Define binary containers.
