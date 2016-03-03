@@ -120,6 +120,9 @@ private:
         writeXMLTag(xml, "iWidth", param.iWidth);
         writeXMLTag(xml, "iHeight", param.iHeight);
         writeXMLTag(xml, "iDepth", param.iDepth);
+        writeXMLTag(xml, "oWidth", param.oWidth);
+        writeXMLTag(xml, "oHeight", param.oHeight);
+        writeXMLTag(xml, "oDepth", param.oDepth);
         writeXMLTag(xml, "kernelSize", param.kernelSize);
 
         // Randomly write the weight.

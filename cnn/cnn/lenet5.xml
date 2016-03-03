@@ -177,6 +177,9 @@
 </workGroupSize><iWidth>28</iWidth>
 <iHeight>28</iHeight>
 <iDepth>6</iDepth>
+<oWidth>14</oWidth>
+<oHeight>14</oHeight>
+<oDepth>6</oDepth>
 <kernelSize>2</kernelSize>
 <weight><item>0.0274667</item>
 <item>0.994629</item>
@@ -2626,6 +2629,9 @@
 </workGroupSize><iWidth>10</iWidth>
 <iHeight>10</iHeight>
 <iDepth>16</iDepth>
+<oWidth>5</oWidth>
+<oHeight>5</oHeight>
+<oDepth>16</oDepth>
 <kernelSize>2</kernelSize>
 <weight><item>0.710379</item>
 <item>0.186926</item>

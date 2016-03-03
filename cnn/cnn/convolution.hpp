@@ -16,9 +16,7 @@ namespace cnn {
             const cl_context &context,
             const cl_program &program,
             const cl_mem &clIn
-            ) : Layer(params, context),
-            weight(weight),
-            offset(offset),
+            ) : Layer(params, weight, offset, context, program, clIn),
             kernelSize(params.kernelSize) {
 
             // Resize the input buffer.
@@ -142,65 +140,7 @@ namespace cnn {
 
         // Buffer for convolution.
         vec inputBuffer;
-        vec weight;
-        vec offset;
 
-        // For OpenCL.
-        cl_mem clWeight;
-        cl_mem clOffset;
-
-        // Initialize the OpenCL.
-        void initOpenCL(const cl_context &context,
-            const cl_program &program,
-            const cl_mem &clIn,
-            const std::string &kernelName
-            ) {
-            
-            cl_int err;
-
-            clWeight = clCreateBuffer(
-                context,
-                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                kernelSize * kernelSize * iDepth * oDepth * sizeof(cl_float),
-                const_cast<void *>(static_cast<const void *>(&weight[0])),
-                &err);
-            handleError(err, "Failed creating clWeight.");
-            err = clRetainMemObject(clWeight);
-            handleError(err, "Failed retaining clWeight");
-
-            clOffset = clCreateBuffer(
-                context,
-                CL_MEM_READ_ONLY | CL_MEM_COPY_HOST_PTR,
-                oDepth * sizeof(cl_float),
-                const_cast<void *>(static_cast<const void *>(&offset[0])),
-                &err);
-            handleError(err, "Failed creating clOffset");
-            err = clRetainMemObject(clOffset);
-            handleError(err, "Failed retaining clOffset");
-
-            // Set the arguments for the kernel.
-            kernel = clCreateKernel(program, kernelName.c_str(), &err);
-            handleError(err, "Failed creating kernel. ");
-            err = clRetainKernel(kernel);
-            handleError(err, "Failed retaining kernel. ");
-
-            unsigned int i = 0;
-            if (flag & FRONT) {
-                err = clSetKernelArg(kernel, i++, sizeof(cl_mem), &clIn);
-                handleError(err, "Failed setting kernel arg: clIn. ");
-            }
-
-            if (flag & BACK) {
-                err = clSetKernelArg(kernel, i++, sizeof(cl_mem), &clOut);
-                handleError(err, "Failed setting kernel arg: clOut. ");
-            }
-
-            err = clSetKernelArg(kernel, i++, sizeof(cl_mem), &clWeight);
-            handleError(err, "Failed setting kernel arg: clWeight. ");
-
-            err = clSetKernelArg(kernel, i++, sizeof(cl_mem), &clOffset);
-            handleError(err, "Failed setting kernel arg: clOffset. ");
-        }
     };
 
 }

@@ -193,23 +193,6 @@ namespace cnn {
         // Create a layer.
         Layer *createLayer(rapidxml::xml_node<> *root, Flag flag) {
 
-            std::string type = getString(root, "type");
-            if (type == "conv") {
-                return createConvLayer(root, flag);
-            }
-            else if (type == "max") {
-                return createMaxLayer(root, flag);
-            }
-            else if (type == "full") {
-                return createFullLayer(root, flag);
-            }
-            else {
-                std::cerr << "createLayer: Unsupported layer: " << type << std::endl;
-                exit(-1);
-            }
-        }
-
-        Layer *createFullLayer(rapidxml::xml_node<> *root, Flag flag) {
             LayerParam params;
 
             params.flag = flag;
@@ -221,6 +204,7 @@ namespace cnn {
             params.oWidth = getSizeT(root, "oWidth");
             params.oHeight = getSizeT(root, "oHeight");
             params.oDepth = getSizeT(root, "oDepth");
+            params.kernelSize = getSizeT(root, "kernelSize");
 
             // Get the kernel name.
             params.kernelName = getString(root, "kernelName");
@@ -244,109 +228,41 @@ namespace cnn {
             }
             assert(offset.size() == params.oWidth * params.oHeight * params.oDepth);
 
-            return new cnn::FullConnectLayer(params,
-                weight,
-                offset,
-                context,
-                program,
-                clIn
-                );
-        }
-
-        Layer *createMaxLayer(rapidxml::xml_node<> *root, Flag flag) {
-            LayerParam params;
-
-            params.flag = flag;
-
-            // Get the parameters for the convolutional layer.
-            params.iWidth = getSizeT(root, "iWidth");
-            params.iHeight = getSizeT(root, "iHeight");
-            params.iDepth = getSizeT(root, "iDepth");
-            params.kernelSize = getSizeT(root, "kernelSize");
-            params.oDepth = params.iDepth;
-            params.oWidth = params.iWidth / params.kernelSize;
-            params.oHeight = params.iHeight / params.kernelSize;
-
-            // Get the kernel name.
-            params.kernelName = getString(root, "kernelName");
-
-            // Get the work group size.
-            std::vector<size_t> workGroupSize;
-            getAllItem(root->first_node("workGroupSize"), workGroupSize);
-            for (size_t i = 0; i < workGroupSize.size(); ++i) {
-                params.workGroupSize[i] = workGroupSize[i];
+            std::string type = getString(root, "type");
+            if (type == "conv") {
+                return new cnn::ConvolutionLayer(params,
+                    weight,
+                    offset,
+                    context,
+                    program,
+                    clIn
+                    );
             }
-
-            // Create the weight vector.
-            cnn::vec weight;
-            getAllItem(root->first_node("weight"), weight);
-            assert(weight.size() == params.oDepth);
-
-            // Create the offset vector.
-            cnn::vec offset;
-            for (rapidxml::xml_node<> *node = root->first_node("offset")->first_node(); node; node = node->next_sibling()) {
-                offset.push_back((float)std::atof(node->value()));
+            else if (type == "max") {
+                return new cnn::MaxPoolLayer(params,
+                    weight,
+                    offset,
+                    context,
+                    program,
+                    clIn
+                    );
             }
-
-            return new cnn::MaxPoolLayer(params,
-                weight,
-                offset,
-                context,
-                program,
-                clIn
-                );
-        }
-
-        Layer *createConvLayer(rapidxml::xml_node<> *root, Flag flag) {
-
-            LayerParam params;
-
-            params.flag = flag;
-
-            // Get the parameters for the convolutional layer.
-            params.iWidth       = getSizeT(root, "iWidth");
-            params.iHeight      = getSizeT(root, "iHeight");
-            params.iDepth       = getSizeT(root, "iDepth");
-            params.kernelSize   = getSizeT(root, "kernelSize");
-            params.oDepth       = getSizeT(root, "oDepth");
-
-            params.oWidth       = params.iWidth - params.kernelSize + 1;
-            params.oHeight      = params.iHeight - params.kernelSize + 1;
-
-            // Get the kernel name.
-            params.kernelName   = getString(root, "kernelName");
-
-            // Get the work group size.
-            std::vector<size_t> workGroupSize;
-            getAllItem(root->first_node("workGroupSize"), workGroupSize);
-            for (size_t i = 0; i < workGroupSize.size(); ++i) {
-                params.workGroupSize[i] = workGroupSize[i];
+            else if (type == "full") {
+                return new cnn::FullConnectLayer(params,
+                    weight,
+                    offset,
+                    context,
+                    program,
+                    clIn
+                    );
             }
-
-            // Create the weight vector.
-            cnn::vec weight;
-            getAllItem(root->first_node("weight"), weight);
-            assert(weight.size() == params.oDepth * params.iDepth * params.kernelSize * params.kernelSize);
-
-            // Create the offset vector.
-            cnn::vec offset;
-            for (rapidxml::xml_node<> *node = root->first_node("offset")->first_node(); node; node = node->next_sibling()) {
-                offset.push_back((float)std::atof(node->value()));
+            else {
+                std::cerr << "createLayer: Unsupported layer: " << type << std::endl;
+                exit(-1);
             }
-            assert(offset.size() == params.oDepth);
-
-            return new cnn::ConvolutionLayer(params,
-                weight,
-                offset,
-                context,
-                program,
-                clIn
-                );
         }
 
     };
 }
-
-
 
 #endif

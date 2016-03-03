@@ -52,7 +52,7 @@ create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernel
 create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels max2] -name MAX2
 create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv3] -name CONV3
 create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels max4] -name MAX4
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv5] -name CONV4
+create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv5] -name CONV5
 create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels full6] -name FULL6
 
 # Compile the design for CPU based emulation.
