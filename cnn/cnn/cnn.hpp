@@ -8,6 +8,7 @@
 #include "rbf.hpp"
 
 #define BUFSIZE (64 * 1024 * 1024)
+#define QUEUE_BARRIER 100
 
 namespace cnn {
     class CNN {
@@ -51,7 +52,7 @@ namespace cnn {
                 layers.push_back(createLayer(layer, flag));
             }
 
-            delete buf;
+            delete[] buf;
         }
 
         ~CNN() {
@@ -74,6 +75,7 @@ namespace cnn {
             return totalTime;
         }
 
+        // Forward with OpenCL.
         unsigned long long forwardCL(const vec &in) {
 
             // Prepare the input cl_mem.
@@ -107,6 +109,80 @@ namespace cnn {
                 NULL);
 
             return totalTime;
+        }
+
+        // Forward more than one input with in order command queue.
+        std::vector<cl_event> forwardCLBatch(const vec &in, vec &out, size_t n) {
+
+            // Make sure that input size is correct.
+            size_t inSize = getInSize();
+            size_t outSize = getOutSize();
+            size_t eventSize = layers.size() + 2;
+            if (in.size() != inSize * n) {
+                std::cerr << "Wrong input size! " << std::endl;
+                exit(-2);
+            }
+
+            // Reserve the output buffer.
+            out.resize(outSize * n);
+
+            // Reserve the event buffer.
+            // One event for each layer plus two events for IO.
+            std::vector<cl_event> events(n * eventSize);
+
+            // For OpenCL error.
+            cl_int err;
+
+            for (size_t i = 0; i < n; ++i) {
+                
+                // Prepare the input cl_mem.
+                err = clEnqueueWriteBuffer(queue,
+                    clIn,
+                    CL_FALSE,
+                    0,
+                    inSize * sizeof(cl_float),
+                    (void *)&in[i * inSize],
+                    i == 0 ? 0 : 1,
+                    i == 0 ? NULL : &events[(i - 1) * eventSize],
+                    &events[i * eventSize]);
+                handleError(err, "Failed copy input buffer. ");
+
+                // For each layer.
+                for (size_t l = 0; l < layers.size(); ++l) {
+                    err = clEnqueueNDRangeKernel(queue,
+                        layers[l]->kernel,
+                        3,
+                        NULL,
+                        layers[l]->global,
+                        layers[l]->workGroupSize,
+                        1,
+                        &events[i * eventSize + l],
+                        &events[i * eventSize + l + 1]);
+                    handleError(err, "Failed enqueuing kernel. ");
+                }
+
+                // Get the output.
+                err = clEnqueueReadBuffer(queue,
+                    layers[layers.size() - 1]->clOut,
+                    CL_FALSE,
+                    0,
+                    outSize * sizeof(cl_float),
+                    &out[i * outSize],
+                    1,
+                    &events[i * eventSize + layers.size()],
+                    &events[i * eventSize + layers.size() + 1]);
+                handleError(err, "Failed enqueuing reading buffer. ");
+
+                if (i % QUEUE_BARRIER == QUEUE_BARRIER - 1) {
+                    err = clFinish(queue);
+                    handleError(err, "Failed executing clFinish. ");
+                }
+            }
+
+            // Call clFinish.
+            err = clFinish(queue);
+            handleError(err, "Failed executing clFinish. ");
+            return events;
         }
 
         // For OpenCL.

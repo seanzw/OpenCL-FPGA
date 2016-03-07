@@ -6,21 +6,10 @@ using namespace cnn;
 
 namespace test {
 
-    // Run the test.
-    void runTimeTest(CNN *cnn, const vec &in, const std::string &outFile
-        ) {
+    // Run time test with single input.
+    void runTimeTest(std::ofstream &o, CNN *cnn, const vec &in) {
 
-        std::ofstream o(outFile.c_str());
-        if (!o.is_open()) {
-            std::cerr << "Can't open file " << outFile << std::endl;
-            exit(-1);
-        }
-        o << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << std::endl;
-        writeXMLOpenTag(o, "results");
-        
-        
-        
-        writeXMLOpenTag(o, "result");
+        writeXMLOpenTag(o, "single");
 
         unsigned long long totalTime = 0;
         for (size_t i = 0; i < NUM_TEST; ++i) {
@@ -29,15 +18,49 @@ namespace test {
         size_t averageTime = totalTime / NUM_TEST;
         std::cout << "Average Time: " << averageTime << std::endl;
         writeXMLTag(o, "averageTime", averageTime);
-        writeXMLCloseTag(o, "result");
-        writeXMLCloseTag(o, "results");
+        writeXMLCloseTag(o, "single");
         std::cout << "Finish testing!" << std::endl;
+    }
 
-        o.close();
+    // Run time test with batch input.
+    void runTimeTestBatch(std::ofstream &o, CNN *cnn, const vec &in, size_t n) {
+        vec out;
+        cl_int err;
+        cl_ulong t;
+        writeXMLOpenTag(o, "batch");
+        std::vector<cl_event> events = cnn->forwardCLBatch(in, out, n);
+
+        for (size_t i = 0; i < n; ++i) {
+            writeXMLOpenTag(o, "input");
+            for (size_t e = 0; e < events.size() / n; ++e) {
+                writeXMLOpenTag(o, "event");
+
+                err = clGetEventProfilingInfo(events[e], CL_PROFILING_COMMAND_QUEUED, sizeof(cl_ulong), &t, NULL);
+                handleError(err, "Failed get profile. ");
+                writeXMLTag(o, "que", t);
+
+                err = clGetEventProfilingInfo(events[e], CL_PROFILING_COMMAND_SUBMIT, sizeof(cl_ulong), &t, NULL);
+                handleError(err, "Failed get profile. ");
+                writeXMLTag(o, "sub", t);
+
+                err = clGetEventProfilingInfo(events[e], CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &t, NULL);
+                handleError(err, "Failed get profile. ");
+                writeXMLTag(o, "sta", t);
+
+                err = clGetEventProfilingInfo(events[e], CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &t, NULL);
+                handleError(err, "Failed get profile. ");
+                writeXMLTag(o, "end", t);
+
+                writeXMLCloseTag(o, "event");
+            }
+            writeXMLCloseTag(o, "input");
+        }
+
+        writeXMLCloseTag(o, "batch");
+        std::cout << "Finish testing!" << std::endl;
     }
 
     void runFuncTest(CNN *cnn, const vec &in) {
-
         cnn->forwardCL(in);
         cnn::vec outCL(cnn->getOut());
         cnn->forwardCPU(in);
@@ -48,7 +71,6 @@ namespace test {
                 exit(-2);
             }
         }
-
         std::cout << "CL Kernel works perfect!. " << std::endl;
     }
 }
