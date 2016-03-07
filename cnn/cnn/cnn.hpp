@@ -5,6 +5,7 @@
 #include "convolution.hpp"
 #include "maxpool.hpp"
 #include "fullconnect.hpp"
+#include "rbf.hpp"
 
 #define BUFSIZE (64 * 1024 * 1024)
 
@@ -219,14 +220,10 @@ namespace cnn {
             // Create the weight vector.
             cnn::vec weight;
             getAllItem(root->first_node("weight"), weight);
-            assert(weight.size() == params.oWidth * params.oHeight * params.oDepth * params.iDepth * params.iWidth * params.iHeight);
 
             // Create the offset vector.
             cnn::vec offset;
-            for (rapidxml::xml_node<> *node = root->first_node("offset")->first_node(); node; node = node->next_sibling()) {
-                offset.push_back((float)std::atof(node->value()));
-            }
-            assert(offset.size() == params.oWidth * params.oHeight * params.oDepth);
+            getAllItem(root->first_node("offset"), offset);
 
             std::string type = getString(root, "type");
             if (type == "conv") {
@@ -249,6 +246,15 @@ namespace cnn {
             }
             else if (type == "full") {
                 return new cnn::FullConnectLayer(params,
+                    weight,
+                    offset,
+                    context,
+                    program,
+                    clIn
+                    );
+            }
+            else if (type == "rbf") {
+                return new cnn::RBFLayer(params,
                     weight,
                     offset,
                     context,

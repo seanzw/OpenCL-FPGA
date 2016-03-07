@@ -158,6 +158,7 @@
     <ClInclude Include="fullconnect.hpp" />
     <ClInclude Include="layer.hpp" />
     <ClInclude Include="maxpool.hpp" />
+    <ClInclude Include="rbf.hpp" />
     <ClInclude Include="test.hpp" />
     <ClInclude Include="util.hpp" />
   </ItemGroup>
@@ -178,6 +179,7 @@
     <Xml Include="lenet5.xml" />
     <Xml Include="max1.xml" />
     <Xml Include="max1_baseline.xml" />
+    <Xml Include="rbf.xml" />
     <Xml Include="result.xml" />
     <Xml Include="result_gpu_baseline.xml" />
   </ItemGroup>
@@ -209,6 +211,7 @@
     <None Include="max1.cl" />
     <None Include="max1_baseline.cl" />
     <None Include="max1_baseline.tcl" />
+    <None Include="rbf.cl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

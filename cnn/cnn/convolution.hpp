@@ -22,9 +22,6 @@ namespace cnn {
             // Resize the input buffer.
             inputBuffer.resize(kernelSize * kernelSize);
 
-            // Initialize OpenCL.
-            initOpenCL(context, program, clIn, params.kernelName);
-
             // Prepare the ND-Range.
             global[0] = closestMultiple(workGroupSize[0], oWidth);
             global[1] = closestMultiple(workGroupSize[1], oHeight * oDepth);
@@ -32,8 +29,6 @@ namespace cnn {
         }
 
         virtual ~ConvolutionLayer() {
-            clReleaseMemObject(clWeight);
-            clReleaseMemObject(clOffset);
         }
 
         // Forward with CPU.

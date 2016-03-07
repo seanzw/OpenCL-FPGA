@@ -9,7 +9,8 @@ public:
     enum LayerType {
         CONV,
         MAX,
-        FULL
+        FULL,
+        RBF
     };
 
 #define INNER (0)
@@ -100,6 +101,10 @@ private:
             genXMLFullLayer(xml, param);
             genCLFullLayer(kernel, param, idx, flag);
             break;
+        case RBF:
+            genXMLRBFLayer(xml, param);
+            genCLRBFLayer(kernel, param, idx, flag);
+            break;
         default:
             std::cerr << "Unsupported layer type. " << std::endl;
             exit(-1);
@@ -109,21 +114,7 @@ private:
 
     static void genXMLMaxLayer(std::ofstream &xml, const LayerParam &param) {
         writeXMLTag(xml, "type", "max");
-        writeXMLTag(xml, "kernelName", param.kernelName);
-
-        writeXMLOpenTag(xml, "workGroupSize");
-        for (size_t i = 0; i < sizeof(param.workGroupSize) / sizeof(size_t); ++i) {
-            writeXMLTag(xml, "item", param.workGroupSize[i]);
-        }
-        writeXMLCloseTag(xml, "workGroupSize");
-
-        writeXMLTag(xml, "iWidth", param.iWidth);
-        writeXMLTag(xml, "iHeight", param.iHeight);
-        writeXMLTag(xml, "iDepth", param.iDepth);
-        writeXMLTag(xml, "oWidth", param.oWidth);
-        writeXMLTag(xml, "oHeight", param.oHeight);
-        writeXMLTag(xml, "oDepth", param.oDepth);
-        writeXMLTag(xml, "kernelSize", param.kernelSize);
+        writeXMLInfo(xml, param);
 
         // Randomly write the weight.
         writeXMLOpenTag(xml, "weight");
@@ -164,7 +155,7 @@ private:
             ss << "    __global float *out,\n";
         }
 
-        fprintf(kernel, maxKernelBaseline.c_str(),
+        fprintf(kernel, maxKernel.c_str(),
             (int)param.workGroupSize[0],
             (int)param.workGroupSize[1],
             (int)param.workGroupSize[2],
@@ -190,20 +181,7 @@ private:
     // Generate the xml for this layer.
     static void genXMLFullLayer(std::ofstream &xml, const LayerParam &param) {
         writeXMLTag(xml, "type", "full");
-        writeXMLTag(xml, "kernelName", param.kernelName);
-
-        writeXMLOpenTag(xml, "workGroupSize");
-        for (size_t i = 0; i < sizeof(param.workGroupSize) / sizeof(size_t); ++i) {
-            writeXMLTag(xml, "item", param.workGroupSize[i]);
-        }
-        writeXMLCloseTag(xml, "workGroupSize");
-
-        writeXMLTag(xml, "iWidth", param.iWidth);
-        writeXMLTag(xml, "iHeight", param.iHeight);
-        writeXMLTag(xml, "iDepth", param.iDepth);
-        writeXMLTag(xml, "oWidth", param.oWidth);
-        writeXMLTag(xml, "oHeight", param.oHeight);
-        writeXMLTag(xml, "oDepth", param.oDepth);
+        writeXMLInfo(xml, param);
 
         // Randomly write the weight.
         writeXMLOpenTag(xml, "weight");
@@ -264,21 +242,7 @@ private:
     // Generate the xml for this layer.
     static void genXMLConvLayer(std::ofstream &xml, const LayerParam &param) {
         writeXMLTag(xml, "type", "conv");
-        writeXMLTag(xml, "kernelName", param.kernelName);
-
-        writeXMLOpenTag(xml, "workGroupSize");
-        for (size_t i = 0; i < sizeof(param.workGroupSize) / sizeof(size_t); ++i) {
-            writeXMLTag(xml, "item", param.workGroupSize[i]);
-        }
-        writeXMLCloseTag(xml,"workGroupSize");
-
-        writeXMLTag(xml, "iWidth", param.iWidth);
-        writeXMLTag(xml, "iHeight", param.iHeight);
-        writeXMLTag(xml, "iDepth", param.iDepth);
-        writeXMLTag(xml, "kernelSize", param.kernelSize);
-        writeXMLTag(xml, "oWidth", param.oWidth);
-        writeXMLTag(xml, "oHeight", param.oHeight);
-        writeXMLTag(xml, "oDepth", param.oDepth);
+        writeXMLInfo(xml, param);
 
         // Randomly write the weight.
         writeXMLOpenTag(xml, "weight");
@@ -335,7 +299,7 @@ private:
             ss << "    __global float *out,";
         }
 
-        fprintf(kernel, convKernelOptimized.c_str(),
+        fprintf(kernel, convKernel.c_str(),
             (int)param.workGroupSize[0],
             (int)param.workGroupSize[1],
             (int)param.workGroupSize[2],
@@ -357,6 +321,63 @@ private:
         writeUndef(kernel, "OWIDTH");
         writeUndef(kernel, "OHEIGHT");
         writeUndef(kernel, "ODEPTH");
+    }
+
+    // Generate the xml for this layer.
+    static void genXMLRBFLayer(std::ofstream &xml, const LayerParam &param) {
+        writeXMLTag(xml, "type", "rbf");
+        writeXMLInfo(xml, param);
+
+        // Randomly write the weight.
+        writeXMLOpenTag(xml, "weight");
+        size_t weightSize = param.iWidth * param.iHeight * param.iDepth * param.oWidth * param.oHeight * param.oDepth;
+        for (int i = 0; i < weightSize; ++i) {
+            float r = static_cast<float>(rand()) / static_cast<float>(RAND_MAX);
+            writeXMLTag(xml, "item", r > 0.5f ? 1.0f : -1.0f);
+        }
+        writeXMLCloseTag(xml, "weight");
+
+        writeXMLOpenTag(xml, "offset");
+        writeXMLTag(xml, "item", 0.0f);
+        writeXMLCloseTag(xml, "offset");
+    }
+
+    static void genCLRBFLayer(FILE *kernel, const LayerParam &param, size_t idx, Flag flag) {
+        writeDefine(kernel, "IN_SIZE", param.iWidth * param.iHeight * param.iDepth);
+        writeDefine(kernel, "OUT_SIZE", param.oWidth * param.oHeight * param.oDepth);
+        writeDefine(kernel, "BUF_SIZE", 14);
+        std::stringstream ss;
+        if (!(flag & FRONT)) {
+            fprintf(kernel, "#define in buf%zu\n", idx);
+        }
+        else {
+            ss << "__global float *in,\n";
+        }
+
+        if (!(flag & BACK)) {
+            fprintf(kernel, "#define out buf%zu\n", idx + 1);
+        }
+        else {
+            ss << "    __global float *out,";
+        }
+
+        fprintf(kernel, rbfKernel.c_str(),
+            (int)param.workGroupSize[0],
+            (int)param.workGroupSize[1],
+            (int)param.workGroupSize[2],
+            param.kernelName.c_str(),
+            ss.str().c_str()
+            );
+
+        if (!(flag &FRONT)) {
+            writeUndef(kernel, "in");
+        }
+        if (!(flag & BACK)) {
+            writeUndef(kernel, "out");
+        }
+        writeUndef(kernel, "IN_SIZE");
+        writeUndef(kernel, "OUT_SIZE");
+        writeUndef(kernel, "BUF_SIZE");
     }
 
     /***********************************************************************
@@ -391,6 +412,22 @@ private:
         o << std::endl;
     }
 
+    static void writeXMLInfo(std::ofstream &xml, const LayerParam &param) {
+        writeXMLTag(xml, "kernelName", param.kernelName);
+        writeXMLOpenTag(xml, "workGroupSize");
+        for (size_t i = 0; i < sizeof(param.workGroupSize) / sizeof(size_t); ++i) {
+            writeXMLTag(xml, "item", param.workGroupSize[i]);
+        }
+        writeXMLCloseTag(xml, "workGroupSize");
+        writeXMLTag(xml, "iWidth", param.iWidth);
+        writeXMLTag(xml, "iHeight", param.iHeight);
+        writeXMLTag(xml, "iDepth", param.iDepth);
+        writeXMLTag(xml, "kernelSize", param.kernelSize);
+        writeXMLTag(xml, "oWidth", param.oWidth);
+        writeXMLTag(xml, "oHeight", param.oHeight);
+        writeXMLTag(xml, "oDepth", param.oDepth);
+    }
+
     /***********************************************************************
      Helper function to generate OpenCL kernel file.
     ************************************************************************/
@@ -406,10 +443,10 @@ private:
      Some constant value.
      ********************************************************************************************/
     static const std::string activateFunc;
-    static const std::string convKernelBaseline;
-    static const std::string convKernelOptimized;
-    static const std::string maxKernelBaseline;
+    static const std::string convKernel;
+    static const std::string maxKernel;
     static const std::string fullKernel;
+    static const std::string rbfKernel;
 };
 
 /* Initialize the constant value. */
@@ -418,52 +455,7 @@ float sigmod(float in) {\n\
     return 1.0f / (1.0f + exp(-in)); \n\
 }";
 
-const std::string CNNGenerator::convKernelBaseline = "\
-#ifdef __xilinx__\n\
-__attribute__ ((reqd_work_group_size(%d, %d, %d)))\n\
-#endif\n\
-__kernel void %s(\n\
-    %s\n\
-    __constant float *weight,\n\
-    __constant float *offset\n\
-    ) {\n\
-    #ifdef __xilinx__\n\
-    __attribute__((xcl_pipeline_workitems))\n\
-    #endif\n\
-    int o = get_global_id(0);\n\
-\n\
-    float inBuf[BUF_SIZE];\n\
-    float weightBuf[BUF_SIZE];\n\
-\n\
-    if (o < OUT_SIZE) {\n\
-        float sum = 0;\n\
-#ifdef __xilinx__\n\
-        __attribute__((xcl_pipeline_loop))\n\
-#endif\n\
-        for (int i = 0; i < IN_SIZE; i += BUF_SIZE) {\n\
-\n\
-            #ifdef __xilinx__\n\
-            __attribute__((opencl_unroll_hint))\n\
-            #endif\n\
-            for (int j = 0; j < BUF_SIZE; ++j) {\n\
-                inBuf[j] = in[i + j];\n\
-                weightBuf[j] = weight[o * IN_SIZE + i + j];\n\
-            }\n\
-\n\
-            #ifdef __xilinx__\n\
-            __attribute__((opencl_unroll_hint))\n\
-            #endif\n\
-            for (int j = 0; j < BUF_SIZE; ++j) {\n\
-                sum += weightBuf[j] * inBuf[j];\n\
-            }\n\
-        }\n\
-        sum += offset[o]; \n\
-        out[o] = sigmod(sum);\n\
-    }\n\
-}\n";
-
-
-const std::string CNNGenerator::convKernelOptimized = "\
+const std::string CNNGenerator::convKernel = "\
 #ifdef __xilinx__\n\
 __attribute__ ((reqd_work_group_size(%d, %d, %d)))\n\
 #endif\n\
@@ -525,7 +517,7 @@ __kernel void %s(\n\
     } \n\
 }\n";
 
-const std::string CNNGenerator::maxKernelBaseline = "\
+const std::string CNNGenerator::maxKernel = "\
 #ifdef __xilinx__\n\
 __attribute__ ((reqd_work_group_size(%d, %d, %d)))\n\
 #endif\n\
@@ -568,17 +560,77 @@ __kernel void %s(\n\
     __global float *offset\n\
     ) {\n\
     int o = get_global_id(0);\n\
+\n\
+    float inBuf[BUF_SIZE];\n\
+    float weightBuf[BUF_SIZE];\n\
+\n\
     if (o < OUT_SIZE) {\n\
         float sum = 0;\n\
-        for (int i = 0; i < IN_SIZE; i++) {\n\
-            sum += weight[o * IN_SIZE + i] * in[i];\n\
+        #ifdef __xilinx__\n\
+                __attribute__((xcl_pipeline_loop))\n\
+        #endif\n\
+        for (int i = 0; i < IN_SIZE; i += BUF_SIZE) {\n\
+\n\
+            #ifdef __xilinx__\n\
+            __attribute__((opencl_unroll_hint))\n\
+            #endif\n\
+            for (int j = 0; j < BUF_SIZE; ++j) {\n\
+                inBuf[j] = in[i + j];\n\
+                weightBuf[j] = weight[o * IN_SIZE + i + j];\n\
+            }\n\
+\n\
+            #ifdef __xilinx__\n\
+            __attribute__((opencl_unroll_hint))\n\
+            #endif\n\
+            for (int j = 0; j < BUF_SIZE; ++j) {\n\
+                sum += weightBuf[j] * inBuf[j];\n\
+            }\n\
         }\n\
-        sum += offset[o];\n\
+        sum += offset[o]; \n\
         out[o] = sigmod(sum);\n\
     }\n\
 }\n\
 ";
 
+const std::string CNNGenerator::rbfKernel = "\
+#ifdef __xilinx__\n\
+__attribute__((reqd_work_group_size(%d, %d, %d)))\n\
+#endif\n\
+__kernel void %s(\n\
+    %s\n\
+    __global float *weight,\n\
+    __global float *offset\n\
+    ) {\n\
+    int o = get_global_id(0);\n\
+    float inBuf[BUF_SIZE];\n\
+    float weightBuf[BUF_SIZE];\n\
+    if (o < OUT_SIZE) {\n\
+        float sum = 0.0f; \n\
+        #ifdef __xilinx__\n\
+        __attribute__((xcl_pipeline_loop))\n\
+        #endif\n\
+        for (int i = 0; i < IN_SIZE; i += BUF_SIZE) {\n\
+        \n\
+            #ifdef __xilinx__\n\
+            __attribute__((opencl_unroll_hint))\n\
+            #endif\n\
+            for (int j = 0; j < BUF_SIZE; ++j) {\n\
+                inBuf[j] = in[i + j];\n\
+                weightBuf[j] = weight[o * IN_SIZE + i + j];\n\
+            }\n\
+        \n\
+            #ifdef __xilinx__\n\
+            __attribute__((opencl_unroll_hint))\n\
+            #endif\n\
+            for (int j = 0; j < BUF_SIZE; ++j) {\n\
+                float diff = weightBuf[j] - inBuf[j];\n\
+                sum += diff * diff;\n\
+            }\n\
+        }\n\
+        out[o] = sum;\n\
+    }\n\
+}\n\
+";
 
 int main(int argc, char *argv[]) {
 
@@ -654,10 +706,24 @@ int main(int argc, char *argv[]) {
             84,
             1,
             1
+        },
+        {
+            CNNGenerator::RBF,
+            "rbf",
+            { 10, 1, 1 },
+            84,
+            1,
+            1,
+            1,
+            10,
+            1,
+            1
         }
     };
 
-    CNNGenerator::genCNN("../cnn/lenet5.xml", "../cnn/lenet5.cl", sizeof(params) / sizeof(CNNGenerator::LayerParam), params);
+    CNNGenerator::genCNN("../cnn/full.xml", "../cnn/full.cl", 1, &params[5]);
+    CNNGenerator::genCNN("../cnn/rbf.xml", "../cnn/rbf.cl", 1, &params[6]);
+    CNNGenerator::genCNN("../cnn/lenet5.xml", "../cnn/lenet5.cl", 7, params);
 
     return 0;
 }

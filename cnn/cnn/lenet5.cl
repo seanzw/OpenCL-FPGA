@@ -6,6 +6,7 @@ __global float buf2[1176];
 __global float buf3[1600];
 __global float buf4[400];
 __global float buf5[120];
+__global float buf6[84];
 #define KERNEL_SIZE 5
 #define KERNEL_LEN 25
 #define IWIDTH 32
@@ -347,22 +348,90 @@ __kernel void conv5(
 #define OUT_SIZE 84
 #define BUF_SIZE 10
 #define in buf5
+#define out buf6
 #ifdef __xilinx__
 __attribute__((reqd_work_group_size(16, 1, 1)))
 #endif
 __kernel void full6(
+    
+    __global float *weight,
+    __global float *offset
+    ) {
+    int o = get_global_id(0);
+
+    float inBuf[BUF_SIZE];
+    float weightBuf[BUF_SIZE];
+
+    if (o < OUT_SIZE) {
+        float sum = 0;
+        #ifdef __xilinx__
+                __attribute__((xcl_pipeline_loop))
+        #endif
+        for (int i = 0; i < IN_SIZE; i += BUF_SIZE) {
+
+            #ifdef __xilinx__
+            __attribute__((opencl_unroll_hint))
+            #endif
+            for (int j = 0; j < BUF_SIZE; ++j) {
+                inBuf[j] = in[i + j];
+                weightBuf[j] = weight[o * IN_SIZE + i + j];
+            }
+
+            #ifdef __xilinx__
+            __attribute__((opencl_unroll_hint))
+            #endif
+            for (int j = 0; j < BUF_SIZE; ++j) {
+                sum += weightBuf[j] * inBuf[j];
+            }
+        }
+        sum += offset[o]; 
+        out[o] = sigmod(sum);
+    }
+}
+#undef in
+#undef out
+#undef IN_SIZE
+#undef OUT_SIZE
+#undef BUF_SIZE
+#define IN_SIZE 84
+#define OUT_SIZE 10
+#define BUF_SIZE 14
+#define in buf6
+#ifdef __xilinx__
+__attribute__((reqd_work_group_size(10, 1, 1)))
+#endif
+__kernel void rbf(
         __global float *out,
     __global float *weight,
     __global float *offset
     ) {
     int o = get_global_id(0);
+    float inBuf[BUF_SIZE];
+    float weightBuf[BUF_SIZE];
     if (o < OUT_SIZE) {
-        float sum = 0;
-        for (int i = 0; i < IN_SIZE; i++) {
-            sum += weight[o * IN_SIZE + i] * in[i];
+        float sum = 0.0f; 
+        #ifdef __xilinx__
+        __attribute__((xcl_pipeline_loop))
+        #endif
+        for (int i = 0; i < IN_SIZE; i += BUF_SIZE) {
+        
+            #ifdef __xilinx__
+            __attribute__((opencl_unroll_hint))
+            #endif
+            for (int j = 0; j < BUF_SIZE; ++j) {
+                inBuf[j] = in[i + j];
+                weightBuf[j] = weight[o * IN_SIZE + i + j];
+            }
+        
+            #ifdef __xilinx__
+            __attribute__((opencl_unroll_hint))
+            #endif
+            for (int j = 0; j < BUF_SIZE; ++j) {
+                float diff = weightBuf[j] - inBuf[j];
+                sum += diff * diff;
+            }
         }
-        sum += offset[o];
-        out[o] = sigmod(sum);
+        out[o] = sum;
     }
 }
 #undef in

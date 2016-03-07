@@ -24,9 +24,6 @@ namespace cnn {
             assert(offset.size() == params.oDepth);
             assert(offset.size() == params.oDepth);
 
-            //Initialize OpenCL.
-            initOpenCL(context, program, clIn, params.kernelName);
-
             // Prepare the ND-Range.
             global[0] = closestMultiple(workGroupSize[0], oWidth);
             global[1] = closestMultiple(workGroupSize[1], oHeight * oDepth);

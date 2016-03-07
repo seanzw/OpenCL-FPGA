@@ -9,7 +9,8 @@ namespace cnn {
     enum LayerType {
         CONV,
         SUB,
-        FULL
+        FULL,
+        RBF
     };
 
 #define INNER (0)

@@ -58,6 +58,9 @@
     <Filter Include="Resource Files\cnn\lenet5">
       <UniqueIdentifier>{8ae4cf24-95fb-4adb-a6dc-825e2bd0a952}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\rbf">
+      <UniqueIdentifier>{b44121be-e013-44f5-8c06-8105583f7643}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cnn.hpp">
@@ -79,6 +82,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="fullconnect.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rbf.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -132,6 +138,9 @@
     </Xml>
     <Xml Include="lenet5.xml">
       <Filter>Resource Files\cnn\lenet5</Filter>
+    </Xml>
+    <Xml Include="rbf.xml">
+      <Filter>Resource Files\rbf</Filter>
     </Xml>
   </ItemGroup>
   <ItemGroup>
@@ -215,6 +224,9 @@
     </None>
     <None Include="lenet5.tcl">
       <Filter>Resource Files\cnn\lenet5</Filter>
+    </None>
+    <None Include="rbf.cl">
+      <Filter>Resource Files\rbf</Filter>
     </None>
   </ItemGroup>
 </Project>
