@@ -22,6 +22,9 @@ set_property file_type "c header files" [get_files "maxpool.hpp"]
 add_files "fullconnect.hpp"
 set_property file_type "c header files" [get_files "fullconnect.hpp"]
 
+add_files "rbf.hpp"
+set_property file_type "c header files" [get_files "rbf.hpp"]
+
 add_files "layer.hpp"
 set_property file_type "c header files" [get_files "layer.hpp"]
 
@@ -44,6 +47,8 @@ create_kernel conv5 -type clc
 add_files -kernel [get_kernels conv5] "lenet5.cl"
 create_kernel full6 -type clc
 add_files -kernel [get_kernels full6] "lenet5.cl"
+create_kernel rbf -type clc
+add_files -kernel [get_kernels rbf] "lenet5.cl"
 
 # Define binary containers.
 create_opencl_binary alpha
@@ -54,6 +59,7 @@ create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernel
 create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels max4] -name MAX4
 create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv5] -name CONV5
 create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels full6] -name FULL6
+create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels rbf] -name RBF
 
 # Compile the design for CPU based emulation.
 compile_emulation -flow cpu -opencl_binary [get_opencl_binary alpha]
