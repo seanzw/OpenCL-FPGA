@@ -20,6 +20,11 @@ namespace cnn {
 
             // Initialize OpenCL.
             initOpenCL(context, program, clIn, params.kernelName);
+
+            // Prepare the ND-Range.
+            global[0] = closestMultiple(workGroupSize[0], oWidth * oDepth * oHeight);
+            global[1] = workGroupSize[1];
+            global[2] = workGroupSize[2];
         }
 
         virtual ~FullConnectLayer() {
@@ -51,40 +56,7 @@ namespace cnn {
             return (unsigned long long)msec;
         }
 
-        // Forward with OpenCL.
-        virtual unsigned long long forwardCL(cl_command_queue &queue) {
 
-            cl_int err;
-            cl_event event;
-            cl_ulong t1, t2;
-
-            // Prepare the NDRange.
-            size_t global[] = {
-                closestMultiple(workGroupSize[0], oWidth * oDepth * oHeight),
-                workGroupSize[1],
-                workGroupSize[2]
-            };
-
-            // Enqueue the kernel.
-            err = clEnqueueNDRangeKernel(queue,
-                kernel,
-                3,
-                NULL,
-                global,
-                workGroupSize,
-                0,
-                NULL,
-                &event);
-            handleError(err, "Failed enqueuing kernel. ");
-
-            clWaitForEvents(1, &event);
-
-            err = clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &t1, NULL);
-            err = clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &t2, NULL);
-            handleError(err, "Failed timing the kernel. ");
-
-            return t2 - t1;
-        }
     };
 }
 

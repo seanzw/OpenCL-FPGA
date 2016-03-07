@@ -69,7 +69,34 @@ namespace cnn {
         }
         
         virtual unsigned long long forwardCPU(const vec &in) = 0;
-        virtual unsigned long long forwardCL(cl_command_queue &queue) = 0;
+
+        // Forward with OpenCL.
+        virtual unsigned long long forwardCL(cl_command_queue &queue) {
+
+            cl_int err;
+            cl_event event;
+            cl_ulong t1, t2;
+
+            // Enqueue the kernel.
+            err = clEnqueueNDRangeKernel(queue,
+                kernel,
+                3,
+                NULL,
+                global,
+                workGroupSize,
+                0,
+                NULL,
+                &event);
+            handleError(err, "Failed enqueuing kernel. ");
+
+            clWaitForEvents(1, &event);
+
+            err = clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &t1, NULL);
+            err = clGetEventProfilingInfo(event, CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &t2, NULL);
+            handleError(err, "Failed timing the kernel. ");
+
+            return t2 - t1;
+        }
 
 
         friend class CNN;
@@ -99,7 +126,9 @@ namespace cnn {
         cl_mem clWeight;
         cl_mem clOffset;
 
+        // For ND-Range.
         size_t workGroupSize[3];
+        size_t global[3];
 
         // Whether this is the first layer or the last layer.
         const Flag flag;
