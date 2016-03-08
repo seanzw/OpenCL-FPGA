@@ -29,25 +29,26 @@ namespace test {
         cl_ulong t;
         writeXMLOpenTag(o, "batch");
         std::vector<cl_event> events = cnn->forwardCLBatch(in, out, n);
+        size_t eventForOneInput = events.size() / n;
 
         for (size_t i = 0; i < n; ++i) {
             writeXMLOpenTag(o, "input");
-            for (size_t e = 0; e < events.size() / n; ++e) {
+            for (size_t e = 0; e < eventForOneInput; ++e) {
                 writeXMLOpenTag(o, "event");
 
-                err = clGetEventProfilingInfo(events[e], CL_PROFILING_COMMAND_QUEUED, sizeof(cl_ulong), &t, NULL);
+                err = clGetEventProfilingInfo(events[i * eventForOneInput + e], CL_PROFILING_COMMAND_QUEUED, sizeof(cl_ulong), &t, NULL);
                 handleError(err, "Failed get profile. ");
                 writeXMLTag(o, "que", t);
 
-                err = clGetEventProfilingInfo(events[e], CL_PROFILING_COMMAND_SUBMIT, sizeof(cl_ulong), &t, NULL);
+                err = clGetEventProfilingInfo(events[i * eventForOneInput + e], CL_PROFILING_COMMAND_SUBMIT, sizeof(cl_ulong), &t, NULL);
                 handleError(err, "Failed get profile. ");
                 writeXMLTag(o, "sub", t);
 
-                err = clGetEventProfilingInfo(events[e], CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &t, NULL);
+                err = clGetEventProfilingInfo(events[i * eventForOneInput + e], CL_PROFILING_COMMAND_START, sizeof(cl_ulong), &t, NULL);
                 handleError(err, "Failed get profile. ");
                 writeXMLTag(o, "sta", t);
 
-                err = clGetEventProfilingInfo(events[e], CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &t, NULL);
+                err = clGetEventProfilingInfo(events[i * eventForOneInput + e], CL_PROFILING_COMMAND_END, sizeof(cl_ulong), &t, NULL);
                 handleError(err, "Failed get profile. ");
                 writeXMLTag(o, "end", t);
 

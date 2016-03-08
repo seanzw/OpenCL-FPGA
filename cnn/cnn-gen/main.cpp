@@ -55,6 +55,7 @@ public:
         writeXMLOpenTag(xml, "cnn");
         writeXMLTag(xml, "kernelFileName", kernelFileName);
         writeXMLTag(xml, "inSize", params[0].iWidth * params[0].iHeight * params[0].iDepth);
+        writeXMLTag(xml, "queueBarrier", static_cast<size_t>(10));
 
         // Write some basic information in the cl kernel file.
         fprintf(kernel, "%s\n", activateFunc.c_str());

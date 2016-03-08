@@ -142,6 +142,9 @@
     <Xml Include="rbf.xml">
       <Filter>Resource Files\rbf</Filter>
     </Xml>
+    <Xml Include="result_lenet5_FPGA.xml">
+      <Filter>Resource Files\cnn</Filter>
+    </Xml>
   </ItemGroup>
   <ItemGroup>
     <None Include="alpha.tcl">

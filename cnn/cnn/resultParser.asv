@@ -1,0 +1,22 @@
+function result = resultParser(fn)
+
+    try
+        tree = xmlread(fn);
+    catch
+        error('Failed reading XML file %s.', fn);
+    end
+    
+    inputs = tree.getElementsByTagName('input');
+    events = inputs.item(0).getElementsByTagName('event');
+    result = zeros(inputs.getLength, events.getLength, 4);
+    
+    for i = 0 : inputs.getLength - 1
+        events = inputs.item(i).getElementsByTagName('event');
+        for j = 0 : events.getLength - 1
+            attrs = events.item(j).getAttributes;
+            attrs.getLength
+            items = events.item(j).getElementsByTagName('que')
+            items.getValue
+        end
+    end
+end

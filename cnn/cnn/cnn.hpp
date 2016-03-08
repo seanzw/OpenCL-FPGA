@@ -8,7 +8,6 @@
 #include "rbf.hpp"
 
 #define BUFSIZE (64 * 1024 * 1024)
-#define QUEUE_BARRIER 10
 
 namespace cnn {
     class CNN {
@@ -29,6 +28,9 @@ namespace cnn {
 
             // Get the input size.
             size_t inSize = getSizeT(root, "inSize");
+
+            // Get the queue barrier.
+            queueBarrier = getSizeT(root, "queueBarrier");
 
             // Initialize the OpenCL.
             if (xclbinFile == "NONE") {
@@ -173,7 +175,7 @@ namespace cnn {
                     &events[i * eventSize + layers.size() + 1]);
                 handleError(err, "Failed enqueuing reading buffer. ");
 
-                if (i % QUEUE_BARRIER == QUEUE_BARRIER - 1) {
+                if (i % queueBarrier == queueBarrier - 1) {
                     err = clFinish(queue);
                     handleError(err, "Failed executing clFinish. ");
                 }
@@ -192,6 +194,8 @@ namespace cnn {
         cl_command_queue queue;
         cl_program program;
         cl_mem clIn;
+
+        size_t queueBarrier;
 
         std::vector<Layer *> layers;
 

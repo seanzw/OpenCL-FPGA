@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <cnn><kernelFileName>../cnn/lenet5.cl</kernelFileName>
 <inSize>1024</inSize>
+<queueBarrier>10</queueBarrier>
 <layer><type>conv</type>
 <kernelName>conv1</kernelName>
 <workGroupSize><item>16</item>

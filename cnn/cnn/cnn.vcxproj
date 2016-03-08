@@ -180,8 +180,11 @@
     <Xml Include="max1.xml" />
     <Xml Include="max1_baseline.xml" />
     <Xml Include="rbf.xml" />
-    <Xml Include="result.xml" />
+    <Xml Include="result.xml">
+      <SubType>Designer</SubType>
+    </Xml>
     <Xml Include="result_gpu_baseline.xml" />
+    <Xml Include="result_lenet5_FPGA.xml" />
   </ItemGroup>
   <ItemGroup>
     <None Include="alpha.tcl" />
