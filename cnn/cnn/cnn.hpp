@@ -8,7 +8,7 @@
 #include "rbf.hpp"
 
 #define BUFSIZE (64 * 1024 * 1024)
-#define QUEUE_BARRIER 100
+#define QUEUE_BARRIER 10
 
 namespace cnn {
     class CNN {
