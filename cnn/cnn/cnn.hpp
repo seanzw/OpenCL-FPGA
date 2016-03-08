@@ -125,6 +125,8 @@ namespace cnn {
                 exit(-2);
             }
 
+            clock_t start = clock(), diff;
+
             // Reserve the output buffer.
             out.resize(outSize * n);
 
@@ -180,6 +182,9 @@ namespace cnn {
                 handleError(err, "Failed enqueuing reading buffer. ");
 
             }
+
+            diff = clock() - start;
+            std::cout << "Average time: " << diff / n << "ms" << std::endl;
 
             return events;
         }
