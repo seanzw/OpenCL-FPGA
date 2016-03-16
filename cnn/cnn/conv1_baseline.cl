@@ -1,5 +1,5 @@
 float sigmod(float in) {
-    return 1.0f / (1.0f + exp(-in)); 
+    return 1.0f / (1.0f + exp(-in));
 }
 #define KERNEL_SIZE 5
 #define KERNEL_LEN 25
@@ -15,21 +15,21 @@ __kernel void conv1(
     __constant float *weight,
     __constant float *offset
     ) {
-    
+
     int c = get_global_id(0);
     int r = get_global_id(1);
-    
+
     if (c < OWIDTH && r < ODEPTH * OHEIGHT) {
 
         // Get the index of the element in output feature map.
         int o = r / OHEIGHT;
-        r = r % OHEIGHT; 
+        r = r % OHEIGHT;
 
         float sum = 0.0f;
 
         // For each input feature map.
         for (int i = 0; i < IDEPTH; ++i) {
-            
+
             float inputBuf[KERNEL_LEN];
             float weightBuf[KERNEL_LEN];
             int idx = 0;
@@ -50,7 +50,7 @@ __kernel void conv1(
         // Get the output index.
         int outIdx = (o * OHEIGHT + r) * OWIDTH + c;
         out[outIdx] = sigmod(sum + offset[o]);
-    } 
+    }
 }
 #undef KERNEL_SIZE
 #undef KERNEL_LEN

@@ -722,6 +722,7 @@ int main(int argc, char *argv[]) {
         }
     };
 
+    CNNGenerator::genCNN("../cnn/conv1.xml", "../cnn/conv1.cl", 1, &params[0]);
     CNNGenerator::genCNN("../cnn/full.xml", "../cnn/full.cl", 1, &params[5]);
     CNNGenerator::genCNN("../cnn/rbf.xml", "../cnn/rbf.cl", 1, &params[6]);
     CNNGenerator::genCNN("../cnn/lenet5.xml", "../cnn/lenet5.cl", 7, params);

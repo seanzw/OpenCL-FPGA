@@ -1,5 +1,0 @@
-result = resultParser('result_lenet5_FPGA.xml');
-result = result - min(result(:));
-
-% Time for each event.
-duration = 
