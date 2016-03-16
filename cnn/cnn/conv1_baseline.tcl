@@ -22,6 +22,9 @@ set_property file_type "c header files" [get_files "maxpool.hpp"]
 add_files "fullconnect.hpp"
 set_property file_type "c header files" [get_files "fullconnect.hpp"]
 
+add_files "rbf.hpp"
+set_property file_type "c header files" [get_files "rbf.hpp"]
+
 add_files "layer.hpp"
 set_property file_type "c header files" [get_files "layer.hpp"]
 
@@ -47,7 +50,7 @@ compile_emulation -flow cpu -opencl_binary [get_opencl_binary alpha]
 report_estimate
 
 # Run the design in CPU emulation mode
-run_emulation -flow cpu -args "../../../../../conv1.xml result.xml alpha.xclbin"
+run_emulation -flow cpu -args "../../../../../conv1_baseline.xml result.xml alpha.xclbin"
 
 build_system
 

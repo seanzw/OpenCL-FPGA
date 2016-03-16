@@ -9,9 +9,6 @@ float sigmod(float in) {
 #define OWIDTH 28
 #define OHEIGHT 28
 #define ODEPTH 6
-#ifdef __xilinx__
-__attribute__ ((reqd_work_group_size(16, 1, 1)))
-#endif
 __kernel void conv1(
     __global float *in,
     __global float *out,
