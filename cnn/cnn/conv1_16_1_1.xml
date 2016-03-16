@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <cnn>
-    <kernelFileName>../cnn/conv1_1_1_1.cl</kernelFileName>
+    <kernelFileName>../cnn/conv1_16_1_1.cl</kernelFileName>
     <inSize>1024</inSize>
     <queueBarrier>10</queueBarrier>
     <layer>
         <type>conv</type>
         <kernelName>conv1</kernelName>
         <workGroupSize>
-            <item>1</item>
+            <item>16</item>
             <item>1</item>
             <item>1</item>
         </workGroupSize>
