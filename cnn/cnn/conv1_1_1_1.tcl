@@ -22,6 +22,9 @@ set_property file_type "c header files" [get_files "maxpool.hpp"]
 add_files "fullconnect.hpp"
 set_property file_type "c header files" [get_files "fullconnect.hpp"]
 
+add_files "rbf.hpp"
+set_property file_type "c header files" [get_files "rbf.hpp"]
+
 add_files "layer.hpp"
 set_property file_type "c header files" [get_files "layer.hpp"]
 
