@@ -20,12 +20,16 @@ __kernel void conv1(
     int r = get_global_id(1);
     int o = get_global_id(2);
 
+    int cLocal = get_local_id(0);
+    int rLocal = get_local_id(1);
+    int oLocal = get_local_id(2);
+
     __local float inLocal[IWIDTH * IHEIGHT * IDEPTH];
     __local float weightLocal[IDEPTH * ODEPTH * KERNEL_LEN];
 
     // This the the first work item in the group,
     // Copy the input and weight into the local buffer.
-    if (c == 0 && r == 0 && o == 0) {
+    if (cLocal == 0 && rLocal == 0 && oLocal == 0) {
 
         for (int i = 0; i < IWIDTH * IHEIGHT * IDEPTH; ++i) {
             inLocal[i] = in[i];

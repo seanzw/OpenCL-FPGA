@@ -175,6 +175,10 @@ namespace cnn {
         o << ")" << std::endl;
         delete[] maxWorkItemSize;
 
+        size_t maxWorkGroupSize;
+        clGetDeviceInfo(device, CL_DEVICE_MAX_WORK_GROUP_SIZE, sizeof(maxWorkGroupSize), &maxWorkGroupSize, NULL);
+        o << "CL_DEVICE_MAX_WORK_GROUP_SIZE: " << maxWorkGroupSize << std::endl;
+
         cl_bool imageSupport;
         clGetDeviceInfo(device, CL_DEVICE_IMAGE_SUPPORT, sizeof(cl_bool), &imageSupport, NULL);
         o << "CL_DEVICE_IMAGE_SUPPORT: " << (imageSupport == CL_TRUE ? "TRUE" : "FALSE") << std::endl;
