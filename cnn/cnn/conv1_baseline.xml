@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <cnn>
-    <kernelFileName>../cnn/conv1.cl</kernelFileName>
+    <kernelFileName>../cnn/conv1_baseline.cl</kernelFileName>
     <inSize>1024</inSize>
     <queueBarrier>10</queueBarrier>
     <layer>
         <type>conv</type>
         <kernelName>conv1</kernelName>
         <workGroupSize>
-            <item>16</item>
-            <item>1</item>
-            <item>1</item>
+            <item>28</item>
+            <item>28</item>
+            <item>6</item>
         </workGroupSize>
         <iWidth>32</iWidth>
         <iHeight>32</iHeight>

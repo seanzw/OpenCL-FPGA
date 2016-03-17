@@ -18,12 +18,28 @@ __kernel void conv1(
 
     int c = get_global_id(0);
     int r = get_global_id(1);
+    int o = get_global_id(2);
 
-    if (c < OWIDTH && r < ODEPTH * OHEIGHT) {
+    __local float inLocal[IWIDTH * IHEIGHT * IDEPTH];
+    __local float weightLocal[IDEPTH * ODEPTH * KERNEL_LEN];
 
-        // Get the index of the element in output feature map.
-        int o = r / OHEIGHT;
-        r = r % OHEIGHT;
+    // This the the first work item in the group,
+    // Copy the input and weight into the local buffer.
+    if (c == 0 && r == 0 && o == 0) {
+
+        for (int i = 0; i < IWIDTH * IHEIGHT * IDEPTH; ++i) {
+            inLocal[i] = in[i];
+        }
+
+        for (int i = 0; i < IDEPTH * ODEPTH * KERNEL_LEN; ++i) {
+            weightLocal[i] = weight[i];
+        }
+    }
+
+    // Set a barrier.
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    if (c < OWIDTH && r < OHEIGHT && o < ODEPTH) {
 
         float sum = 0.0f;
 
@@ -36,8 +52,8 @@ __kernel void conv1(
             int weightBase = (o * IDEPTH + i) * KERNEL_LEN;
             for (int x = 0; x < KERNEL_SIZE; ++x) {
                 for (int y = 0; y < KERNEL_SIZE; ++y) {
-                    inputBuf[idx] = in[(i * IHEIGHT + r + x) * IWIDTH + c + y];
-                    weightBuf[idx] = weight[weightBase + idx];
+                    inputBuf[idx] = inLocal[(i * IHEIGHT + r + x) * IWIDTH + c + y];
+                    weightBuf[idx] = weightLocal[weightBase + idx];
                     idx++;
                 }
             }
