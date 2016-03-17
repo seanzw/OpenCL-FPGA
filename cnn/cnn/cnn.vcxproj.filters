@@ -14,52 +14,7 @@
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
     <Filter Include="Resource Files\convolution">
-      <UniqueIdentifier>{6077f578-8052-4f7d-b635-c30dde04a020}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\convolution\conv1">
-      <UniqueIdentifier>{829b2949-3ae5-4566-9bc9-45e61dec27be}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\convolution\conv1_baseline">
-      <UniqueIdentifier>{390564bc-57ea-46c4-b86d-4d91b130c785}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\convolution\conv1_2_cu">
-      <UniqueIdentifier>{a0d682a6-3c27-4097-8202-c1ffc26bc93e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\convolution\conv1_unroll">
-      <UniqueIdentifier>{7025731b-1aaa-4a6e-a730-550460784b6c}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\convolution\conv1_pipeline">
-      <UniqueIdentifier>{be1eebab-2796-4b94-b37f-5fb5f4b2b57d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\convolution\conv1_1_1_1">
-      <UniqueIdentifier>{e082c538-b89e-4c6c-9b1b-d9517ffe1ffc}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\maxpool">
-      <UniqueIdentifier>{701abdd7-4b29-4051-bdd1-8cbb5e92723f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\maxpool\max1_baseline">
-      <UniqueIdentifier>{74ce80a2-6745-4a0e-beaa-61d5777c967d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\fullconnect">
-      <UniqueIdentifier>{a1a4e2bb-5659-49b1-a6c9-8acd072c8764}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\fullconnect\full_baseline">
-      <UniqueIdentifier>{f4ecfa4d-f0c0-4d26-9ef7-a530d710c3f8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\fullconnect\full_pipeline">
-      <UniqueIdentifier>{628d54f8-d1bd-45e1-8154-2afefd647234}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\fullconnect\full">
-      <UniqueIdentifier>{f3355685-d362-4ff6-b8b1-667de995554d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\cnn">
-      <UniqueIdentifier>{120bfb6a-da55-4bcd-aa12-01701e163ef4}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\cnn\lenet5">
-      <UniqueIdentifier>{8ae4cf24-95fb-4adb-a6dc-825e2bd0a952}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Resource Files\rbf">
-      <UniqueIdentifier>{b44121be-e013-44f5-8c06-8105583f7643}</UniqueIdentifier>
+      <UniqueIdentifier>{993bfb20-ca28-4401-8a8c-986c2376d341}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -94,142 +49,19 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="result_gpu_baseline.xml">
-      <Filter>Resource Files</Filter>
-    </Xml>
-    <Xml Include="result.xml">
-      <Filter>Resource Files</Filter>
-    </Xml>
-    <Xml Include="conv1.xml">
-      <Filter>Resource Files\convolution\conv1</Filter>
-    </Xml>
-    <Xml Include="conv1_baseline.xml">
-      <Filter>Resource Files\convolution\conv1_baseline</Filter>
-    </Xml>
-    <Xml Include="conv1_2_cu.xml">
-      <Filter>Resource Files\convolution\conv1_2_cu</Filter>
-    </Xml>
-    <Xml Include="conv1_unroll.xml">
-      <Filter>Resource Files\convolution\conv1_unroll</Filter>
-    </Xml>
-    <Xml Include="conv1_pipeline.xml">
-      <Filter>Resource Files\convolution\conv1_pipeline</Filter>
-    </Xml>
-    <Xml Include="conv1_1_1_1.xml">
-      <Filter>Resource Files\convolution\conv1_1_1_1</Filter>
-    </Xml>
-    <Xml Include="max1_baseline.xml">
-      <Filter>Resource Files\maxpool\max1_baseline</Filter>
-    </Xml>
-    <Xml Include="full_baseline.xml">
-      <Filter>Resource Files\fullconnect\full_baseline</Filter>
-    </Xml>
-    <Xml Include="full_pipeline.xml">
-      <Filter>Resource Files\fullconnect\full_pipeline</Filter>
-    </Xml>
-    <Xml Include="full.xml">
-      <Filter>Resource Files\fullconnect\full</Filter>
-    </Xml>
-    <Xml Include="cnn.xml">
-      <Filter>Resource Files\cnn</Filter>
-    </Xml>
-    <Xml Include="max1.xml">
-      <Filter>Resource Files\maxpool</Filter>
-    </Xml>
-    <Xml Include="lenet5.xml">
-      <Filter>Resource Files\cnn\lenet5</Filter>
-    </Xml>
-    <Xml Include="rbf.xml">
-      <Filter>Resource Files\rbf</Filter>
-    </Xml>
-    <Xml Include="result_lenet5_FPGA.xml">
-      <Filter>Resource Files\cnn</Filter>
-    </Xml>
+    <None Include="kernel\conv1_workgroup.cl">
+      <Filter>Resource Files\convolution</Filter>
+    </None>
+    <None Include="kernel\conv1.cl">
+      <Filter>Resource Files\convolution</Filter>
+    </None>
+    <None Include="kernel\conv1.tcl">
+      <Filter>Resource Files\convolution</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
-    <None Include="alpha.tcl">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="convolution_baseline.cl">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="conv1.cl">
-      <Filter>Resource Files\convolution\conv1</Filter>
-    </None>
-    <None Include="conv1_baseline.cl">
-      <Filter>Resource Files\convolution\conv1_baseline</Filter>
-    </None>
-    <None Include="conv1_baseline.tcl">
-      <Filter>Resource Files\convolution\conv1_baseline</Filter>
-    </None>
-    <None Include="conv1.tcl">
-      <Filter>Resource Files\convolution\conv1</Filter>
-    </None>
-    <None Include="conv1_2_cu.cl">
-      <Filter>Resource Files\convolution\conv1_2_cu</Filter>
-    </None>
-    <None Include="conv1_2_cu.tcl">
-      <Filter>Resource Files\convolution\conv1_2_cu</Filter>
-    </None>
-    <None Include="conv1_unroll.cl">
-      <Filter>Resource Files\convolution\conv1_unroll</Filter>
-    </None>
-    <None Include="conv1_unroll.tcl">
-      <Filter>Resource Files\convolution\conv1_unroll</Filter>
-    </None>
-    <None Include="conv1_pipeline.cl">
-      <Filter>Resource Files\convolution\conv1_pipeline</Filter>
-    </None>
-    <None Include="conv1_pipeline.tcl">
-      <Filter>Resource Files\convolution\conv1_pipeline</Filter>
-    </None>
-    <None Include="conv1_1_1_1.cl">
-      <Filter>Resource Files\convolution\conv1_1_1_1</Filter>
-    </None>
-    <None Include="conv1_1_1_1.tcl">
-      <Filter>Resource Files\convolution\conv1_1_1_1</Filter>
-    </None>
-    <None Include="max1_baseline.cl">
-      <Filter>Resource Files\maxpool\max1_baseline</Filter>
-    </None>
-    <None Include="max1_baseline.tcl">
-      <Filter>Resource Files\maxpool\max1_baseline</Filter>
-    </None>
-    <None Include="full_baseline.cl">
-      <Filter>Resource Files\fullconnect\full_baseline</Filter>
-    </None>
-    <None Include="full_baseline.tcl">
-      <Filter>Resource Files\fullconnect\full_baseline</Filter>
-    </None>
-    <None Include="full_pipeline.cl">
-      <Filter>Resource Files\fullconnect\full_pipeline</Filter>
-    </None>
-    <None Include="full_pipeline.tcl">
-      <Filter>Resource Files\fullconnect\full_pipeline</Filter>
-    </None>
-    <None Include="full.cl">
-      <Filter>Resource Files\fullconnect\full</Filter>
-    </None>
-    <None Include="cnn.cl">
-      <Filter>Resource Files\cnn</Filter>
-    </None>
-    <None Include="cnn.tcl">
-      <Filter>Resource Files\cnn</Filter>
-    </None>
-    <None Include="max1.cl">
-      <Filter>Resource Files\maxpool</Filter>
-    </None>
-    <None Include="cnn.vcxproj.user">
-      <Filter>Resource Files\cnn\lenet5</Filter>
-    </None>
-    <None Include="lenet5.cl">
-      <Filter>Resource Files\cnn\lenet5</Filter>
-    </None>
-    <None Include="lenet5.tcl">
-      <Filter>Resource Files\cnn\lenet5</Filter>
-    </None>
-    <None Include="rbf.cl">
-      <Filter>Resource Files\rbf</Filter>
-    </None>
+    <Xml Include="kernel\conv1.xml">
+      <Filter>Resource Files\convolution</Filter>
+    </Xml>
   </ItemGroup>
 </Project>

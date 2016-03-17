@@ -284,29 +284,28 @@ private:
         writeDefine(kernel, "OWIDTH", param.oWidth);
         writeDefine(kernel, "OHEIGHT", param.oHeight);
         writeDefine(kernel, "ODEPTH", param.oDepth);
-        
+        writeDefine(kernel, "WORK_GROUP_DIM_0", param.workGroupSize[0]);
+        writeDefine(kernel, "WORK_GROUP_DIM_1", param.workGroupSize[1]);
+        writeDefine(kernel, "WORK_GROUP_DIM_2", param.workGroupSize[2]);
+        writeDefine(kernel, "KERNEL_NAME", param.kernelName);
+
         std::stringstream ss;
         if (!(flag & FRONT)) {
             fprintf(kernel, "#define in buf%zu\n", idx);
         }
         else {
-            ss << "__global float *in,\n";
+            ss << "__global float *in, ";
         }
 
         if (!(flag & BACK)) {
             fprintf(kernel, "#define out buf%zu\n", idx + 1);
         }
         else {
-            ss << "    __global float *out,";
+            ss << "__global float *out,";
         }
+        writeDefine(kernel, "KERNEL_PARAM", ss.str());
 
-        fprintf(kernel, convKernel.c_str(),
-            (int)param.workGroupSize[0],
-            (int)param.workGroupSize[1],
-            (int)param.workGroupSize[2],
-            param.kernelName.c_str(),
-            ss.str().c_str()
-            );
+        fprintf(kernel, "%s\n", convKernel.c_str());
 
         if (!(flag &FRONT)) {
             writeUndef(kernel, "in");
@@ -322,6 +321,11 @@ private:
         writeUndef(kernel, "OWIDTH");
         writeUndef(kernel, "OHEIGHT");
         writeUndef(kernel, "ODEPTH");
+        writeUndef(kernel, "WORK_GROUP_DIM_0");
+        writeUndef(kernel, "WORK_GROUP_DIM_1");
+        writeUndef(kernel, "WORK_GROUP_DIM_2");
+        writeUndef(kernel, "KERNEL_NAME");
+        writeUndef(kernel, "KERNEL_PARAM");
     }
 
     // Generate the xml for this layer.
@@ -436,8 +440,24 @@ private:
         fprintf(o, "#define %s %u\n", macro.c_str(), (unsigned int)value);
     }
 
+    static void writeDefine(FILE *o, const std::string &macro, const std::string &value) {
+        fprintf(o, "#define %s %s\n", macro.c_str(), value.c_str());
+    }
+
     static void writeUndef(FILE *o, const std::string &macro) {
         fprintf(o, "#undef %s\n", macro.c_str());
+    }
+
+    static std::string fileToString(const std::string &fn) {
+        std::string text;
+        std::ifstream fs(fn.c_str());
+        if (!fs) {
+            std::ostringstream os;
+            os << "There is no file called " << fn;
+            exit(-1);
+        }
+        text.assign(std::istreambuf_iterator<char>(fs), std::istreambuf_iterator<char>());
+        return text;
     }
 
     /********************************************************************************************
@@ -456,67 +476,7 @@ float sigmod(float in) {\n\
     return 1.0f / (1.0f + exp(-in)); \n\
 }";
 
-const std::string CNNGenerator::convKernel = "\
-#ifdef __xilinx__\n\
-__attribute__ ((reqd_work_group_size(%d, %d, %d)))\n\
-#endif\n\
-__kernel void %s(\n\
-    %s\n\
-    __constant float *weight,\n\
-    __constant float *offset\n\
-    ) {\n\
-    \n\
-    #ifdef __xilinx__\n\
-    __attribute__((xcl_pipeline_workitems))\n\
-    #endif\n\
-    int c = get_global_id(0);\n\
-    int r = get_global_id(1);\n\
-    \n\
-    if (c < OWIDTH && r < ODEPTH * OHEIGHT) {\n\
-\n\
-        // Get the index of the element in output feature map.\n\
-        int o = r / OHEIGHT;\n\
-        r = r %% OHEIGHT; \n\
-\n\
-        float sum = 0.0f;\n\
-\n\
-        // For each input feature map.\n\
-        #ifdef __xilinx__\n\
-        __attribute__((xcl_pipeline_loop))\n\
-        #endif\n\
-        for (int i = 0; i < IDEPTH; ++i) {\n\
-            \n\
-            float inputBuf[KERNEL_LEN];\n\
-            float weightBuf[KERNEL_LEN];\n\
-            int idx = 0;\n\
-            int weightBase = (o * IDEPTH + i) * KERNEL_LEN;\n\
-            #ifdef __xilinx__\n\
-            __attribute__((opencl_unroll_hint))\n\
-            #endif\n\
-            for (int x = 0; x < KERNEL_SIZE; ++x) {\n\
-                #ifdef __xilinx__\n\
-                __attribute__((opencl_unroll_hint))\n\
-                #endif\n\
-                for (int y = 0; y < KERNEL_SIZE; ++y) {\n\
-                    inputBuf[idx] = in[(i * IHEIGHT + r + x) * IWIDTH + c + y];\n\
-                    weightBuf[idx] = weight[weightBase + idx];\n\
-                    idx++;\n\
-                }\n\
-            }\n\
-\n\
-            #ifdef __xilinx__\n\
-            __attribute__((opencl_unroll_hint))\n\
-            #endif\n\
-            for (int x = 0; x < KERNEL_LEN; ++x) {\n\
-                sum += inputBuf[x] * weightBuf[x];\n\
-            }\n\
-        }\n\
-\n\
-        // Get the output index.\n\
-        int outIdx = (o * OHEIGHT + r) * OWIDTH + c;\n\
-        out[outIdx] = sigmod(sum + offset[o]);\n\
-    } \n\
-}\n";
+const std::string CNNGenerator::convKernel = CNNGenerator::fileToString("convolution.cl");
 
 const std::string CNNGenerator::maxKernel = "\
 #ifdef __xilinx__\n\
@@ -639,7 +599,7 @@ int main(int argc, char *argv[]) {
         {
             CNNGenerator::CONV,
             "conv1",
-            {16, 1, 1},
+            {28, 28, 3},
             32,
             32,
             1,
@@ -722,10 +682,10 @@ int main(int argc, char *argv[]) {
         }
     };
 
-    CNNGenerator::genCNN("../cnn/conv1.xml", "../cnn/conv1.cl", 1, &params[0]);
-    CNNGenerator::genCNN("../cnn/full.xml", "../cnn/full.cl", 1, &params[5]);
-    CNNGenerator::genCNN("../cnn/rbf.xml", "../cnn/rbf.cl", 1, &params[6]);
-    CNNGenerator::genCNN("../cnn/lenet5.xml", "../cnn/lenet5.cl", 7, params);
+    CNNGenerator::genCNN("../cnn/kernel/conv1.xml", "../cnn/kernel/conv1.cl", 1, &params[0]);
+    CNNGenerator::genCNN("../cnn/kernel/full.xml", "../cnn/kernel/full.cl", 1, &params[5]);
+    CNNGenerator::genCNN("../cnn/kernel/rbf.xml", "../cnn/kernel/rbf.cl", 1, &params[6]);
+    CNNGenerator::genCNN("../cnn/kernel/lenet5.xml", "../cnn/kernel/lenet5.cl", 7, params);
 
     return 0;
 }

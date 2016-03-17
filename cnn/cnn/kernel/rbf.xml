@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<cnn><kernelFileName>../cnn/rbf.cl</kernelFileName>
+<cnn><kernelFileName>../cnn/kernel/rbf.cl</kernelFileName>
 <inSize>84</inSize>
 <queueBarrier>10</queueBarrier>
 <layer><type>rbf</type>

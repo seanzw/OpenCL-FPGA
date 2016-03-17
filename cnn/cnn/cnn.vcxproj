@@ -166,55 +166,12 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Xml Include="cnn.xml" />
-    <Xml Include="conv1.xml" />
-    <Xml Include="conv1_1_1_1.xml" />
-    <Xml Include="conv1_2_cu.xml" />
-    <Xml Include="conv1_baseline.xml" />
-    <Xml Include="conv1_pipeline.xml" />
-    <Xml Include="conv1_unroll.xml" />
-    <Xml Include="full.xml" />
-    <Xml Include="full_baseline.xml" />
-    <Xml Include="full_pipeline.xml" />
-    <Xml Include="lenet5.xml" />
-    <Xml Include="max1.xml" />
-    <Xml Include="max1_baseline.xml" />
-    <Xml Include="rbf.xml" />
-    <Xml Include="result.xml">
-      <SubType>Designer</SubType>
-    </Xml>
-    <Xml Include="result_gpu_baseline.xml" />
-    <Xml Include="result_lenet5_FPGA.xml" />
+    <None Include="kernel\conv1.cl" />
+    <None Include="kernel\conv1.tcl" />
+    <None Include="kernel\conv1_workgroup.cl" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="alpha.tcl" />
-    <None Include="cnn.cl" />
-    <None Include="cnn.tcl" />
-    <None Include="cnn.vcxproj.user" />
-    <None Include="conv1.cl" />
-    <None Include="conv1_1_1_1.cl" />
-    <None Include="conv1_1_1_1.tcl" />
-    <None Include="conv1_2_cu.cl" />
-    <None Include="conv1_2_cu.tcl" />
-    <None Include="conv1_baseline.cl" />
-    <None Include="conv1_baseline.tcl" />
-    <None Include="conv1_pipeline.cl" />
-    <None Include="conv1_pipeline.tcl" />
-    <None Include="conv1_unroll.cl" />
-    <None Include="conv1_unroll.tcl" />
-    <None Include="convolution_baseline.cl" />
-    <None Include="conv1.tcl" />
-    <None Include="full.cl" />
-    <None Include="full_baseline.cl" />
-    <None Include="full_baseline.tcl" />
-    <None Include="full_pipeline.cl" />
-    <None Include="full_pipeline.tcl" />
-    <None Include="lenet5.cl" />
-    <None Include="lenet5.tcl" />
-    <None Include="max1.cl" />
-    <None Include="max1_baseline.cl" />
-    <None Include="max1_baseline.tcl" />
-    <None Include="rbf.cl" />
+    <Xml Include="kernel\conv1.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

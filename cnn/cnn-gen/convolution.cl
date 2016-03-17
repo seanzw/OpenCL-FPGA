@@ -1,17 +1,8 @@
-float sigmod(float in) {
-    return 1.0f / (1.0f + exp(-in));
-}
-#define KERNEL_SIZE 5
-#define KERNEL_LEN 25
-#define IWIDTH 32
-#define IHEIGHT 32
-#define IDEPTH 1
-#define OWIDTH 28
-#define OHEIGHT 28
-#define ODEPTH 6
-__kernel void conv1(
-    __global float *in,
-    __global float *out,
+#ifdef __xilinx__
+__attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, WORK_GROUP_DIM_1, WORK_GROUP_DIM_2)))
+#endif
+__kernel void KERNEL_NAME(
+    KERNEL_PARAM
     __constant float *weight,
     __constant float *offset
     ) {
@@ -25,7 +16,7 @@ __kernel void conv1(
     int oLocal = get_local_id(2);
 
     __local float inLocal[IWIDTH * IHEIGHT * IDEPTH];
-    __local float weightLocal[IDEPTH * ODEPTH * KERNEL_LEN];
+    __local float weightLocal[IDEPTH * WORK_GROUP_DIM_2 * KERNEL_LEN];
 
     // This the the first work item in the group,
     // Copy the input and weight into the local buffer.
@@ -35,8 +26,8 @@ __kernel void conv1(
             inLocal[i] = in[i];
         }
 
-        for (int i = 0; i < IDEPTH * ODEPTH * KERNEL_LEN; ++i) {
-            weightLocal[i] = weight[i];
+        for (int i = 0; i < IDEPTH * WORK_GROUP_DIM_2 * KERNEL_LEN; ++i) {
+            weightLocal[i] = weight[o * IDEPTH * KERNEL_LEN + i];
         }
     }
 
@@ -46,6 +37,7 @@ __kernel void conv1(
     if (c < OWIDTH && r < OHEIGHT && o < ODEPTH) {
 
         float sum = 0.0f;
+        int weightBase = (oLocal * IDEPTH) * KERNEL_LEN;
 
         // For each input feature map.
         for (int i = 0; i < IDEPTH; ++i) {
@@ -53,7 +45,6 @@ __kernel void conv1(
             float inputBuf[KERNEL_LEN];
             float weightBuf[KERNEL_LEN];
             int idx = 0;
-            int weightBase = (o * IDEPTH + i) * KERNEL_LEN;
             for (int x = 0; x < KERNEL_SIZE; ++x) {
                 for (int y = 0; y < KERNEL_SIZE; ++y) {
                     inputBuf[idx] = inLocal[(i * IHEIGHT + r + x) * IWIDTH + c + y];
@@ -65,6 +56,7 @@ __kernel void conv1(
             for (int x = 0; x < KERNEL_LEN; ++x) {
                 sum += inputBuf[x] * weightBuf[x];
             }
+            weightBase += KERNEL_LEN;
         }
 
         // Get the output index.
@@ -72,11 +64,3 @@ __kernel void conv1(
         out[outIdx] = sigmod(sum + offset[o]);
     }
 }
-#undef KERNEL_SIZE
-#undef KERNEL_LEN
-#undef IWIDTH
-#undef IHEIGHT
-#undef IDEPTH
-#undef OWIDTH
-#undef OHEIGHT
-#undef ODEPTH

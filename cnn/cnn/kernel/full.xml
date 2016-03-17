@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<cnn><kernelFileName>../cnn/full.cl</kernelFileName>
+<cnn><kernelFileName>../cnn/kernel/full.cl</kernelFileName>
 <inSize>120</inSize>
 <queueBarrier>10</queueBarrier>
 <layer><type>full</type>
