@@ -27,10 +27,12 @@ namespace test {
         vec out;
         cl_int err;
         cl_ulong t;
+        double averageTime;
         writeXMLOpenTag(o, "batch");
-        std::vector<cl_event> events = cnn->forwardCLBatch(in, out, n);
+        std::vector<cl_event> events = cnn->forwardCLBatch(in, out, n, &averageTime);
         size_t eventForOneInput = events.size() / n;
 
+        writeXMLTag(o, "averageTime", (float)averageTime);
         for (size_t i = 0; i < n; ++i) {
             writeXMLOpenTag(o, "input");
             for (size_t e = 0; e < eventForOneInput; ++e) {

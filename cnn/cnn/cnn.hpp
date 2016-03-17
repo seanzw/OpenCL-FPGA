@@ -114,7 +114,7 @@ namespace cnn {
         }
 
         // Forward more than one input with in order command queue.
-        std::vector<cl_event> forwardCLBatch(const vec &in, vec &out, size_t n) {
+        std::vector<cl_event> forwardCLBatch(const vec &in, vec &out, size_t n, double *averageTime) {
 
             // Make sure that input size is correct.
             size_t inSize = getInSize();
@@ -184,7 +184,8 @@ namespace cnn {
             }
 
             diff = clock() - start;
-            std::cout << "Average time: " << (double)diff / (double)CLOCKS_PER_SEC / (double)n << "s" << std::endl;
+            *averageTime = (double)diff / (double)CLOCKS_PER_SEC / (double)n;
+            std::cout << "Average time: " << *averageTime << "s" << std::endl;
 
             return events;
         }
