@@ -184,7 +184,7 @@ namespace cnn {
             }
 
             diff = clock() - start;
-            std::cout << "Average time: " << diff / n << "ms" << std::endl;
+            std::cout << "Average time: " << (double)diff / (double)CLOCKS_PER_SEC / (double)n << "s" << std::endl;
 
             return events;
         }

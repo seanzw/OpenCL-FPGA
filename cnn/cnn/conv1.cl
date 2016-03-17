@@ -24,12 +24,9 @@ __kernel void conv1(
     #endif
     int c = get_global_id(0);
     int r = get_global_id(1);
+    int o = get_global_id(2);
     
     if (c < OWIDTH && r < ODEPTH * OHEIGHT) {
-
-        // Get the index of the element in output feature map.
-        int o = r / OHEIGHT;
-        r = r % OHEIGHT; 
 
         float sum = 0.0f;
 
