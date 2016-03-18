@@ -6,7 +6,7 @@ KERNELDIR = kernel
 OUTPUTDIR = FPGA
 
 TARGETS = host
-TARGETS += conv1_baseline conv1_workgroup conv1_unroll conv1_pipeline conv1_item_pipeline
+TARGETS += conv1_baseline conv1_workgroup conv1_unroll conv1_pipeline conv1_item_pipeline conv1_memory_partition conv1
 
 TCLS = $(addsuffix .tcl, $(TARGETS))
 OBJS = $(addsuffix .o, $(TARGETS))
@@ -19,9 +19,9 @@ BIN = $(BINDIR)/alpha.xclbin
 HOST = ./$(OUTPUTDIR)/host/$(BINDIR)/host.exe
 
 
-all: $(TCLFILES) $(OBJFILES)
+all: $(TCLFILES) $(OBJS)
 
-$(OBJS):
+$(OBJS): $(TCLFILES)
 	$(CLC) $(KERNELDIR)/$(@:.o=.tcl)
 	$(CC) $(OUTPUTDIR)/$@
 

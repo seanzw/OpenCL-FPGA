@@ -14,6 +14,7 @@ float sigmod(float in) {
 #define WORK_GROUP_DIM_2 3
 #define KERNEL_NAME conv1
 #define KERNEL_PARAM __global float *in, __global float *out,
+#define LOCAL_MEM_PATITION 5
 #ifdef __xilinx__
 __attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, WORK_GROUP_DIM_1, WORK_GROUP_DIM_2)))
 #endif
@@ -31,22 +32,22 @@ __kernel void KERNEL_NAME(
     int rLocal = get_local_id(1);
     int oLocal = get_local_id(2);
 
-    __local float inLocal[IWIDTH * IHEIGHT * IDEPTH];
-    __local float weightLocal[IDEPTH * WORK_GROUP_DIM_2 * KERNEL_LEN];
+    __local float inLocal[IWIDTH * IHEIGHT * IDEPTH] __attribute__((xcl_array_partition(cyclic, LOCAL_MEM_PATITION, 1)));
+    __local float weightLocal[IDEPTH * WORK_GROUP_DIM_2 * KERNEL_LEN] __attribute__((xcl_array_partition(cyclic, LOCAL_MEM_PATITION, 1)));
 
     // This the the first work item in the group,
     // Copy the input and weight into the local buffer.
     if (cLocal == 0 && rLocal == 0 && oLocal == 0) {
 
         #ifdef __xilinx__
-        __attribute__((opencl_unroll_hint(4)))
+        __attribute__((opencl_unroll_hint(LOCAL_MEM_PATITION)))
         #endif
         for (int i = 0; i < IWIDTH * IHEIGHT * IDEPTH; ++i) {
             inLocal[i] = in[i];
         }
 
         #ifdef __xilinx__
-        __attribute__((opencl_unroll_hint(4)))
+        __attribute__((opencl_unroll_hint(LOCAL_MEM_PATITION)))
         #endif
         for (int i = 0; i < IDEPTH * WORK_GROUP_DIM_2 * KERNEL_LEN; ++i) {
             weightLocal[i] = weight[o * IDEPTH * KERNEL_LEN + i];
