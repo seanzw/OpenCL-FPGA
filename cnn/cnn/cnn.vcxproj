@@ -168,6 +168,8 @@
   <ItemGroup>
     <None Include="kernel\conv1.cl" />
     <None Include="kernel\conv1.tcl" />
+    <None Include="kernel\conv1_item_pipeline.cl" />
+    <None Include="kernel\conv1_pipeline.cl" />
     <None Include="kernel\conv1_workgroup.cl" />
   </ItemGroup>
   <ItemGroup>

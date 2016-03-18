@@ -58,6 +58,12 @@
     <None Include="kernel\conv1.tcl">
       <Filter>Resource Files\convolution</Filter>
     </None>
+    <None Include="kernel\conv1_item_pipeline.cl">
+      <Filter>Resource Files\convolution</Filter>
+    </None>
+    <None Include="kernel\conv1_pipeline.cl">
+      <Filter>Resource Files\convolution</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="kernel\conv1.xml">
