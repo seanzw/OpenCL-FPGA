@@ -26,8 +26,8 @@ namespace cnn {
 
             // Prepare the ND-Range.
             global[0] = closestMultiple(workGroupSize[0], oWidth);
-            global[1] = closestMultiple(workGroupSize[1], oHeight * oDepth);
-            global[2] = workGroupSize[2];
+            global[1] = closestMultiple(workGroupSize[1], oHeight);
+            global[2] = closestMultiple(workGroupSize[2], oDepth);
         }
 
         virtual ~MaxPoolLayer() {

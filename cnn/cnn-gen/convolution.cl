@@ -1,6 +1,4 @@
-#ifdef __xilinx__
 __attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, WORK_GROUP_DIM_1, WORK_GROUP_DIM_2)))
-#endif
 __kernel void KERNEL_NAME(
     KERNEL_PARAM
     __constant float *weight,
@@ -15,7 +13,7 @@ __kernel void KERNEL_NAME(
     int rLocal = get_local_id(1);
     int oLocal = get_local_id(2);
 
-    __local float inLocal[IWIDTH * IHEIGHT * IDEPTH];
+    __local float inLocal[IN_SIZE];
     __local float weightLocal[IDEPTH * WORK_GROUP_DIM_2 * KERNEL_LEN];
 
     // This the the first work item in the group,
@@ -44,11 +42,7 @@ __kernel void KERNEL_NAME(
 
         float sum = 0.0f;
 
-
         // For each input feature map.
-        #ifdef __xilinx__
-        __attribute__((xcl_pipeline_loop))
-        #endif
         for (int i = 0; i < IDEPTH; ++i) {
 
             float inputBuf[KERNEL_LEN];

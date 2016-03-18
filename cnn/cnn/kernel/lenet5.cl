@@ -12,18 +12,18 @@ __global float buf6[84];
 #define IWIDTH 32
 #define IHEIGHT 32
 #define IDEPTH 1
+#define IN_SIZE 1024
 #define OWIDTH 28
 #define OHEIGHT 28
 #define ODEPTH 6
+#define OUT_SIZE 4704
 #define WORK_GROUP_DIM_0 28
 #define WORK_GROUP_DIM_1 28
 #define WORK_GROUP_DIM_2 3
 #define KERNEL_NAME conv1
 #define out buf1
 #define KERNEL_PARAM __global float *in, 
-#ifdef __xilinx__
 __attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, WORK_GROUP_DIM_1, WORK_GROUP_DIM_2)))
-#endif
 __kernel void KERNEL_NAME(
     KERNEL_PARAM
     __constant float *weight,
@@ -38,7 +38,7 @@ __kernel void KERNEL_NAME(
     int rLocal = get_local_id(1);
     int oLocal = get_local_id(2);
 
-    __local float inLocal[IWIDTH * IHEIGHT * IDEPTH];
+    __local float inLocal[IN_SIZE];
     __local float weightLocal[IDEPTH * WORK_GROUP_DIM_2 * KERNEL_LEN];
 
     // This the the first work item in the group,
@@ -67,11 +67,7 @@ __kernel void KERNEL_NAME(
 
         float sum = 0.0f;
 
-
         // For each input feature map.
-        #ifdef __xilinx__
-        __attribute__((xcl_pipeline_loop))
-        #endif
         for (int i = 0; i < IDEPTH; ++i) {
 
             float inputBuf[KERNEL_LEN];
@@ -111,71 +107,116 @@ __kernel void KERNEL_NAME(
 #undef IWIDTH
 #undef IHEIGHT
 #undef IDEPTH
+#undef IN_SIZE
 #undef OWIDTH
 #undef OHEIGHT
 #undef ODEPTH
+#undef OUT_SIZE
 #undef WORK_GROUP_DIM_0
 #undef WORK_GROUP_DIM_1
 #undef WORK_GROUP_DIM_2
 #undef KERNEL_NAME
 #undef KERNEL_PARAM
 #define KERNEL_SIZE 2
+#define KERNEL_LEN 4
 #define IWIDTH 28
 #define IHEIGHT 28
 #define IDEPTH 6
+#define IN_SIZE 4704
 #define OWIDTH 14
 #define OHEIGHT 14
 #define ODEPTH 6
+#define OUT_SIZE 1176
+#define WORK_GROUP_DIM_0 14
+#define WORK_GROUP_DIM_1 14
+#define WORK_GROUP_DIM_2 2
+#define KERNEL_NAME pool2
 #define in buf1
 #define out buf2
-#ifdef __xilinx__
-__attribute__ ((reqd_work_group_size(16, 1, 1)))
-#endif
-__kernel void max2(
+#define KERNEL_PARAM 
+__attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, WORK_GROUP_DIM_1, WORK_GROUP_DIM_2)))
+__kernel void KERNEL_NAME(
+    KERNEL_PARAM
     __global float *weight,
     __global float *offset) {
     int c = get_global_id(0);
     int r = get_global_id(1);
+    int o = get_global_id(2);
 
-    if (c < OWIDTH && r < ODEPTH * OHEIGHT) {
+    int cLocal = get_local_id(0);
+    int rLocal = get_local_id(1);
+    int oLocal = get_local_id(2);
 
-        // Get the index of the element in output feature map.
-        int o = r / OHEIGHT;
-        r = r % OHEIGHT;
+    __local float inLocal[IWIDTH * IHEIGHT * IDEPTH];
+    __local float weightLocal[WORK_GROUP_DIM_2];
+    __local float offsetLocal[WORK_GROUP_DIM_2];
+    // This the the first work item in the group,
+    // Copy the input and weight into the local buffer.
+    if (cLocal == 0 && rLocal == 0 && oLocal == 0) {
+
+            #ifdef __xilinx__
+            __attribute__((xcl_pipeline_loop))
+            #endif
+            for (int i = 0; i < IWIDTH * IHEIGHT * IDEPTH; ++i) {
+                inLocal[i] = in[i];
+            }
+
+            #ifdef __xilinx__
+            __attribute__((xcl_pipeline_loop))
+            #endif
+            for (int i = 0; i < WORK_GROUP_DIM_2; ++i) {
+                weightLocal[i] = weight[o + i];
+                offsetLocal[i] = offset[o + i];
+            }
+    }
+
+    // Set a barrier.
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    if (c < OWIDTH && r < OHEIGHT && o < ODEPTH) {
 
         float sum = 0.0f;
 
         for (int x = 0; x < KERNEL_SIZE; ++x) {
             for (int y = 0; y < KERNEL_SIZE; ++y) {
-                sum += in[(o * IHEIGHT + r * KERNEL_SIZE + x) * IWIDTH + c * KERNEL_SIZE + y];
+                sum += inLocal[(o * IHEIGHT + r * KERNEL_SIZE + x) * IWIDTH + c * KERNEL_SIZE + y];
             }
         }
 
-        sum = sum * weight[o] + offset[o];
+        sum = sum * weightLocal[oLocal] + offsetLocal[oLocal];
 
         // Get the output index.
         int outIdx = (o * OHEIGHT + r) * OWIDTH + c;
         out[outIdx] = sigmod(sum);
     }
 }
-
 #undef in
 #undef out
 #undef KERNEL_SIZE
+#undef KERNEL_LEN
 #undef IWIDTH
 #undef IHEIGHT
 #undef IDEPTH
+#undef IN_SIZE
 #undef OWIDTH
 #undef OHEIGHT
 #undef ODEPTH
+#undef OUT_SIZE
+#undef WORK_GROUP_DIM_0
+#undef WORK_GROUP_DIM_1
+#undef WORK_GROUP_DIM_2
+#undef KERNEL_NAME
+#undef KERNEL_PARAM
 #define KERNEL_SIZE 5
 #define KERNEL_LEN 25
 #define IWIDTH 14
 #define IHEIGHT 14
 #define IDEPTH 6
+#define IN_SIZE 1176
 #define OWIDTH 10
 #define OHEIGHT 10
 #define ODEPTH 16
+#define OUT_SIZE 1600
 #define WORK_GROUP_DIM_0 16
 #define WORK_GROUP_DIM_1 1
 #define WORK_GROUP_DIM_2 1
@@ -183,9 +224,7 @@ __kernel void max2(
 #define in buf2
 #define out buf3
 #define KERNEL_PARAM 
-#ifdef __xilinx__
 __attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, WORK_GROUP_DIM_1, WORK_GROUP_DIM_2)))
-#endif
 __kernel void KERNEL_NAME(
     KERNEL_PARAM
     __constant float *weight,
@@ -200,7 +239,7 @@ __kernel void KERNEL_NAME(
     int rLocal = get_local_id(1);
     int oLocal = get_local_id(2);
 
-    __local float inLocal[IWIDTH * IHEIGHT * IDEPTH];
+    __local float inLocal[IN_SIZE];
     __local float weightLocal[IDEPTH * WORK_GROUP_DIM_2 * KERNEL_LEN];
 
     // This the the first work item in the group,
@@ -229,11 +268,7 @@ __kernel void KERNEL_NAME(
 
         float sum = 0.0f;
 
-
         // For each input feature map.
-        #ifdef __xilinx__
-        __attribute__((xcl_pipeline_loop))
-        #endif
         for (int i = 0; i < IDEPTH; ++i) {
 
             float inputBuf[KERNEL_LEN];
@@ -274,71 +309,116 @@ __kernel void KERNEL_NAME(
 #undef IWIDTH
 #undef IHEIGHT
 #undef IDEPTH
+#undef IN_SIZE
 #undef OWIDTH
 #undef OHEIGHT
 #undef ODEPTH
+#undef OUT_SIZE
 #undef WORK_GROUP_DIM_0
 #undef WORK_GROUP_DIM_1
 #undef WORK_GROUP_DIM_2
 #undef KERNEL_NAME
 #undef KERNEL_PARAM
 #define KERNEL_SIZE 2
+#define KERNEL_LEN 4
 #define IWIDTH 10
 #define IHEIGHT 10
 #define IDEPTH 16
+#define IN_SIZE 1600
 #define OWIDTH 5
 #define OHEIGHT 5
 #define ODEPTH 16
+#define OUT_SIZE 400
+#define WORK_GROUP_DIM_0 16
+#define WORK_GROUP_DIM_1 1
+#define WORK_GROUP_DIM_2 1
+#define KERNEL_NAME max4
 #define in buf3
 #define out buf4
-#ifdef __xilinx__
-__attribute__ ((reqd_work_group_size(16, 1, 1)))
-#endif
-__kernel void max4(
+#define KERNEL_PARAM 
+__attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, WORK_GROUP_DIM_1, WORK_GROUP_DIM_2)))
+__kernel void KERNEL_NAME(
+    KERNEL_PARAM
     __global float *weight,
     __global float *offset) {
     int c = get_global_id(0);
     int r = get_global_id(1);
+    int o = get_global_id(2);
 
-    if (c < OWIDTH && r < ODEPTH * OHEIGHT) {
+    int cLocal = get_local_id(0);
+    int rLocal = get_local_id(1);
+    int oLocal = get_local_id(2);
 
-        // Get the index of the element in output feature map.
-        int o = r / OHEIGHT;
-        r = r % OHEIGHT;
+    __local float inLocal[IWIDTH * IHEIGHT * IDEPTH];
+    __local float weightLocal[WORK_GROUP_DIM_2];
+    __local float offsetLocal[WORK_GROUP_DIM_2];
+    // This the the first work item in the group,
+    // Copy the input and weight into the local buffer.
+    if (cLocal == 0 && rLocal == 0 && oLocal == 0) {
+
+            #ifdef __xilinx__
+            __attribute__((xcl_pipeline_loop))
+            #endif
+            for (int i = 0; i < IWIDTH * IHEIGHT * IDEPTH; ++i) {
+                inLocal[i] = in[i];
+            }
+
+            #ifdef __xilinx__
+            __attribute__((xcl_pipeline_loop))
+            #endif
+            for (int i = 0; i < WORK_GROUP_DIM_2; ++i) {
+                weightLocal[i] = weight[o + i];
+                offsetLocal[i] = offset[o + i];
+            }
+    }
+
+    // Set a barrier.
+    barrier(CLK_LOCAL_MEM_FENCE);
+
+    if (c < OWIDTH && r < OHEIGHT && o < ODEPTH) {
 
         float sum = 0.0f;
 
         for (int x = 0; x < KERNEL_SIZE; ++x) {
             for (int y = 0; y < KERNEL_SIZE; ++y) {
-                sum += in[(o * IHEIGHT + r * KERNEL_SIZE + x) * IWIDTH + c * KERNEL_SIZE + y];
+                sum += inLocal[(o * IHEIGHT + r * KERNEL_SIZE + x) * IWIDTH + c * KERNEL_SIZE + y];
             }
         }
 
-        sum = sum * weight[o] + offset[o];
+        sum = sum * weightLocal[oLocal] + offsetLocal[oLocal];
 
         // Get the output index.
         int outIdx = (o * OHEIGHT + r) * OWIDTH + c;
         out[outIdx] = sigmod(sum);
     }
 }
-
 #undef in
 #undef out
 #undef KERNEL_SIZE
+#undef KERNEL_LEN
 #undef IWIDTH
 #undef IHEIGHT
 #undef IDEPTH
+#undef IN_SIZE
 #undef OWIDTH
 #undef OHEIGHT
 #undef ODEPTH
+#undef OUT_SIZE
+#undef WORK_GROUP_DIM_0
+#undef WORK_GROUP_DIM_1
+#undef WORK_GROUP_DIM_2
+#undef KERNEL_NAME
+#undef KERNEL_PARAM
 #define KERNEL_SIZE 5
 #define KERNEL_LEN 25
 #define IWIDTH 5
 #define IHEIGHT 5
 #define IDEPTH 16
+#define IN_SIZE 400
 #define OWIDTH 1
 #define OHEIGHT 1
 #define ODEPTH 120
+#define OUT_SIZE 120
 #define WORK_GROUP_DIM_0 16
 #define WORK_GROUP_DIM_1 1
 #define WORK_GROUP_DIM_2 1
@@ -346,9 +426,7 @@ __kernel void max4(
 #define in buf4
 #define out buf5
 #define KERNEL_PARAM 
-#ifdef __xilinx__
 __attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, WORK_GROUP_DIM_1, WORK_GROUP_DIM_2)))
-#endif
 __kernel void KERNEL_NAME(
     KERNEL_PARAM
     __constant float *weight,
@@ -363,7 +441,7 @@ __kernel void KERNEL_NAME(
     int rLocal = get_local_id(1);
     int oLocal = get_local_id(2);
 
-    __local float inLocal[IWIDTH * IHEIGHT * IDEPTH];
+    __local float inLocal[IN_SIZE];
     __local float weightLocal[IDEPTH * WORK_GROUP_DIM_2 * KERNEL_LEN];
 
     // This the the first work item in the group,
@@ -392,11 +470,7 @@ __kernel void KERNEL_NAME(
 
         float sum = 0.0f;
 
-
         // For each input feature map.
-        #ifdef __xilinx__
-        __attribute__((xcl_pipeline_loop))
-        #endif
         for (int i = 0; i < IDEPTH; ++i) {
 
             float inputBuf[KERNEL_LEN];
@@ -437,97 +511,176 @@ __kernel void KERNEL_NAME(
 #undef IWIDTH
 #undef IHEIGHT
 #undef IDEPTH
+#undef IN_SIZE
 #undef OWIDTH
 #undef OHEIGHT
 #undef ODEPTH
+#undef OUT_SIZE
 #undef WORK_GROUP_DIM_0
 #undef WORK_GROUP_DIM_1
 #undef WORK_GROUP_DIM_2
 #undef KERNEL_NAME
 #undef KERNEL_PARAM
+#define KERNEL_SIZE 10
+#define KERNEL_LEN 100
+#define IWIDTH 1
+#define IHEIGHT 1
+#define IDEPTH 120
 #define IN_SIZE 120
+#define OWIDTH 84
+#define OHEIGHT 1
+#define ODEPTH 1
 #define OUT_SIZE 84
-#define BUF_SIZE 10
+#define WORK_GROUP_DIM_0 12
+#define WORK_GROUP_DIM_1 1
+#define WORK_GROUP_DIM_2 1
+#define KERNEL_NAME full6
 #define in buf5
 #define out buf6
-#ifdef __xilinx__
-__attribute__((reqd_work_group_size(16, 1, 1)))
-#endif
-__kernel void full6(
-    
-    __global float *weight,
-    __global float *offset
+#define KERNEL_PARAM 
+__attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, 1, 1)))
+__kernel void KERNEL_NAME(
+    KERNEL_PARAM
+    __constant float *weight,
+    __constant float *offset
     ) {
-    int o = get_global_id(0);
 
-    float inBuf[BUF_SIZE];
-    float weightBuf[BUF_SIZE];
+    int o = get_global_id(0);
+    int oLocal = get_local_id(0);
+
+    __local float inLocal[IN_SIZE];
+    __local float weightLocal[WORK_GROUP_DIM_0 * IN_SIZE];
+    __local float offsetLocal[WORK_GROUP_DIM_0];
+
+    if (oLocal == 0) {
+
+        for (int i = 0; i < IN_SIZE; ++i) {
+            inLocal[i] = in[i];
+        }
+
+        for (int i = 0; i < WORK_GROUP_DIM_0 * IN_SIZE; ++i) {
+            weightLocal[i] = weight[o * IN_SIZE + i];
+        }
+
+        for (int i = 0; i < WORK_GROUP_DIM_0; ++i) {
+            offsetLocal[i] = offset[o + i];
+        }
+    }
+
+    // Set a barrier.
+    barrier(CLK_LOCAL_MEM_FENCE);
 
     if (o < OUT_SIZE) {
+
         float sum = 0;
         #ifdef __xilinx__
                 __attribute__((xcl_pipeline_loop))
         #endif
-        for (int i = 0; i < IN_SIZE; i += BUF_SIZE) {
+        float inBuf[KERNEL_SIZE];
+        float weightBuf[KERNEL_SIZE];
+        for (int i = 0; i < IN_SIZE; i += KERNEL_SIZE) {
 
             #ifdef __xilinx__
             __attribute__((opencl_unroll_hint))
             #endif
-            for (int j = 0; j < BUF_SIZE; ++j) {
-                inBuf[j] = in[i + j];
-                weightBuf[j] = weight[o * IN_SIZE + i + j];
+            for (int j = 0; j < KERNEL_SIZE; ++j) {
+                inBuf[j] = inLocal[i + j];
+                weightBuf[j] = weightLocal[oLocal * IN_SIZE + i + j];
             }
 
             #ifdef __xilinx__
             __attribute__((opencl_unroll_hint))
             #endif
-            for (int j = 0; j < BUF_SIZE; ++j) {
+            for (int j = 0; j < KERNEL_SIZE; ++j) {
                 sum += weightBuf[j] * inBuf[j];
             }
         }
-        sum += offset[o]; 
+        sum += offsetLocal[oLocal]; 
         out[o] = sigmod(sum);
     }
 }
+
 #undef in
 #undef out
+#undef KERNEL_SIZE
+#undef KERNEL_LEN
+#undef IWIDTH
+#undef IHEIGHT
+#undef IDEPTH
 #undef IN_SIZE
+#undef OWIDTH
+#undef OHEIGHT
+#undef ODEPTH
 #undef OUT_SIZE
-#undef BUF_SIZE
+#undef WORK_GROUP_DIM_0
+#undef WORK_GROUP_DIM_1
+#undef WORK_GROUP_DIM_2
+#undef KERNEL_NAME
+#undef KERNEL_PARAM
+#define KERNEL_SIZE 14
+#define KERNEL_LEN 196
+#define IWIDTH 84
+#define IHEIGHT 1
+#define IDEPTH 1
 #define IN_SIZE 84
+#define OWIDTH 10
+#define OHEIGHT 1
+#define ODEPTH 1
 #define OUT_SIZE 10
-#define BUF_SIZE 14
+#define WORK_GROUP_DIM_0 10
+#define WORK_GROUP_DIM_1 1
+#define WORK_GROUP_DIM_2 1
+#define KERNEL_NAME rbf
 #define in buf6
-#ifdef __xilinx__
-__attribute__((reqd_work_group_size(10, 1, 1)))
-#endif
-__kernel void rbf(
-        __global float *out,
+#define KERNEL_PARAM __global float *out,
+__attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, WORK_GROUP_DIM_1, WORK_GROUP_DIM_2)))
+__kernel void KERNEL_NAME(
+    KERNEL_PARAM
     __global float *weight,
     __global float *offset
     ) {
+
     int o = get_global_id(0);
-    float inBuf[BUF_SIZE];
-    float weightBuf[BUF_SIZE];
+    int oLocal = get_local_id(0);
+
+    __local float inLocal[IN_SIZE];
+    __local float weightLocal[IN_SIZE * WORK_GROUP_DIM_0];
+
+    if (oLocal == 0) {
+        for (int i = 0; i < IN_SIZE; ++i) {
+            inLocal[i] = in[i];
+        }
+        for (int i = 0; i < IN_SIZE * WORK_GROUP_DIM_0; ++i) {
+            weightLocal[i] = weight[o * IN_SIZE + i];
+        }
+    }
+
+    // Set a barrier.
+    barrier(CLK_LOCAL_MEM_FENCE);
+    
     if (o < OUT_SIZE) {
-        float sum = 0.0f; 
+        float sum = 0.0f;
+
+        float inBuf[KERNEL_SIZE];
+        float weightBuf[KERNEL_SIZE];
+
         #ifdef __xilinx__
         __attribute__((xcl_pipeline_loop))
         #endif
-        for (int i = 0; i < IN_SIZE; i += BUF_SIZE) {
+        for (int i = 0; i < IN_SIZE; i += KERNEL_SIZE) {
         
             #ifdef __xilinx__
             __attribute__((opencl_unroll_hint))
             #endif
-            for (int j = 0; j < BUF_SIZE; ++j) {
-                inBuf[j] = in[i + j];
-                weightBuf[j] = weight[o * IN_SIZE + i + j];
+            for (int j = 0; j < KERNEL_SIZE; ++j) {
+                inBuf[j] = inLocal[i + j];
+                weightBuf[j] = weightLocal[oLocal * IN_SIZE + i + j];
             }
         
             #ifdef __xilinx__
             __attribute__((opencl_unroll_hint))
             #endif
-            for (int j = 0; j < BUF_SIZE; ++j) {
+            for (int j = 0; j < KERNEL_SIZE; ++j) {
                 float diff = weightBuf[j] - inBuf[j];
                 sum += diff * diff;
             }
@@ -535,7 +688,20 @@ __kernel void rbf(
         out[o] = sum;
     }
 }
+
 #undef in
+#undef KERNEL_SIZE
+#undef KERNEL_LEN
+#undef IWIDTH
+#undef IHEIGHT
+#undef IDEPTH
 #undef IN_SIZE
+#undef OWIDTH
+#undef OHEIGHT
+#undef ODEPTH
 #undef OUT_SIZE
-#undef BUF_SIZE
+#undef WORK_GROUP_DIM_0
+#undef WORK_GROUP_DIM_1
+#undef WORK_GROUP_DIM_2
+#undef KERNEL_NAME
+#undef KERNEL_PARAM

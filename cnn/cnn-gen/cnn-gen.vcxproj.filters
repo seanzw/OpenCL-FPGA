@@ -23,5 +23,14 @@
     <None Include="convolution.cl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="pool.cl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="full.cl">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="rbf.cl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -16,6 +16,18 @@
     <Filter Include="Resource Files\convolution">
       <UniqueIdentifier>{993bfb20-ca28-4401-8a8c-986c2376d341}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\pool">
+      <UniqueIdentifier>{4baad805-34d3-493d-91d2-1d8b3de2255b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\full">
+      <UniqueIdentifier>{592ab4ae-2564-4823-b30e-499be6f76f1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\rbf">
+      <UniqueIdentifier>{e79277f8-1942-4344-87ce-7accf1405494}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\cnn">
+      <UniqueIdentifier>{5e76888a-6790-4490-a61f-774ea6ca6d64}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="cnn.hpp">
@@ -64,10 +76,40 @@
     <None Include="kernel\conv1_pipeline.cl">
       <Filter>Resource Files\convolution</Filter>
     </None>
+    <None Include="kernel\pool2.cl">
+      <Filter>Resource Files\pool</Filter>
+    </None>
+    <None Include="kernel\full6.cl">
+      <Filter>Resource Files\full</Filter>
+    </None>
+    <None Include="kernel\rbf7.cl">
+      <Filter>Resource Files\rbf</Filter>
+    </None>
+    <None Include="kernel\lenet5.cl">
+      <Filter>Resource Files\cnn</Filter>
+    </None>
+    <None Include="kernel\lenet5.tcl">
+      <Filter>Resource Files\cnn</Filter>
+    </None>
+    <None Include="pool2.tcl">
+      <Filter>Resource Files\pool</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="kernel\conv1.xml">
       <Filter>Resource Files\convolution</Filter>
+    </Xml>
+    <Xml Include="kernel\pool2.xml">
+      <Filter>Resource Files\pool</Filter>
+    </Xml>
+    <Xml Include="kernel\full6.xml">
+      <Filter>Resource Files\full</Filter>
+    </Xml>
+    <Xml Include="kernel\rbf7.xml">
+      <Filter>Resource Files\rbf</Filter>
+    </Xml>
+    <Xml Include="kernel\lenet5.xml">
+      <Filter>Resource Files\cnn</Filter>
     </Xml>
   </ItemGroup>
 </Project>

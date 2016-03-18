@@ -151,6 +151,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="convolution.cl" />
+    <None Include="full.cl" />
+    <None Include="pool.cl" />
+    <None Include="rbf.cl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

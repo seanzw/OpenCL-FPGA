@@ -171,9 +171,19 @@
     <None Include="kernel\conv1_item_pipeline.cl" />
     <None Include="kernel\conv1_pipeline.cl" />
     <None Include="kernel\conv1_workgroup.cl" />
+    <None Include="kernel\full6.cl" />
+    <None Include="kernel\lenet5.cl" />
+    <None Include="kernel\lenet5.tcl" />
+    <None Include="kernel\pool2.cl" />
+    <None Include="kernel\rbf7.cl" />
+    <None Include="pool2.tcl" />
   </ItemGroup>
   <ItemGroup>
     <Xml Include="kernel\conv1.xml" />
+    <Xml Include="kernel\full6.xml" />
+    <Xml Include="kernel\lenet5.xml" />
+    <Xml Include="kernel\pool2.xml" />
+    <Xml Include="kernel\rbf7.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

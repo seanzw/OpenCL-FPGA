@@ -318,7 +318,7 @@ namespace cnn {
                     clIn
                     );
             }
-            else if (type == "max") {
+            else if (type == "pool") {
                 return new cnn::MaxPoolLayer(params,
                     weight,
                     offset,
