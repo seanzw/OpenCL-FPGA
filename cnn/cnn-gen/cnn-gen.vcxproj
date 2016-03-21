@@ -155,6 +155,9 @@
     <None Include="pool.cl" />
     <None Include="rbf.cl" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="CNNGenerator.hpp" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
