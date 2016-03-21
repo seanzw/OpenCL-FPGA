@@ -3,22 +3,22 @@ float sigmod(float in) {
 }
 #define KERNEL_SIZE 2
 #define KERNEL_LEN 4
-#define IWIDTH 28
-#define IHEIGHT 28
-#define IDEPTH 6
-#define IN_SIZE 4704
-#define OWIDTH 14
-#define OHEIGHT 14
-#define ODEPTH 6
+#define IWIDTH 10
+#define IHEIGHT 10
+#define IDEPTH 16
+#define IN_SIZE 1600
+#define OWIDTH 5
+#define OHEIGHT 5
+#define ODEPTH 16
 #define OWIDTH_TILE 1
 #define OHEIGHT_TILE 1
 #define ODEPTH_TILE 1
 #define IDEPTH_TILE 1
-#define OUT_SIZE 1176
-#define WORK_GROUP_DIM_0 14
-#define WORK_GROUP_DIM_1 14
-#define WORK_GROUP_DIM_2 2
-#define KERNEL_NAME pool2
+#define OUT_SIZE 400
+#define WORK_GROUP_DIM_0 16
+#define WORK_GROUP_DIM_1 1
+#define WORK_GROUP_DIM_2 1
+#define KERNEL_NAME pool4
 #define KERNEL_PARAM __global float *in, __global float *out,
 __attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, WORK_GROUP_DIM_1, WORK_GROUP_DIM_2)))
 __kernel void KERNEL_NAME(

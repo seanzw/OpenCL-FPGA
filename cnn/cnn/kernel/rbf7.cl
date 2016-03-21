@@ -10,6 +10,10 @@ float sigmod(float in) {
 #define OWIDTH 10
 #define OHEIGHT 1
 #define ODEPTH 1
+#define OWIDTH_TILE 1
+#define OHEIGHT_TILE 1
+#define ODEPTH_TILE 1
+#define IDEPTH_TILE 1
 #define OUT_SIZE 10
 #define WORK_GROUP_DIM_0 10
 #define WORK_GROUP_DIM_1 1
@@ -81,6 +85,10 @@ __kernel void KERNEL_NAME(
 #undef OWIDTH
 #undef OHEIGHT
 #undef ODEPTH
+#undef OWIDTH_TILE
+#undef OHEIGHT_TILE
+#undef ODEPTH_TILE
+#undef IDEPTH_TILE
 #undef OUT_SIZE
 #undef WORK_GROUP_DIM_0
 #undef WORK_GROUP_DIM_1

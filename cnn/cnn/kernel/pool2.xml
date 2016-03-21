@@ -14,6 +14,10 @@
 <oWidth>14</oWidth>
 <oHeight>14</oHeight>
 <oDepth>6</oDepth>
+<oWidthTile>1</oWidthTile>
+<oHeightTile>1</oHeightTile>
+<oDepthTile>1</oDepthTile>
+<iDepthTile>1</iDepthTile>
 <weight><item>0.0274667</item>
 <item>0.994629</item>
 <item>0.572588</item>
