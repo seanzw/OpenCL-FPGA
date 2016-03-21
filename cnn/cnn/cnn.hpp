@@ -288,6 +288,10 @@ namespace cnn {
             params.oWidth = getSizeT(root, "oWidth");
             params.oHeight = getSizeT(root, "oHeight");
             params.oDepth = getSizeT(root, "oDepth");
+            params.oWidthTile = getSizeT(root, "oWidthTile");
+            params.oHeightTile = getSizeT(root, "oHeightTile");
+            params.oDepthTile = getSizeT(root, "oDepthTile");
+            params.iDepthTile = getSizeT(root, "iDepthTile");
             params.kernelSize = getSizeT(root, "kernelSize");
 
             // Get the kernel name.

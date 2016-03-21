@@ -23,9 +23,9 @@ namespace cnn {
             inputBuffer.resize(kernelSize * kernelSize);
 
             // Prepare the ND-Range.
-            global[0] = closestMultiple(workGroupSize[0], oWidth);
-            global[1] = closestMultiple(workGroupSize[1], oHeight);
-            global[2] = closestMultiple(workGroupSize[2], oDepth);
+            global[0] = closestMultiple(workGroupSize[0] * params.oWidthTile, oWidth);
+            global[1] = closestMultiple(workGroupSize[1] * params.oHeightTile, oHeight);
+            global[2] = closestMultiple(workGroupSize[2] * params.oDepthTile, oDepth);
         }
 
         virtual ~ConvolutionLayer() {

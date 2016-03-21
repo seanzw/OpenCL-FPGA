@@ -224,11 +224,8 @@ namespace cnn {
         std::string text = fileToString(fileName);
         const char *source = text.c_str();
         cl_int err;
-        cl_program program = clCreateProgramWithSource(context, 1, (const char **)&source, NULL, NULL);
-        if (program == NULL) {
-            std::cerr << "Failed to create CL program from source. " << std::endl;
-            exit(-1);
-        }
+        cl_program program = clCreateProgramWithSource(context, 1, (const char **)&source, NULL, &err);
+        handleError(err, "Failed to create CL program from source. ");
         
         err = clBuildProgram(program, 0, NULL, NULL, NULL, NULL);
         if (err != CL_SUCCESS) {

@@ -1,3 +1,25 @@
+float sigmod(float in) {
+    return 1.0f / (1.0f + exp(-in)); 
+}
+#define KERNEL_SIZE 5
+#define KERNEL_LEN 25
+#define IWIDTH 32
+#define IHEIGHT 32
+#define IDEPTH 1
+#define IN_SIZE 1024
+#define OWIDTH 28
+#define OHEIGHT 28
+#define ODEPTH 6
+#define OWIDTH_TILE 1
+#define OHEIGHT_TILE 1
+#define ODEPTH_TILE 1
+#define IDEPTH_TILE 1
+#define OUT_SIZE 4704
+#define WORK_GROUP_DIM_0 28
+#define WORK_GROUP_DIM_1 28
+#define WORK_GROUP_DIM_2 3
+#define KERNEL_NAME conv1
+#define KERNEL_PARAM __global float *in, __global float *out,
 __attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, WORK_GROUP_DIM_1, WORK_GROUP_DIM_2)))
 __kernel void KERNEL_NAME(
     KERNEL_PARAM
@@ -81,3 +103,22 @@ __kernel void KERNEL_NAME(
         }
     }
 }
+#undef KERNEL_SIZE
+#undef KERNEL_LEN
+#undef IWIDTH
+#undef IHEIGHT
+#undef IDEPTH
+#undef IN_SIZE
+#undef OWIDTH
+#undef OHEIGHT
+#undef ODEPTH
+#undef OWIDTH_TILE
+#undef OHEIGHT_TILE
+#undef ODEPTH_TILE
+#undef IDEPTH_TILE
+#undef OUT_SIZE
+#undef WORK_GROUP_DIM_0
+#undef WORK_GROUP_DIM_1
+#undef WORK_GROUP_DIM_2
+#undef KERNEL_NAME
+#undef KERNEL_PARAM

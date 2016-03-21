@@ -29,6 +29,10 @@ namespace cnn {
         size_t oWidth;
         size_t oHeight;
         size_t oDepth;
+        size_t oWidthTile;
+        size_t oHeightTile;
+        size_t oDepthTile;
+        size_t iDepthTile;
         Flag flag;
     };
 

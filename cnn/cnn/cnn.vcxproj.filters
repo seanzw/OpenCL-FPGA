@@ -94,6 +94,9 @@
     <None Include="pool2.tcl">
       <Filter>Resource Files\pool</Filter>
     </None>
+    <None Include="kernel\conv1_tile.cl">
+      <Filter>Resource Files\convolution</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="kernel\conv1.xml">
@@ -110,6 +113,9 @@
     </Xml>
     <Xml Include="kernel\lenet5.xml">
       <Filter>Resource Files\cnn</Filter>
+    </Xml>
+    <Xml Include="kernel\conv1_tile.xml">
+      <Filter>Resource Files\convolution</Filter>
     </Xml>
   </ItemGroup>
 </Project>

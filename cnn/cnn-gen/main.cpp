@@ -29,6 +29,10 @@ public:
         size_t oWidth;
         size_t oHeight;
         size_t oDepth;
+        size_t oWidthTile;
+        size_t oHeightTile;
+        size_t oDepthTile;
+        size_t iDepthTile;
     };
 
     static void genCNN(const std::string &XMLFileName,
@@ -252,6 +256,10 @@ private:
         writeXMLTag(xml, "oWidth", param.oWidth);
         writeXMLTag(xml, "oHeight", param.oHeight);
         writeXMLTag(xml, "oDepth", param.oDepth);
+        writeXMLTag(xml, "oWidthTile", param.oWidthTile);
+        writeXMLTag(xml, "oHeightTile", param.oHeightTile);
+        writeXMLTag(xml, "oDepthTile", param.oDepthTile);
+        writeXMLTag(xml, "iDepthTile", param.iDepthTile);
     }
 
     /***********************************************************************
@@ -291,6 +299,10 @@ private:
         writeDefine(kernel, "OWIDTH", param.oWidth);
         writeDefine(kernel, "OHEIGHT", param.oHeight);
         writeDefine(kernel, "ODEPTH", param.oDepth);
+        writeDefine(kernel, "OWIDTH_TILE", param.oWidthTile);
+        writeDefine(kernel, "OHEIGHT_TILE", param.oHeightTile);
+        writeDefine(kernel, "ODEPTH_TILE", param.oDepthTile);
+        writeDefine(kernel, "IDEPTH_TILE", param.iDepthTile);
         writeDefine(kernel, "OUT_SIZE", param.oWidth * param.oHeight * param.oDepth);
         writeDefine(kernel, "WORK_GROUP_DIM_0", param.workGroupSize[0]);
         writeDefine(kernel, "WORK_GROUP_DIM_1", param.workGroupSize[1]);
@@ -330,6 +342,10 @@ private:
         writeUndef(kernel, "OWIDTH");
         writeUndef(kernel, "OHEIGHT");
         writeUndef(kernel, "ODEPTH");
+        writeUndef(kernel, "OWIDTH_TILE");
+        writeUndef(kernel, "OHEIGHT_TILE");
+        writeUndef(kernel, "ODEPTH_TILE");
+        writeUndef(kernel, "IDEPTH_TILE");
         writeUndef(kernel, "OUT_SIZE");
         writeUndef(kernel, "WORK_GROUP_DIM_0");
         writeUndef(kernel, "WORK_GROUP_DIM_1");
@@ -361,7 +377,7 @@ const std::string CNNGenerator::rbfKernel = CNNGenerator::fileToString("rbf.cl")
 
 int main(int argc, char *argv[]) {
 
-    CNNGenerator::LayerParam params[] = {
+    CNNGenerator::LayerParam paramsUntile[] = {
         {
             CNNGenerator::CONV,
             "conv1",
@@ -372,7 +388,11 @@ int main(int argc, char *argv[]) {
             5,
             28,
             28,
-            6
+            6,
+            1,
+            1,
+            1,
+            1
         },
         {
             CNNGenerator::POOL,
@@ -384,7 +404,11 @@ int main(int argc, char *argv[]) {
             2,
             14,
             14,
-            6
+            6,
+            1,
+            1,
+            1,
+            1
         },
         {
             CNNGenerator::CONV,
@@ -396,11 +420,15 @@ int main(int argc, char *argv[]) {
             5,
             10,
             10,
-            16
+            16,
+            1,
+            1,
+            1,
+            1
         },
         {
             CNNGenerator::POOL,
-            "max4",
+            "pool4",
             { 16, 1, 1 },
             10,
             10,
@@ -408,7 +436,11 @@ int main(int argc, char *argv[]) {
             2,
             5,
             5,
-            16
+            16,
+            1,
+            1,
+            1,
+            1
         },
         {
             CNNGenerator::CONV,
@@ -420,7 +452,11 @@ int main(int argc, char *argv[]) {
             5,
             1,
             1,
-            120
+            120,
+            1,
+            1,
+            1,
+            1
         },
         {
             CNNGenerator::FULL,
@@ -432,11 +468,15 @@ int main(int argc, char *argv[]) {
             10,
             84,
             1,
+            1,
+            1,
+            1,
+            1,
             1
         },
         {
             CNNGenerator::RBF,
-            "rbf",
+            "rbf7",
             { 10, 1, 1 },
             84,
             1,
@@ -444,15 +484,136 @@ int main(int argc, char *argv[]) {
             14,
             10,
             1,
+            1,
+            1,
+            1,
+            1,
             1
         }
     };
 
-    CNNGenerator::genCNN("../cnn/kernel/conv1.xml", "../cnn/kernel/conv1.cl", 1, &params[0]);
-    CNNGenerator::genCNN("../cnn/kernel/pool2.xml", "../cnn/kernel/pool2.cl", 1, &params[1]);
-    CNNGenerator::genCNN("../cnn/kernel/full6.xml", "../cnn/kernel/full6.cl", 1, &params[5]);
-    CNNGenerator::genCNN("../cnn/kernel/rbf7.xml", "../cnn/kernel/rbf7.cl", 1, &params[6]);
-    CNNGenerator::genCNN("../cnn/kernel/lenet5.xml", "../cnn/kernel/lenet5.cl", 7, params);
+    CNNGenerator::LayerParam paramsTile[] = {
+        {
+            CNNGenerator::CONV,
+            "conv1",
+            {28, 28, 3},
+            32,
+            32,
+            1,
+            5,
+            28,
+            28,
+            6,
+            1,
+            1,
+            1,
+            1
+        },
+        {
+            CNNGenerator::POOL,
+            "pool2",
+            { 14, 14, 2 },
+            28,
+            28,
+            6,
+            2,
+            14,
+            14,
+            6,
+            1,
+            1,
+            1,
+            1
+        },
+        {
+            CNNGenerator::CONV,
+            "conv3",
+            { 16, 1, 1 },
+            14,
+            14,
+            6,
+            5,
+            10,
+            10,
+            16,
+            1,
+            1,
+            1,
+            1
+        },
+        {
+            CNNGenerator::POOL,
+            "pool4",
+            { 16, 1, 1 },
+            10,
+            10,
+            16,
+            2,
+            5,
+            5,
+            16,
+            1,
+            1,
+            1,
+            1
+        },
+        {
+            CNNGenerator::CONV,
+            "conv5",
+            { 16, 1, 1 },
+            5,
+            5,
+            16,
+            5,
+            1,
+            1,
+            120,
+            1,
+            1,
+            1,
+            1
+        },
+        {
+            CNNGenerator::FULL,
+            "full6",
+            { 12, 1, 1 },
+            1,
+            1,
+            120,
+            10,
+            84,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        },
+        {
+            CNNGenerator::RBF,
+            "rbf7",
+            { 10, 1, 1 },
+            84,
+            1,
+            1,
+            14,
+            10,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        }
+    };
+
+    /*CNNGenerator::genCNN("../cnn/kernel/conv1.xml", "../cnn/kernel/conv1.cl", 1, &paramsUntile[0]);
+    CNNGenerator::genCNN("../cnn/kernel/pool2.xml", "../cnn/kernel/pool2.cl", 1, &paramsUntile[1]);
+    CNNGenerator::genCNN("../cnn/kernel/full6.xml", "../cnn/kernel/full6.cl", 1, &paramsUntile[5]);
+    CNNGenerator::genCNN("../cnn/kernel/rbf7.xml", "../cnn/kernel/rbf7.cl", 1, &paramsUntile[6]);
+    CNNGenerator::genCNN("../cnn/kernel/lenet5.xml", "../cnn/kernel/lenet5.cl", 7, paramsUntile);*/
+
+    CNNGenerator::genCNN("../cnn/kernel/conv1_tile.xml", "../cnn/kernel/conv1_tile.cl", 1, &paramsTile[0]);
 
     return 0;
 }
