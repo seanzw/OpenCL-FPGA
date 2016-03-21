@@ -10,14 +10,14 @@ float sigmod(float in) {
 #define OWIDTH 28
 #define OHEIGHT 28
 #define ODEPTH 6
-#define OWIDTH_TILE 1
-#define OHEIGHT_TILE 1
-#define ODEPTH_TILE 1
+#define OWIDTH_TILE 4
+#define OHEIGHT_TILE 4
+#define ODEPTH_TILE 3
 #define IDEPTH_TILE 1
 #define OUT_SIZE 4704
-#define WORK_GROUP_DIM_0 28
-#define WORK_GROUP_DIM_1 28
-#define WORK_GROUP_DIM_2 3
+#define WORK_GROUP_DIM_0 7
+#define WORK_GROUP_DIM_1 7
+#define WORK_GROUP_DIM_2 2
 #define KERNEL_NAME conv1
 #define KERNEL_PARAM __global float *in, __global float *out,
 __attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, WORK_GROUP_DIM_1, WORK_GROUP_DIM_2)))
@@ -37,6 +37,7 @@ __kernel void KERNEL_NAME(
 
     __local float inLocal[IN_SIZE];
     __local float weightLocal[IDEPTH * ODEPTH * KERNEL_LEN];
+    __local float outLocal[OUT_SIZE];
 
     // This the the first work item in the group,
     // Copy the input, output and weight into the local buffer.
@@ -45,7 +46,7 @@ __kernel void KERNEL_NAME(
         #ifdef __xilinx__
         __attribute__((xcl_pipeline_loop))
         #endif
-        for (int i = 0; i < IWIDTH * IHEIGHT * IDEPTH; ++i) {
+        for (int i = 0; i < IN_SIZE; ++i) {
             inLocal[i] = in[i];
         }
 
@@ -62,6 +63,9 @@ __kernel void KERNEL_NAME(
 
     // Initialize the private output buffer to zero.
     float outPrivate[OWIDTH_TILE * OHEIGHT_TILE * ODEPTH_TILE];
+    #ifdef __xilinx__
+    __attribute__((xcl_pipeline_loop))
+    #endif
     for (int i = 0; i < OWIDTH_TILE * OHEIGHT_TILE * ODEPTH_TILE; ++i) {
         outPrivate[i] = 0.0f;
     }
@@ -70,12 +74,18 @@ __kernel void KERNEL_NAME(
     for (int iTile = 0; iTile < IDEPTH; iTile += IDEPTH_TILE) {
 
         int oPrivateIdx = 0;
-        for (int o = oTile; o < oTile + ODEPTH_TILE; ++o) {
-            
-            for (int r = rTile; r < rTile + OHEIGHT_TILE; ++r) {
-
-                for (int c = cTile; c < cTile + OWIDTH_TILE; ++c, ++oPrivateIdx) {
-
+        #ifdef __xilinx__
+        __attribute__((xcl_pipeline_loop))
+        #endif
+        for (int r = rTile; r < rTile + OHEIGHT_TILE; ++r) {
+            #ifdef __xilinx__
+            __attribute__((xcl_pipeline_loop))
+            #endif
+            for (int c = cTile; c < cTile + OWIDTH_TILE; ++c) {
+                #ifdef __xilinx__
+                __attribute__((opencl_unroll_hint))
+                #endif
+                for (int o = oTile; o < oTile + ODEPTH_TILE; ++o, ++oPrivateIdx) {
                     for (int i = iTile; i < iTile + IDEPTH_TILE; ++i) {
 
                         int weightIdx = 0;
@@ -93,13 +103,34 @@ __kernel void KERNEL_NAME(
         }
     }
 
-    // Store the output buffer to global buffer.
+    // Store the output buffer to local buffer.
     int oPrivateIdx = 0;
-    for (int o = oTile; o < oTile + ODEPTH_TILE; ++o) {
-        for (int r = rTile; r < rTile + OHEIGHT_TILE; ++r) {
-            for (int c = cTile; c < cTile + OWIDTH_TILE; ++c, ++oPrivateIdx) {
-                out[(o * OHEIGHT + r) * OWIDTH + c] = sigmod(outPrivate[oPrivateIdx] + offset[o]);
+    #ifdef __xilinx__
+    __attribute__((xcl_pipeline_loop))
+    #endif
+    for (int r = rTile; r < rTile + OHEIGHT_TILE; ++r) {
+        #ifdef __xilinx__
+        __attribute__((xcl_pipeline_loop))
+        #endif
+        for (int c = cTile; c < cTile + OWIDTH_TILE; ++c) {
+            #ifdef __xilinx__
+            __attribute__((xcl_pipeline_loop))
+            #endif
+            for (int o = oTile; o < oTile + ODEPTH_TILE; ++o, ++oPrivateIdx) {
+                outLocal[(o * OHEIGHT + r) * OWIDTH + c] = sigmod(outPrivate[oPrivateIdx] + offset[o]);
             }
+        }
+    }
+
+    barrier(CLK_LOCAL_MEM_FENCE);
+    // Copy the output back into the global memory.
+    if (cLocal == WORK_GROUP_DIM_0 - 1 && rLocal == WORK_GROUP_DIM_1 - 1 && oLocal == WORK_GROUP_DIM_2 - 1) {
+
+        #ifdef __xilinx__
+        __attribute__((xcl_pipeline_loop))
+        #endif
+        for (int i = 0; i < OUT_SIZE; ++i) {
+            out[i] = outLocal[i];
         }
     }
 }

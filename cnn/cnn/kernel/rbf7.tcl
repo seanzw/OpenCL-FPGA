@@ -1,7 +1,7 @@
 # SDAccel command script.
 
 # Define a solution name.
-create_solution -name lenet5 -dir FPGA -force
+create_solution -name rbf7 -dir FPGA -force
 
 # Define the target platform of the application
 add_device -vbnv xilinx:adm-pcie-7v3:1ddr:2.0
@@ -35,30 +35,12 @@ add_files "test.hpp"
 set_property file_type "c header files" [get_files "test.hpp"]
 
 # Create the kernel.
-create_kernel conv1 -type clc
-add_files -kernel [get_kernels conv1] "kernel/lenet5.cl"
-create_kernel pool2 -type clc
-add_files -kernel [get_kernels pool2] "kernel/lenet5.cl"
-create_kernel conv3 -type clc
-add_files -kernel [get_kernels conv3] "kernel/lenet5.cl"
-create_kernel pool4 -type clc
-add_files -kernel [get_kernels pool4] "kernel/lenet5.cl"
-create_kernel conv5 -type clc
-add_files -kernel [get_kernels conv5] "kernel/lenet5.cl"
-create_kernel full6 -type clc
-add_files -kernel [get_kernels full6] "kernel/lenet5.cl"
 create_kernel rbf7 -type clc
-add_files -kernel [get_kernels rbf7] "kernel/lenet5.cl"
+add_files -kernel [get_kernels rbf7] "kernel/rbf7.cl"
 
 # Define binary containers.
 create_opencl_binary alpha
 set_property region "OCL_REGION_0" [get_opencl_binary alpha]
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv1] -name CONV1
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels pool2] -name POOL2
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv3] -name CONV3
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels pool4] -name POOL4
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv5] -name CONV5
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels full6] -name FULL6
 create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels rbf7] -name RBF7
 
 # Compile the design for CPU based emulation.
@@ -68,7 +50,7 @@ compile_emulation -flow cpu -opencl_binary [get_opencl_binary alpha]
 report_estimate
 
 # Run the design in CPU emulation mode
-run_emulation -flow cpu -args "../../../../../kernel/lenet5.xml result.xml alpha.xclbin"
+run_emulation -flow cpu -args "../../../../../kernel/rbf7.xml result.xml alpha.xclbin"
 
 build_system
 

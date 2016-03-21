@@ -14,7 +14,7 @@ float sigmod(float in) {
 #define WORK_GROUP_DIM_0 10
 #define WORK_GROUP_DIM_1 1
 #define WORK_GROUP_DIM_2 1
-#define KERNEL_NAME rbf
+#define KERNEL_NAME rbf7
 #define KERNEL_PARAM __global float *in, __global float *out,
 __attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, WORK_GROUP_DIM_1, WORK_GROUP_DIM_2)))
 __kernel void KERNEL_NAME(

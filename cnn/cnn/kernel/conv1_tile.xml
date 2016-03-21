@@ -4,9 +4,9 @@
 <queueBarrier>10</queueBarrier>
 <layer><type>conv</type>
 <kernelName>conv1</kernelName>
-<workGroupSize><item>28</item>
-<item>28</item>
-<item>3</item>
+<workGroupSize><item>7</item>
+<item>7</item>
+<item>2</item>
 </workGroupSize><iWidth>32</iWidth>
 <iHeight>32</iHeight>
 <iDepth>1</iDepth>
@@ -14,9 +14,9 @@
 <oWidth>28</oWidth>
 <oHeight>28</oHeight>
 <oDepth>6</oDepth>
-<oWidthTile>1</oWidthTile>
-<oHeightTile>1</oHeightTile>
-<oDepthTile>1</oDepthTile>
+<oWidthTile>4</oWidthTile>
+<oHeightTile>4</oHeightTile>
+<oDepthTile>3</oDepthTile>
 <iDepthTile>1</iDepthTile>
 <weight><oFeatureMap><iFeatureMap><line><item>0.00125126</item>
 <item>0.563585</item>

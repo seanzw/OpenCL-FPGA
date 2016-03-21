@@ -332,7 +332,7 @@ __kernel void KERNEL_NAME(
 #define WORK_GROUP_DIM_0 16
 #define WORK_GROUP_DIM_1 1
 #define WORK_GROUP_DIM_2 1
-#define KERNEL_NAME max4
+#define KERNEL_NAME pool4
 #define in buf3
 #define out buf4
 #define KERNEL_PARAM 
@@ -630,7 +630,7 @@ __kernel void KERNEL_NAME(
 #define WORK_GROUP_DIM_0 10
 #define WORK_GROUP_DIM_1 1
 #define WORK_GROUP_DIM_2 1
-#define KERNEL_NAME rbf
+#define KERNEL_NAME rbf7
 #define in buf6
 #define KERNEL_PARAM __global float *out,
 __attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, WORK_GROUP_DIM_1, WORK_GROUP_DIM_2)))

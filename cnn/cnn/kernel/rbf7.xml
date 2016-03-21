@@ -3,7 +3,7 @@
 <inSize>84</inSize>
 <queueBarrier>10</queueBarrier>
 <layer><type>rbf</type>
-<kernelName>rbf</kernelName>
+<kernelName>rbf7</kernelName>
 <workGroupSize><item>10</item>
 <item>1</item>
 <item>1</item>

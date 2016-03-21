@@ -6,7 +6,11 @@ KERNELDIR = kernel
 OUTPUTDIR = FPGA
 
 TARGETS = host
-TARGETS += conv1_baseline conv1_workgroup conv1_unroll conv1_pipeline conv1_item_pipeline conv1_memory_partition conv1
+TARGETS += conv1_baseline conv1_workgroup conv1_unroll conv1_pipeline conv1_item_pipeline conv1_memory_partition conv1_tile conv1
+TARGETS += pool2
+TARGETS += full6
+TARGETS += rbf7
+TARGETS += lenet5
 
 TCLS = $(addsuffix .tcl, $(TARGETS))
 OBJS = $(addsuffix .o, $(TARGETS))

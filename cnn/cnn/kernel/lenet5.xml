@@ -2623,7 +2623,7 @@
 <item>0.464431</item>
 <item>0.235511</item>
 </offset></layer><layer><type>pool</type>
-<kernelName>max4</kernelName>
+<kernelName>pool4</kernelName>
 <workGroupSize><item>16</item>
 <item>1</item>
 <item>1</item>
@@ -60975,7 +60975,7 @@
 <item>0.0110477</item>
 <item>0.679403</item>
 </offset></layer><layer><type>rbf</type>
-<kernelName>rbf</kernelName>
+<kernelName>rbf7</kernelName>
 <workGroupSize><item>10</item>
 <item>1</item>
 <item>1</item>
