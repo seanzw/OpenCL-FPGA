@@ -37,6 +37,7 @@ __kernel void KERNEL_NAME(
 
     __local float inLocal[IN_SIZE];
     __local float weightLocal[IDEPTH * ODEPTH * KERNEL_LEN];
+    __local float offsetLocal[ODEPTH];
     __local float outLocal[OUT_SIZE];
 
     // This the the first work item in the group,
@@ -55,6 +56,14 @@ __kernel void KERNEL_NAME(
         #endif
         for (int i = 0; i < IDEPTH * ODEPTH * KERNEL_LEN; ++i) {
             weightLocal[i] = weight[i];
+        }
+
+
+        #ifdef __xilinx__
+        __attribute__((xcl_pipeline_loop))
+        #endif
+        for (int i = 0; i < ODEPTH; ++i) {
+            offsetLocal[i] = offset[i];
         }
     }
 
@@ -117,7 +126,7 @@ __kernel void KERNEL_NAME(
             __attribute__((xcl_pipeline_loop))
             #endif
             for (int o = oTile; o < oTile + ODEPTH_TILE; ++o, ++oPrivateIdx) {
-                outLocal[(o * OHEIGHT + r) * OWIDTH + c] = sigmod(outPrivate[oPrivateIdx] + offset[o]);
+                outLocal[(o * OHEIGHT + r) * OWIDTH + c] = sigmod(outPrivate[oPrivateIdx] + offsetLocal[o]);
             }
         }
     }
