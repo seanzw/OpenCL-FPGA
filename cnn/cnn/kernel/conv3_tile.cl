@@ -13,7 +13,7 @@ float sigmod(float in) {
 #define OWIDTH_TILE 5
 #define OHEIGHT_TILE 5
 #define ODEPTH_TILE 4
-#define IDEPTH_TILE 1
+#define IDEPTH_TILE 2
 #define OUT_SIZE 1600
 #define WORK_GROUP_DIM_0 2
 #define WORK_GROUP_DIM_1 2
@@ -80,6 +80,9 @@ __kernel void KERNEL_NAME(
     }
 
     // Tile the input feature map.
+    #ifdef __xilinx__
+    __attribute__((xcl_pipeline_loop))
+    #endif
     for (int iTile = 0; iTile < IDEPTH; iTile += IDEPTH_TILE) {
 
         int oPrivateIdx = 0;
@@ -95,6 +98,9 @@ __kernel void KERNEL_NAME(
                 __attribute__((opencl_unroll_hint))
                 #endif
                 for (int o = oTile; o < oTile + ODEPTH_TILE; ++o, ++oPrivateIdx) {
+                    #ifdef __xilinx__
+                    __attribute__((opencl_unroll_hint))
+                    #endif
                     for (int i = iTile; i < iTile + IDEPTH_TILE; ++i) {
 
                         int weightIdx = 0;

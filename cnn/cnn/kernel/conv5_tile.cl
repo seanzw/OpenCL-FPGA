@@ -12,12 +12,12 @@ float sigmod(float in) {
 #define ODEPTH 120
 #define OWIDTH_TILE 1
 #define OHEIGHT_TILE 1
-#define ODEPTH_TILE 1
-#define IDEPTH_TILE 1
+#define ODEPTH_TILE 12
+#define IDEPTH_TILE 4
 #define OUT_SIZE 120
-#define WORK_GROUP_DIM_0 16
+#define WORK_GROUP_DIM_0 1
 #define WORK_GROUP_DIM_1 1
-#define WORK_GROUP_DIM_2 1
+#define WORK_GROUP_DIM_2 10
 #define KERNEL_NAME conv5
 #define KERNEL_PARAM __global float *in, __global float *out,
 __attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, WORK_GROUP_DIM_1, WORK_GROUP_DIM_2)))
