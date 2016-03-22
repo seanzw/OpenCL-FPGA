@@ -81,7 +81,7 @@ int main(int argc, char *argv[]) {
         {
             CNNGenerator::CONV,
             "conv5",
-            { 16, 1, 1 },
+            { 1, 1, 10 },
             5,
             5,
             16,
@@ -91,8 +91,8 @@ int main(int argc, char *argv[]) {
             120,
             1,
             1,
-            1,
-            1
+            12,
+            4
         },
         {
             CNNGenerator::FULL,

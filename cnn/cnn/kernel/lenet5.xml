@@ -2684,9 +2684,9 @@
 <item>0.70043</item>
 </offset></layer><layer><type>conv</type>
 <kernelName>conv5</kernelName>
-<workGroupSize><item>16</item>
+<workGroupSize><item>1</item>
 <item>1</item>
-<item>1</item>
+<item>10</item>
 </workGroupSize><iWidth>5</iWidth>
 <iHeight>5</iHeight>
 <iDepth>16</iDepth>
@@ -2696,8 +2696,8 @@
 <oDepth>120</oDepth>
 <oWidthTile>1</oWidthTile>
 <oHeightTile>1</oHeightTile>
-<oDepthTile>1</oDepthTile>
-<iDepthTile>1</iDepthTile>
+<oDepthTile>12</oDepthTile>
+<iDepthTile>4</iDepthTile>
 <weight><oFeatureMap><iFeatureMap><line><item>0.21485</item>
 <item>0.660024</item>
 <item>0.647847</item>

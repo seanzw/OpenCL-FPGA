@@ -97,6 +97,18 @@
     <None Include="kernel\conv1_tile.cl">
       <Filter>Resource Files\convolution</Filter>
     </None>
+    <None Include="kernel\conv3_tile.cl">
+      <Filter>Resource Files\convolution</Filter>
+    </None>
+    <None Include="kernel\conv3_tile.tcl">
+      <Filter>Resource Files\convolution</Filter>
+    </None>
+    <None Include="kernel\conv5_tile.cl">
+      <Filter>Resource Files\convolution</Filter>
+    </None>
+    <None Include="kernel\conv5_tile.tcl">
+      <Filter>Resource Files\convolution</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="kernel\conv1.xml">
@@ -115,6 +127,12 @@
       <Filter>Resource Files\cnn</Filter>
     </Xml>
     <Xml Include="kernel\conv1_tile.xml">
+      <Filter>Resource Files\convolution</Filter>
+    </Xml>
+    <Xml Include="kernel\conv3_tile.xml">
+      <Filter>Resource Files\convolution</Filter>
+    </Xml>
+    <Xml Include="kernel\conv5_tile.xml">
       <Filter>Resource Files\convolution</Filter>
     </Xml>
   </ItemGroup>

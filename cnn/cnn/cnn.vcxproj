@@ -172,6 +172,10 @@
     <None Include="kernel\conv1_pipeline.cl" />
     <None Include="kernel\conv1_tile.cl" />
     <None Include="kernel\conv1_workgroup.cl" />
+    <None Include="kernel\conv3_tile.cl" />
+    <None Include="kernel\conv3_tile.tcl" />
+    <None Include="kernel\conv5_tile.cl" />
+    <None Include="kernel\conv5_tile.tcl" />
     <None Include="kernel\full6.cl" />
     <None Include="kernel\lenet5.cl" />
     <None Include="kernel\lenet5.tcl" />
@@ -182,6 +186,8 @@
   <ItemGroup>
     <Xml Include="kernel\conv1.xml" />
     <Xml Include="kernel\conv1_tile.xml" />
+    <Xml Include="kernel\conv3_tile.xml" />
+    <Xml Include="kernel\conv5_tile.xml" />
     <Xml Include="kernel\full6.xml" />
     <Xml Include="kernel\lenet5.xml" />
     <Xml Include="kernel\pool2.xml" />
