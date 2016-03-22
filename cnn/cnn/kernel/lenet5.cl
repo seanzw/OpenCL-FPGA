@@ -134,6 +134,7 @@ __kernel void KERNEL_NAME(
             #endif
             for (int o = oTile; o < oTile + ODEPTH_TILE; ++o, ++oPrivateIdx) {
                 outLocal[(o * OHEIGHT + r) * OWIDTH + c] = sigmod(outPrivate[oPrivateIdx] + offsetLocal[o]);
+                // out[(o * OHEIGHT + r) * OWIDTH + c] = sigmod(outPrivate[oPrivateIdx] + offsetLocal[o]);
             }
         }
     }
@@ -402,6 +403,7 @@ __kernel void KERNEL_NAME(
             #endif
             for (int o = oTile; o < oTile + ODEPTH_TILE; ++o, ++oPrivateIdx) {
                 outLocal[(o * OHEIGHT + r) * OWIDTH + c] = sigmod(outPrivate[oPrivateIdx] + offsetLocal[o]);
+                // out[(o * OHEIGHT + r) * OWIDTH + c] = sigmod(outPrivate[oPrivateIdx] + offsetLocal[o]);
             }
         }
     }
@@ -671,6 +673,7 @@ __kernel void KERNEL_NAME(
             #endif
             for (int o = oTile; o < oTile + ODEPTH_TILE; ++o, ++oPrivateIdx) {
                 outLocal[(o * OHEIGHT + r) * OWIDTH + c] = sigmod(outPrivate[oPrivateIdx] + offsetLocal[o]);
+                //out[(o * OHEIGHT + r) * OWIDTH + c] = sigmod(outPrivate[oPrivateIdx] + offsetLocal[o]);
             }
         }
     }

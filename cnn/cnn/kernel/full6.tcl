@@ -52,6 +52,6 @@ report_estimate
 # Run the design in CPU emulation mode
 run_emulation -flow cpu -args "../../../../../kernel/full6.xml result.xml alpha.xclbin"
 
-build_system
+# build_system
 
-package_system
+# package_system
