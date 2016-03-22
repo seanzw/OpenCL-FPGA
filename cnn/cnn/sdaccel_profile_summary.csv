@@ -1,0 +1,95 @@
+SDAccel Profile Summary
+
+OpenCL API Calls
+API Name,Number Of Calls,Total Time (ms),Minimum Time (ms),Average Time (ms),Maximum Time (ms),
+clWaitForEvents,3033,2579.22,0.048615,0.850385,3.48182,
+clCreateProgramWithBinary,1,410.442,410.442,410.442,410.442,
+clEnqueueWriteBuffer,1011,91.9189,0.077308,0.0909188,0.219496,
+clEnqueueReadBuffer,1011,65.1987,0.052651,0.0644893,0.173453,
+clGetEventProfilingInfo,12022,12.2425,0.000287,0.00101834,0.006107,
+clEnqueueNDRangeKernel,1011,4.32393,0.003309,0.00427689,0.029438,
+clCreateBuffer,4,0.088241,0.001182,0.0220602,0.071584,
+clCreateKernel,1,0.011023,0.011023,0.011023,0.011023,
+clGetDeviceInfo,11,0.009684,0.000329,0.000880364,0.004972,
+clGetPlatformIDs,1,0.006313,0.006313,0.006313,0.006313,
+clCreateContext,1,0.004038,0.004038,0.004038,0.004038,
+clBuildProgram,1,0.003174,0.003174,0.003174,0.003174,
+clRetainMemObject,4,0.002902,0.000339,0.0007255,0.001099,
+clGetDeviceIDs,1,0.002443,0.002443,0.002443,0.002443,
+clSetKernelArg,4,0.002186,0.000412,0.0005465,0.000862,
+clCreateCommandQueue,1,0.002042,0.002042,0.002042,0.002042,
+clRetainProgram,1,0.001785,0.001785,0.001785,0.001785,
+clRetainCommandQueue,1,0.000906,0.000906,0.000906,0.000906,
+clRetainContext,1,0.00073,0.00073,0.00073,0.00073,
+clRetainKernel,1,0.000681,0.000681,0.000681,0.000681,
+
+
+Kernel Execution
+Kernel,Number Of Enqueues,Total Time (ms),Minimum Time (ms),Average Time (ms),Maximum Time (ms),
+conv5,1011,2428.45,2.39907,2.40203,2.43185,
+
+
+Compute Unit Utilization
+Compute Unit,Kernel,Global Work Size,Local Work Size,Number Of Calls,Total Time (ms),Minimum Time (ms),Average Time (ms),Maximum Time (ms),
+CONV,conv5,1:1:10,1:1:10,1011,2424.21,2.39528,2.39783,2.42257,
+
+
+Data Transfer: Host and Global Memory
+Transfer Type,Number Of Transfers,Transfer Rate (MB/s),Average Bandwidth Utilization (%),Average Size (KB),Total Time (ms),Average Time (ms),
+READ,1011,9.10277,0.182055,0.48,53.3112,0.0527312,
+WRITE,1011,20.095,0.4019,1.6,80.4975,0.0796217,
+
+
+Data Transfer: Kernels and Global Memory
+Transfer Type,Number Of Transfers,Transfer / Execution Rate (MB/s),Average Bandwidth Utilization (%),Average Size (KB),Average Time (ns),
+READ,193101,80.8117,1.26243,1.01629,30295.2,
+WRITE,1011,0.199831,0.00312173,0.48,507.275,
+
+
+Top Data Transfer: Kernels and Global Memory
+Kernel Name,Number of Transfers,Average Bytes per Transfer,Transfer Efficiency (%),Total Data Transfer (MB),Total Write (MB),Total Read (MB),Transfer Rate (MB/s),Average Bandwidth Utilization (%),
+ALL,194112,1013.5,6.18591,196.733,0.48528,196.247,40.5057,0.632776,
+
+
+Top Kernel Execution
+Kernel Instance Address,Kernel,Context ID,Command Queue ID,Device Name,Start Time (ms),Duration (ms),Global Work Size,Local Work Size,
+33688208,conv5,3872980696,0,fpga0,1479.48,2.43185,1:1:10,1:1:10,
+33688208,conv5,3872980696,0,fpga0,1357.07,2.42862,1:1:10,1:1:10,
+33688208,conv5,3872980696,0,fpga0,1324.9,2.42383,1:1:10,1:1:10,
+33688208,conv5,3872980696,0,fpga0,1386.8,2.42317,1:1:10,1:1:10,
+33688208,conv5,3872980696,0,fpga0,1476.71,2.4222,1:1:10,1:1:10,
+33688208,conv5,3872980696,0,fpga0,2470.45,2.41633,1:1:10,1:1:10,
+33688208,conv5,3872980696,0,fpga0,2475.64,2.41632,1:1:10,1:1:10,
+33688208,conv5,3872980696,0,fpga0,1365.17,2.41366,1:1:10,1:1:10,
+33688208,conv5,3872980696,0,fpga0,2534.28,2.41279,1:1:10,1:1:10,
+33688208,conv5,3872980696,0,fpga0,1362.48,2.41271,1:1:10,1:1:10,
+
+
+Top Buffer Writes
+Buffer Address,Context ID,Command Queue ID,Start Time (ms),Duration (ms),Buffer Size (KB),Writing Rate(MB/s),
+33683520,3872980696,0,1403.1,0.174837,1.6,9.15138,
+33683520,3872980696,0,1386.61,0.174067,1.6,9.19186,
+33683520,3872980696,0,1468.46,0.174028,1.6,9.19392,
+33683520,3872980696,0,1476.53,0.173525,1.6,9.22057,
+33683520,3872980696,0,1460.41,0.173323,1.6,9.23132,
+33683520,3872980696,0,1465.79,0.172988,1.6,9.2492,
+33683520,3872980696,0,1479.3,0.171955,1.6,9.30476,
+33683520,3872980696,0,1463.1,0.17165,1.6,9.32129,
+33683520,3872980696,0,1489.84,0.17153,1.6,9.32781,
+33683520,3872980696,0,3396.78,0.159045,1.6,10.06,
+
+
+Top Buffer Reads
+Buffer Address,Context ID,Command Queue ID,Start Time (ms),Duration (ms),Buffer Size (KB),Reading Rate(MB/s),
+33685888,3872980696,0,1327.36,0.134765,0.48,3.56176,
+33685888,3872980696,0,1413.77,0.123381,0.48,3.89039,
+33685888,3872980696,0,1495.14,0.118854,0.48,4.03857,
+33685888,3872980696,0,1402.93,0.118726,0.48,4.04292,
+33685888,3872980696,0,1359.54,0.117024,0.48,4.10172,
+33685888,3872980696,0,3314.26,0.117009,0.48,4.10225,
+33685888,3872980696,0,3396.63,0.116266,0.48,4.12846,
+33685888,3872980696,0,1362.25,0.115786,0.48,4.14558,
+33685888,3872980696,0,1408.43,0.115547,0.48,4.15415,
+33685888,3872980696,0,1355.72,0.115391,0.48,4.15977,
+
+
