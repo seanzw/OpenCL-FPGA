@@ -88,7 +88,7 @@ public:
     cl_event *getDependentEventList(size_t layerId, size_t inId, uint32_t *len) {
         if (layerId == 0 && inId == 0) {
             *len = 0;
-            return nullptr;
+            return NULL;
         }
         else if (inId == 0) {
             *len = 1;
@@ -140,7 +140,7 @@ public:
     
     size_t layerNum, inNum;
     size_t clusterNum, itemNum;
-    std::vector<std::vector<cl_event>> pool;
+    std::vector< std::vector<cl_event> > pool;
 
     // Get the cluster id.
     inline size_t getClusterId(size_t layerId, size_t inId) const {

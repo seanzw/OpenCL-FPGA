@@ -10,6 +10,9 @@ add_device -vbnv xilinx:adm-pcie-7v3:1ddr:2.0
 add_files "main.cpp"
 
 # Header files.
+add_files "eventpool.hpp"
+set_property file_type "c header files" [get_files "eventpool.hpp"]
+
 add_files "cnn.hpp"
 set_property file_type "c header files" [get_files "cnn.hpp"]
 
