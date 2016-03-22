@@ -155,6 +155,7 @@
   <ItemGroup>
     <ClInclude Include="cnn.hpp" />
     <ClInclude Include="convolution.hpp" />
+    <ClInclude Include="eventpool.hpp" />
     <ClInclude Include="fullconnect.hpp" />
     <ClInclude Include="layer.hpp" />
     <ClInclude Include="maxpool.hpp" />

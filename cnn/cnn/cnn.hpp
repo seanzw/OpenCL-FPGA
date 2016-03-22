@@ -6,6 +6,7 @@
 #include "maxpool.hpp"
 #include "fullconnect.hpp"
 #include "rbf.hpp"
+#include "eventpool.hpp"
 
 #define BUFSIZE (64 * 1024 * 1024)
 
@@ -13,7 +14,9 @@ namespace cnn {
     class CNN {
     public:
 
-        CNN(const std::string &xmlFileName, const std::string &xclbinFile = "NONE") {
+        CNN(const std::string &xmlFileName, bool isQueueInOrder = true, const std::string &xclbinFile = "NONE") {
+
+            this->isQueueInOrder = isQueueInOrder;
 
             // Parse the xml file.
             char *buf = new char[BUFSIZE];
@@ -34,10 +37,10 @@ namespace cnn {
 
             // Initialize the OpenCL.
             if (xclbinFile == "NONE") {
-                initOpenCL(kernelFileName, false, inSize);
+                initOpenCL(kernelFileName, false, isQueueInOrder, inSize);
             }
             else {
-                initOpenCL(xclbinFile, true, inSize);
+                initOpenCL(xclbinFile, true, isQueueInOrder, inSize);
             }
 
             // For every layer.
@@ -190,6 +193,99 @@ namespace cnn {
             return events;
         }
 
+        // Forward with pipelined command queue.
+        std::vector<cl_event> forwardCLPipeline(const vec &in, vec &out, size_t n, double *averageTime) {
+
+            // Check if the command queue supports out of order queue.
+            if (isQueueInOrder) {
+                std::cout << "Warning: using an in order command queue for pipeline cnn!" << std::endl;
+            }
+
+            // Make sure that input size is correct.
+            size_t inSize = getInSize();
+            size_t outSize = getOutSize();
+            size_t eventSize = layers.size() + 2;
+            if (in.size() != inSize * n) {
+                std::cerr << "Wrong input size! " << std::endl;
+                exit(-2);
+            }
+
+            // Initialize the event pool.
+            EventPool events(layers.size() + 2, n);
+
+            clock_t start = clock(), diff;
+
+            // Reserve the output buffer.
+            out.resize(outSize * n);
+
+            // For OpenCL error.
+            cl_int err;
+
+            // Temporary holder for returned event.
+            cl_event event;
+            uint32_t len;
+            cl_event *eventList;
+
+            for (size_t i = 0; i < n; ++i) {
+
+                // Prepare the input cl_mem.
+                eventList = events.getDependentEventList(0, i, &len);
+                err = clEnqueueWriteBuffer(queue,
+                    clIn,
+                    CL_FALSE,
+                    0,
+                    inSize * sizeof(cl_float),
+                    (void *)&in[i * inSize],
+                    len,
+                    eventList,
+                    &event);
+                handleError(err, "Failed copy input buffer. ");
+                events.pushEvent(0, i, event);
+
+                // For each layer.
+                for (size_t l = 0; l < layers.size(); ++l) {
+                    eventList = events.getDependentEventList(l + 1, i, &len);
+                    err = clEnqueueNDRangeKernel(queue,
+                        layers[l]->kernel,
+                        3,
+                        NULL,
+                        layers[l]->global,
+                        layers[l]->workGroupSize,
+                        len,
+                        eventList,
+                        &event);
+                    handleError(err, "Failed enqueuing kernel. ");
+                    events.pushEvent(l + 1, i, event);
+                }
+
+                // Get the output.
+                eventList = events.getDependentEventList(layers.size() + 1, i, &len);
+                err = clEnqueueReadBuffer(queue,
+                    layers[layers.size() - 1]->clOut,
+                    CL_FALSE,
+                    0,
+                    outSize * sizeof(cl_float),
+                    &out[i * outSize],
+                    len,
+                    eventList,
+                    &event);
+                handleError(err, "Failed enqueuing reading buffer. ");
+                events.pushEvent(layers.size() + 1, i, event);
+
+                // Wait for the command queue.
+                if (i % queueBarrier == queueBarrier - 1) {
+                    err = clFinish(queue);
+                    handleError(err, "Failed waiting for event. ");
+                }
+            }
+
+            diff = clock() - start;
+            *averageTime = (double)diff / (double)CLOCKS_PER_SEC / (double)n;
+            std::cout << "Pipelined average time: " << *averageTime << "s" << std::endl;
+
+            return events.sort();
+        }
+
         // For OpenCL.
         cl_platform_id platform;
         cl_device_id device;
@@ -199,6 +295,7 @@ namespace cnn {
         cl_mem clIn;
 
         size_t queueBarrier;
+        bool isQueueInOrder;
 
         std::vector<Layer *> layers;
 
@@ -217,7 +314,7 @@ namespace cnn {
 
     private:
 
-        void initOpenCL(const std::string &kernelFileName, bool isBinary, size_t inSize) {
+        void initOpenCL(const std::string &kernelFileName, bool isBinary, bool isQueueInOrder, size_t inSize) {
             cl_int err;
 
             // Choose the first platform.
@@ -249,7 +346,7 @@ namespace cnn {
             queue = clCreateCommandQueue(
                 context,
                 device,
-                CL_QUEUE_PROFILING_ENABLE,
+                CL_QUEUE_PROFILING_ENABLE | (isQueueInOrder ? 0 : CL_QUEUE_OUT_OF_ORDER_EXEC_MODE_ENABLE),
                 &err);
             handleError(err, "Failed creating command queue. ");
             clRetainCommandQueue(queue);

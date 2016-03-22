@@ -6,6 +6,9 @@
 
 int main(int argc, char *argv[]) {
 
+    // Test our event pool.
+    test::runEventPoolTest();
+
     if (argc != 3 && argc != 4) {
         std::cout << "Usage: cnn <xml> <result> [xclbin]" << std::endl;
         exit(-1);
@@ -18,10 +21,10 @@ int main(int argc, char *argv[]) {
 
     if (argc == 4) {
         std::string xclbinFile(argv[3]);
-        cnn = new CNN(xmlFile, xclbinFile);
+        cnn = new CNN(xmlFile, true, xclbinFile);
     }
     else {
-        cnn = new CNN(xmlFile);
+        cnn = new CNN(xmlFile, true);
     }
 
     cnn::vec in(cnn->getInSize());
@@ -51,8 +54,24 @@ int main(int argc, char *argv[]) {
     // Test with batch input.
     test::runTimeTestBatch(o, cnn, inBatch, TEST_BATCH_SIZE);
 
+    // Do the same test for pipelined cnn;
+    delete cnn;
+    if (argc == 4) {
+        std::string xclbinFile(argv[3]);
+        cnn = new CNN(xmlFile, false, xclbinFile);
+    }
+    else {
+        cnn = new CNN(xmlFile, false);
+    }
+
+    test::runFuncTest(cnn, in);
+    test::runTimeTestPipeline(o, cnn, inBatch, TEST_BATCH_SIZE);
+
+
+
     writeXMLCloseTag(o, "results");
     o.close();
-    
+    delete cnn;
+
     return 0;
 }
