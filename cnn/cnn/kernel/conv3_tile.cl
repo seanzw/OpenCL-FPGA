@@ -13,7 +13,7 @@ float sigmod(float in) {
 #define OWIDTH_TILE 5
 #define OHEIGHT_TILE 5
 #define ODEPTH_TILE 4
-#define IDEPTH_TILE 3
+#define IDEPTH_TILE 1
 #define OUT_SIZE 1600
 #define WORK_GROUP_DIM_0 2
 #define WORK_GROUP_DIM_1 2

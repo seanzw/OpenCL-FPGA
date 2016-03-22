@@ -80,6 +80,9 @@ __kernel void KERNEL_NAME(
     }
 
     // Tile the input feature map.
+    #ifdef __xilinx__
+    __attribute__((xcl_pipeline_loop))
+    #endif
     for (int iTile = 0; iTile < IDEPTH; iTile += IDEPTH_TILE) {
 
         int oPrivateIdx = 0;

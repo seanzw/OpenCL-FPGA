@@ -58,6 +58,9 @@ __kernel void KERNEL_NAME(
     }
 
     // Tile the input feature map.
+    #ifdef __xilinx__
+    __attribute__((xcl_pipeline_loop))
+    #endif
     for (int iTile = 0; iTile < IDEPTH; iTile += IDEPTH_TILE) {
 
         int oPrivateIdx = 0;
@@ -73,6 +76,9 @@ __kernel void KERNEL_NAME(
                 __attribute__((opencl_unroll_hint))
                 #endif
                 for (int o = oTile; o < oTile + ODEPTH_TILE; ++o, ++oPrivateIdx) {
+                    #ifdef __xilinx__
+                    __attribute__((opencl_unroll_hint))
+                    #endif
                     for (int i = iTile; i < iTile + IDEPTH_TILE; ++i) {
 
                         int weightIdx = 0;
