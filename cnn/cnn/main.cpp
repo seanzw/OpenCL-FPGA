@@ -66,11 +66,13 @@ int main(int argc, char *argv[]) {
 
     test::runFuncTest(cnnPipelined, in);
     test::runTimeTestPipeline(o, cnnPipelined, inBatch, TEST_BATCH_SIZE);
-    test::runFuncTestPipelined(cnn, cnnPipelined, inBatch, TEST_BATCH_SIZE);
+    test::runTimeTestPipeline(o, cnnPipelined, inBatch, TEST_BATCH_SIZE);
+    //test::runFuncTestPipelined(cnn, cnnPipelined, inBatch, TEST_BATCH_SIZE);
 
     writeXMLCloseTag(o, "results");
     o.close();
     delete cnn;
+    delete cnnPipelined;
 
     return 0;
 }
