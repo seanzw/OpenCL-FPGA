@@ -61,6 +61,18 @@ namespace test {
         std::cout << "CL Kernel works perfect!. " << std::endl;
     }
 
+    void runFuncTestPipelined(CNN *inOrder, CNN *pipelined, const vec &in, const size_t n) {
+        vec outInOrder;
+        vec outPipelined;
+        double averageTime;
+        inOrder->forwardCLBatch(in, outInOrder, n, &averageTime);
+        pipelined->forwardCLPipeline(in, outPipelined, n, &averageTime);
+        for (int i = 0; i < outInOrder.size(); ++i) {
+            ASSERT(abs(outInOrder[i] - outPipelined[i]) < 0.0001f);
+        }
+        std::cout << "CL pipelined works perfect!" << std::endl;
+    }
+
     void dumpEventsProfile(std::ofstream &o, std::vector<cl_event> &events, size_t n) {
         cl_int err;
         cl_ulong t;

@@ -55,19 +55,18 @@ int main(int argc, char *argv[]) {
     test::runTimeTestBatch(o, cnn, inBatch, TEST_BATCH_SIZE);
 
     // Do the same test for pipelined cnn;
-    delete cnn;
+    CNN *cnnPipelined;
     if (argc == 4) {
         std::string xclbinFile(argv[3]);
-        cnn = new CNN(xmlFile, false, xclbinFile);
+        cnnPipelined = new CNN(xmlFile, false, xclbinFile);
     }
     else {
-        cnn = new CNN(xmlFile, false);
+        cnnPipelined = new CNN(xmlFile, false);
     }
 
-    test::runFuncTest(cnn, in);
-    test::runTimeTestPipeline(o, cnn, inBatch, TEST_BATCH_SIZE);
-
-
+    test::runFuncTest(cnnPipelined, in);
+    test::runTimeTestPipeline(o, cnnPipelined, inBatch, TEST_BATCH_SIZE);
+    test::runFuncTestPipelined(cnn, cnnPipelined, inBatch, TEST_BATCH_SIZE);
 
     writeXMLCloseTag(o, "results");
     o.close();
