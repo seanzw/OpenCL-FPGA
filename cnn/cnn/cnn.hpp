@@ -145,7 +145,7 @@ namespace cnn {
                 // Prepare the input cl_mem.
                 err = clEnqueueWriteBuffer(queue,
                     clIn,
-                    CL_TRUE,
+                    CL_FALSE,
                     0,
                     inSize * sizeof(cl_float),
                     (void *)&in[i * inSize],
@@ -168,14 +168,14 @@ namespace cnn {
                     handleError(err, "Failed enqueuing kernel. ");
 
                     // Wait for this layer.
-                    err = clWaitForEvents(1, &events[i * eventSize + l + 1]);
-                    handleError(err, "Failed waiting for event. ");
+                    // err = clWaitForEvents(1, &events[i * eventSize + l + 1]);
+                    // handleError(err, "Failed waiting for event. ");
                 }
 
                 // Get the output.
                 err = clEnqueueReadBuffer(queue,
                     layers[layers.size() - 1]->clOut,
-                    CL_TRUE,
+                    CL_FALSE,
                     0,
                     outSize * sizeof(cl_float),
                     &out[i * outSize],
@@ -183,6 +183,12 @@ namespace cnn {
                     &events[i * eventSize + layers.size()],
                     &events[i * eventSize + layers.size() + 1]);
                 handleError(err, "Failed enqueuing reading buffer. ");
+
+                // Wait for the command queue.
+                if (i % queueBarrier == queueBarrier - 1) {
+                    err = clFinish(queue);
+                    handleError(err, "Failed waiting for event. ");
+                }
 
             }
 
