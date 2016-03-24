@@ -3,22 +3,22 @@ float sigmod(float in) {
 }
 #define KERNEL_SIZE 5
 #define KERNEL_LEN 25
-#define IWIDTH 14
-#define IHEIGHT 14
-#define IDEPTH 6
-#define IN_SIZE 1176
-#define OWIDTH 10
-#define OHEIGHT 10
-#define ODEPTH 16
-#define OWIDTH_TILE 5
-#define OHEIGHT_TILE 5
-#define ODEPTH_TILE 4
+#define IWIDTH 32
+#define IHEIGHT 32
+#define IDEPTH 1
+#define IN_SIZE 1024
+#define OWIDTH 28
+#define OHEIGHT 28
+#define ODEPTH 6
+#define OWIDTH_TILE 4
+#define OHEIGHT_TILE 4
+#define ODEPTH_TILE 3
 #define IDEPTH_TILE 1
-#define OUT_SIZE 1600
+#define OUT_SIZE 4704
 #define WORK_GROUP_DIM_0 1
 #define WORK_GROUP_DIM_1 1
 #define WORK_GROUP_DIM_2 1
-#define KERNEL_NAME conv3
+#define KERNEL_NAME conv1
 #define KERNEL_PARAM __global float *in, __global float *out,
 __attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, WORK_GROUP_DIM_1, WORK_GROUP_DIM_2)))
 __kernel void KERNEL_NAME(
@@ -86,9 +86,6 @@ __kernel void KERNEL_NAME(
     for (int iTile = 0; iTile < IDEPTH; iTile += IDEPTH_TILE) {
 
         int oPrivateIdx = 0;
-        #ifdef __xilinx__
-        __attribute__((xcl_pipeline_loop))
-        #endif
         for (int r = rTile; r < rTile + OHEIGHT_TILE; ++r) {
             #ifdef __xilinx__
             __attribute__((xcl_pipeline_loop))
@@ -98,9 +95,6 @@ __kernel void KERNEL_NAME(
                 __attribute__((opencl_unroll_hint))
                 #endif
                 for (int o = oTile; o < oTile + ODEPTH_TILE; ++o, ++oPrivateIdx) {
-                    #ifdef __xilinx__
-                    __attribute__((opencl_unroll_hint))
-                    #endif
                     for (int i = iTile; i < iTile + IDEPTH_TILE; ++i) {
 
                         int weightIdx = 0;
@@ -138,7 +132,7 @@ __kernel void KERNEL_NAME(
     }
 
     // barrier(CLK_LOCAL_MEM_FENCE);
-    // // Copy the output back into the global memory.
+    // Copy the output back into the global memory.
     // if (cLocal == WORK_GROUP_DIM_0 - 1 && rLocal == WORK_GROUP_DIM_1 - 1 && oLocal == WORK_GROUP_DIM_2 - 1) {
 
     //     #ifdef __xilinx__

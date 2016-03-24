@@ -2,7 +2,7 @@
 #include "test.hpp"
 #include <iostream>
 
-#define TEST_BATCH_SIZE 1000
+#define TEST_BATCH_SIZE 100
 
 int main(int argc, char *argv[]) {
 
@@ -32,9 +32,6 @@ int main(int argc, char *argv[]) {
         in[i] = (float)rand() / (float)RAND_MAX - 0.5f;
     }
 
-    // First test whether the result is correct.
-    test::runFuncTest(cnn, in);
-
     std::ofstream o(testFile.c_str());
     if (!o.is_open()) {
         std::cerr << "Can't open file " << testFile << std::endl;
@@ -43,16 +40,15 @@ int main(int argc, char *argv[]) {
     o << "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << std::endl;
     writeXMLOpenTag(o, "results");
 
-    // Then test with single input.
-    test::runTimeTest(o, cnn, in);
-    
     cnn::vec inBatch(cnn->getInSize() * TEST_BATCH_SIZE);
     for (int i = 0; i < in.size(); ++i) {
         in[i] = (float)rand() / (float)RAND_MAX - 0.5f;
     }
 
-    // Test with batch input.
+    test::runFuncTest(cnn, in);
+    test::runTimeTest(o, cnn, in);
     test::runTimeTestBatch(o, cnn, inBatch, TEST_BATCH_SIZE);
+    delete cnn;
 
     // Do the same test for pipelined cnn;
     CNN *cnnPipelined;
@@ -66,13 +62,14 @@ int main(int argc, char *argv[]) {
 
     test::runFuncTest(cnnPipelined, in);
     test::runTimeTestPipeline(o, cnnPipelined, inBatch, TEST_BATCH_SIZE);
+
+    delete cnnPipelined;
+
     //test::runTimeTestPipeline(o, cnnPipelined, inBatch, TEST_BATCH_SIZE);
     //test::runFuncTestPipelined(cnn, cnnPipelined, inBatch, TEST_BATCH_SIZE);
 
     writeXMLCloseTag(o, "results");
     o.close();
-    delete cnn;
-    delete cnnPipelined;
 
     return 0;
 }

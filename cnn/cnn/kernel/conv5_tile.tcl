@@ -41,7 +41,10 @@ add_files -kernel [get_kernels conv5] "kernel/conv5_tile.cl"
 # Define binary containers.
 create_opencl_binary alpha
 set_property region "OCL_REGION_0" [get_opencl_binary alpha]
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv5] -name CONV
+create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv5] -name CONVa
+create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv5] -name CONVb
+create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv5] -name CONVc
+create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv5] -name CONVd
 
 # Compile the design for CPU based emulation.
 compile_emulation -flow cpu -opencl_binary [get_opencl_binary alpha]

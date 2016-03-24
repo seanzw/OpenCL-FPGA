@@ -1,7 +1,7 @@
 # SDAccel command script.
 
 # Define a solution name.
-create_solution -name conv3_tile -dir FPGA -force
+create_solution -name conv1_multi_cu -dir FPGA -force
 
 # Define the target platform of the application
 add_device -vbnv xilinx:adm-pcie-7v3:1ddr:2.0
@@ -35,16 +35,16 @@ add_files "test.hpp"
 set_property file_type "c header files" [get_files "test.hpp"]
 
 # Create the kernel.
-create_kernel conv3 -type clc
-add_files -kernel [get_kernels conv3] "kernel/conv3_tile.cl"
+create_kernel conv1 -type clc
+add_files -kernel [get_kernels conv1] "kernel/conv1_multi_cu.cl"
 
 # Define binary containers.
 create_opencl_binary alpha
 set_property region "OCL_REGION_0" [get_opencl_binary alpha]
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv3] -name CONVa
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv3] -name CONVb
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv3] -name CONVc
-create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv3] -name CONVd
+create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv1] -name CONV1a
+create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv1] -name CONV1b
+create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv1] -name CONV1c
+create_compute_unit -opencl_binary [get_opencl_binary alpha] -kernel [get_kernels conv1] -name CONV1d
 
 # Compile the design for CPU based emulation.
 compile_emulation -flow cpu -opencl_binary [get_opencl_binary alpha]
@@ -53,7 +53,7 @@ compile_emulation -flow cpu -opencl_binary [get_opencl_binary alpha]
 report_estimate
 
 # Run the design in CPU emulation mode
-run_emulation -flow cpu -args "../../../../../kernel/conv3_tile.xml result.xml alpha.xclbin"
+run_emulation -flow cpu -args "../../../../../kernel/conv1_multi_cu.xml result.xml alpha.xclbin"
 
 build_system
 

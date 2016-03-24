@@ -4,9 +4,9 @@
 <queueBarrier>10</queueBarrier>
 <layer><type>conv</type>
 <kernelName>conv3</kernelName>
-<workGroupSize><item>2</item>
-<item>2</item>
-<item>4</item>
+<workGroupSize><item>1</item>
+<item>1</item>
+<item>1</item>
 </workGroupSize><iWidth>14</iWidth>
 <iHeight>14</iHeight>
 <iDepth>6</iDepth>
