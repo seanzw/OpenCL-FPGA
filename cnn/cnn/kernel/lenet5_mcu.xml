@@ -6,7 +6,7 @@
 <kernelName>conv1</kernelName>
 <workGroupSize><item>7</item>
 <item>7</item>
-<item>2</item>
+<item>1</item>
 </workGroupSize><iWidth>32</iWidth>
 <iHeight>32</iHeight>
 <iDepth>1</iDepth>

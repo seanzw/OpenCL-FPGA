@@ -23,7 +23,7 @@ __global float buf6[84];
 #define OUT_SIZE 4704
 #define WORK_GROUP_DIM_0 7
 #define WORK_GROUP_DIM_1 7
-#define WORK_GROUP_DIM_2 2
+#define WORK_GROUP_DIM_2 1
 #define KERNEL_NAME conv1
 #define out buf1
 #define KERNEL_PARAM __global float *in, 
