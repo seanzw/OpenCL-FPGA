@@ -112,6 +112,12 @@
     <None Include="kernel\conv5_tile.tcl">
       <Filter>Resource Files\convolution</Filter>
     </None>
+    <None Include="kernel\lenet5_final.cl">
+      <Filter>Resource Files\cnn</Filter>
+    </None>
+    <None Include="kernel\lenet5_final.tcl">
+      <Filter>Resource Files\cnn</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Xml Include="kernel\conv1.xml">
@@ -137,6 +143,9 @@
     </Xml>
     <Xml Include="kernel\conv5_tile.xml">
       <Filter>Resource Files\convolution</Filter>
+    </Xml>
+    <Xml Include="kernel\lenet5_final.xml">
+      <Filter>Resource Files\cnn</Filter>
     </Xml>
   </ItemGroup>
 </Project>

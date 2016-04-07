@@ -40,6 +40,7 @@ __kernel void KERNEL_NAME(
     __local float inLocal[IN_SIZE];
     __local float weightLocal[IDEPTH * ODEPTH * KERNEL_LEN];
     __local float offsetLocal[ODEPTH];
+    // __local float outLocal[OUT_SIZE];
 
     // This the the first work item in the group,
     // Copy the input, output and weight into the local buffer.
@@ -73,20 +74,18 @@ __kernel void KERNEL_NAME(
 
     // Initialize the private output buffer to zero.
     float outPrivate[OWIDTH_TILE * OHEIGHT_TILE * ODEPTH_TILE];
-    // #ifdef __xilinx__
-    // __attribute__((xcl_pipeline_loop))
-    // #endif
+    #ifdef __xilinx__
+    __attribute__((xcl_pipeline_loop))
+    #endif
     for (int i = 0; i < OWIDTH_TILE * OHEIGHT_TILE * ODEPTH_TILE; ++i) {
         outPrivate[i] = 0.0f;
     }
 
     // Tile the input feature map.
     for (int iTile = 0; iTile < IDEPTH; iTile += IDEPTH_TILE) {
+
         int oPrivateIdx = 0;
         for (int r = 0; r < OHEIGHT_TILE; ++r) {
-            // #ifdef __xilinx__
-            // __attribute__((xcl_pipeline_loop))
-            // #endif
             for (int c = 0; c < OWIDTH_TILE; ++c) {
                 for (int o = 0; o < ODEPTH_TILE; ++o, ++oPrivateIdx) {
                     for (int i = 0; i < IDEPTH_TILE; ++i) {
@@ -107,11 +106,8 @@ __kernel void KERNEL_NAME(
     int oPrivateIdx = 0;
     for (int r = 0; r < OHEIGHT_TILE; ++r) {
         for (int c = 0; c < OWIDTH_TILE; ++c) {
-            #ifdef __xilinx__
-            __attribute__((xcl_pipeline_loop))
-            #endif
             for (int o = 0; o < ODEPTH_TILE; ++o, ++oPrivateIdx) {
-                out[((o + oTile) * OHEIGHT + r + rTile) * OWIDTH + c + cTile] = sigmod(outPrivate[oPrivateIdx] + offsetLocal[o + oTile]);
+                out[(o * OHEIGHT + r + rTile) * OWIDTH + c + cTile] = sigmod(outPrivate[oPrivateIdx] + offsetLocal[o + oTile]);
             }
         }
     }

@@ -36,23 +36,14 @@ __kernel void KERNEL_NAME(
 
     if (oLocal == 0) {
 
-        #ifdef __xilinx__
-        __attribute__((xcl_pipeline_loop))
-        #endif
         for (int i = 0; i < IN_SIZE; ++i) {
             inLocal[i] = in[i];
         }
 
-        #ifdef __xilinx__
-        __attribute__((xcl_pipeline_loop))
-        #endif
         for (int i = 0; i < WORK_GROUP_DIM_0 * IN_SIZE; ++i) {
             weightLocal[i] = weight[o * IN_SIZE + i];
         }
 
-        #ifdef __xilinx__
-        __attribute__((xcl_pipeline_loop))
-        #endif
         for (int i = 0; i < WORK_GROUP_DIM_0; ++i) {
             offsetLocal[i] = offset[o + i];
         }
@@ -65,7 +56,7 @@ __kernel void KERNEL_NAME(
 
         float sum = 0;
         #ifdef __xilinx__
-        __attribute__((xcl_pipeline_loop))
+                __attribute__((xcl_pipeline_loop))
         #endif
         float inBuf[KERNEL_SIZE];
         float weightBuf[KERNEL_SIZE];

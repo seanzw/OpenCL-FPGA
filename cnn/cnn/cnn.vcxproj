@@ -180,6 +180,8 @@
     <None Include="kernel\full6.cl" />
     <None Include="kernel\lenet5.cl" />
     <None Include="kernel\lenet5.tcl" />
+    <None Include="kernel\lenet5_final.cl" />
+    <None Include="kernel\lenet5_final.tcl" />
     <None Include="kernel\pool2.cl" />
     <None Include="kernel\rbf7.cl" />
     <None Include="pool2.tcl" />
@@ -191,6 +193,7 @@
     <Xml Include="kernel\conv5_tile.xml" />
     <Xml Include="kernel\full6.xml" />
     <Xml Include="kernel\lenet5.xml" />
+    <Xml Include="kernel\lenet5_final.xml" />
     <Xml Include="kernel\pool2.xml" />
     <Xml Include="kernel\rbf7.xml" />
   </ItemGroup>

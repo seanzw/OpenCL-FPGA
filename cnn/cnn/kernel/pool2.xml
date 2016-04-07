@@ -2,8 +2,9 @@
 <cnn><kernelFileName>../cnn/kernel/pool2.cl</kernelFileName>
 <inSize>4704</inSize>
 <queueBarrier>10</queueBarrier>
-<layer><type>pool</type>
-<kernelName>pool2</kernelName>
+<layer><kernelName>pool2</kernelName>
+<kernelFileName>../cnn/kernel/pool2.cl</kernelFileName>
+<xclbinFileName>alpha.xclbin</xclbinFileName>
 <workGroupSize><item>14</item>
 <item>14</item>
 <item>2</item>
@@ -18,6 +19,7 @@
 <oHeightTile>1</oHeightTile>
 <oDepthTile>1</oDepthTile>
 <iDepthTile>1</iDepthTile>
+<type>pool</type>
 <weight><item>0.0274667</item>
 <item>0.994629</item>
 <item>0.572588</item>
