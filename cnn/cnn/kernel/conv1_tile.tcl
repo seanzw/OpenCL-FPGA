@@ -36,6 +36,7 @@ set_property file_type "c header files" [get_files "test.hpp"]
 
 # Create the kernel.
 create_kernel conv1 -type clc
+# set_property max_memory_ports true [get_kernels conv1]
 add_files -kernel [get_kernels conv1] "kernel/conv1_tile.cl"
 
 # Define binary containers.
@@ -52,6 +53,6 @@ report_estimate
 # Run the design in CPU emulation mode
 run_emulation -flow cpu -args "../../../../../kernel/conv1_tile.xml result.xml alpha.xclbin"
 
-build_system
+# build_system
 
-package_system
+# package_system

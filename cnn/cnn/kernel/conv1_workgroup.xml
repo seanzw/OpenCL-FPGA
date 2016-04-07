@@ -6,6 +6,8 @@
     <layer>
         <type>conv</type>
         <kernelName>conv1</kernelName>
+        <kernelFileName>../cnn/conv1_workgroup.cl</kernelFileName>
+        <xclbinFileName>alpha.xclbin</xclbinFileName>
         <workGroupSize>
             <item>28</item>
             <item>28</item>
@@ -18,6 +20,10 @@
         <oWidth>28</oWidth>
         <oHeight>28</oHeight>
         <oDepth>6</oDepth>
+        <oWidthTile>1</oWidthTile>
+        <oHeightTile>1</oHeightTile>
+        <oDepthTile>1</oDepthTile>
+        <iDepthTile>1</iDepthTile>
         <weight>
             <oFeatureMap>
                 <iFeatureMap>
