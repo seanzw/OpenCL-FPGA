@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<cnn><kernelFileName>../cnn/kernel/full6.cl</kernelFileName>
-<inSize>120</inSize>
+<cnn><inSize>120</inSize>
 <queueBarrier>10</queueBarrier>
 <layer><kernelName>full6</kernelName>
-<kernelFileName>../cnn/kernel/full6.cl</kernelFileName>
 <xclbinFileName>alpha.xclbin</xclbinFileName>
+<kernelFileName>../cnn/kernel/full6.cl</kernelFileName>
 <workGroupSize><item>12</item>
 <item>1</item>
 <item>1</item>

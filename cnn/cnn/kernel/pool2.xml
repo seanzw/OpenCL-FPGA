@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<cnn><kernelFileName>../cnn/kernel/pool2.cl</kernelFileName>
-<inSize>4704</inSize>
+<cnn><inSize>4704</inSize>
 <queueBarrier>10</queueBarrier>
 <layer><kernelName>pool2</kernelName>
-<kernelFileName>../cnn/kernel/pool2.cl</kernelFileName>
 <xclbinFileName>alpha.xclbin</xclbinFileName>
+<kernelFileName>../cnn/kernel/pool2.cl</kernelFileName>
 <workGroupSize><item>14</item>
 <item>14</item>
 <item>2</item>

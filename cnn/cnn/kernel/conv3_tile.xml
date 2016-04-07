@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<cnn><kernelFileName>../cnn/kernel/conv3_tile.cl</kernelFileName>
-<inSize>1176</inSize>
+<cnn><inSize>1176</inSize>
 <queueBarrier>10</queueBarrier>
 <layer><kernelName>conv3</kernelName>
-<kernelFileName>../cnn/kernel/conv3_tile.cl</kernelFileName>
 <xclbinFileName>alpha.xclbin</xclbinFileName>
+<kernelFileName>../cnn/kernel/conv3_tile.cl</kernelFileName>
 <workGroupSize><item>2</item>
 <item>2</item>
 <item>4</item>
