@@ -421,7 +421,7 @@ namespace cnn {
             cl_program program;
             cl_int err;
             if (isBinary) {
-                std::string xclbinFileName = getString(root, "xclbinName");
+                std::string xclbinFileName = getString(root, "xclbinFileName");
                 program = buildProgramFromBinary(xclbinFileName.c_str(), context, device);
             }
             else {
