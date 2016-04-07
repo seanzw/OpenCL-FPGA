@@ -121,35 +121,13 @@ __kernel void KERNEL_NAME(
 
     // Store the output buffer to local buffer.
     int oPrivateIdx = 0;
-    #ifdef __xilinx__
-    __attribute__((xcl_pipeline_loop))
-    #endif
     for (int r = rTile; r < rTile + OHEIGHT_TILE; ++r) {
-        #ifdef __xilinx__
-        __attribute__((xcl_pipeline_loop))
-        #endif
         for (int c = cTile; c < cTile + OWIDTH_TILE; ++c) {
-            #ifdef __xilinx__
-            __attribute__((xcl_pipeline_loop))
-            #endif
             for (int o = oTile; o < oTile + ODEPTH_TILE; ++o, ++oPrivateIdx) {
-                /*outLocal*/out[(o * OHEIGHT + r) * OWIDTH + c] = sigmod(outPrivate[oPrivateIdx] + offsetLocal[o]);
-                // out[(o * OHEIGHT + r) * OWIDTH + c] = sigmod(outPrivate[oPrivateIdx] + offsetLocal[o]);
+                out[(o * OHEIGHT + r) * OWIDTH + c] = sigmod(outPrivate[oPrivateIdx] + offsetLocal[o]);
             }
         }
     }
-
-    // barrier(CLK_LOCAL_MEM_FENCE);
-    // // Copy the output back into the global memory.
-    // if (cLocal == WORK_GROUP_DIM_0 - 1 && rLocal == WORK_GROUP_DIM_1 - 1 && oLocal == WORK_GROUP_DIM_2 - 1) {
-
-    //     #ifdef __xilinx__
-    //     __attribute__((xcl_pipeline_loop))
-    //     #endif
-    //     for (int i = 0; i < OUT_SIZE; ++i) {
-    //         out[i] = outLocal[i];
-    //     }
-    // }
 }
 #undef out
 #undef KERNEL_SIZE

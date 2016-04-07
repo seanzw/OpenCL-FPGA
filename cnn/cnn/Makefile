@@ -6,7 +6,7 @@ KERNELDIR = kernel
 OUTPUTDIR = FPGA
 
 TARGETS = host
-TARGETS += conv1_baseline conv1_workgroup conv1_unroll conv1_pipeline conv1_item_pipeline conv1_memory_partition conv1_tile conv1
+TARGETS += conv1_baseline conv1_tile conv1
 TARGETS += conv1_multi_cu
 TARGETS += pool2
 TARGETS += conv3_tile
