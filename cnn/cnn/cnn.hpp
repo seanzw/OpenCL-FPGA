@@ -1,7 +1,7 @@
 #ifndef CNN_HEADER
 #define CNN_HEADER
 
-#include <unordered_map>
+#include <map>
 
 #include "util.hpp"
 #include "convolution.hpp"
@@ -293,7 +293,7 @@ namespace cnn {
         cl_device_id device;
         cl_context context;
         cl_command_queue queue;
-        std::unordered_map<std::string, cl_program> programs;
+        std::map<std::string, cl_program> programs;
         cl_mem clIn;
 
         size_t queueBarrier;
@@ -406,7 +406,7 @@ namespace cnn {
             cl_program program;
             if (isBinary) {
                 std::string xclbinFileName = getString(root, "xclbinFileName");
-                auto iter = programs.find(xclbinFileName);
+                std::map<std::string, cl_program>::iterator iter = programs.find(xclbinFileName);
                 if (iter != programs.end()) {
                     program = iter->second;
                 }
@@ -414,12 +414,12 @@ namespace cnn {
                     program = buildProgramFromBinary(xclbinFileName.c_str(), context, device);
                     cl_int err = clRetainProgram(program);
                     handleError(err, "Failed retaining program. ");
-                    programs.insert(std::make_pair(xclbinFileName, program));
+                    programs.insert(std::pair<std::string, cl_program>(xclbinFileName, program));
                 }
             }
             else {
                 std::string kernelFileName = getString(root, "kernelFileName");
-                auto iter = programs.find(kernelFileName);
+                std::map<std::string, cl_program>::iterator iter = programs.find(kernelFileName);
                 if (iter != programs.end()) {
                     program = iter->second;
                 }
@@ -427,7 +427,7 @@ namespace cnn {
                     program = buildProgramFromSource(kernelFileName.c_str(), context, device);
                     cl_int err = clRetainProgram(program);
                     handleError(err, "Failed retaining program. ");
-                    programs.insert(std::make_pair(kernelFileName, program));
+                    programs.insert(std::pair<std::string, cl_program>(kernelFileName, program));
                 }
             }
 
