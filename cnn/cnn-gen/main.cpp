@@ -142,7 +142,6 @@ int main(int argc, char *argv[]) {
     CNNGenerator::genCNN("../cnn/kernel/conv5_tile.xml", "../cnn/kernel/conv5_tile.cl", 1, &paramsUntile[4]);
     CNNGenerator::genCNN("../cnn/kernel/full6.xml", "../cnn/kernel/full6.cl", 1, &paramsUntile[5]);
     CNNGenerator::genCNN("../cnn/kernel/rbf7.xml", "../cnn/kernel/rbf7.cl", 1, &paramsUntile[6]);
-    CNNGenerator::genCNN("../cnn/kernel/l2.xml", "../cnn/kernel/l2.cl", 2, paramsUntile);
     CNNGenerator::genCNN("../cnn/kernel/lenet5.xml", "../cnn/kernel/lenet5.cl", 7, paramsUntile);
     CNNGenerator::genCNN("../cnn/kernel/lenet5_mcu.xml", "../cnn/kernel/lenet5_mcu.cl", 7, paramsUntile);
     CNNGenerator::genCNN("../cnn/kernel/lenet5_mbin.xml", "../cnn/kernel/lenet5_mbin.cl", 7, paramsUntile);

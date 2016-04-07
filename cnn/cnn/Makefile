@@ -13,7 +13,7 @@ TARGETS += conv3_tile
 TARGETS += conv5_tile
 TARGETS += full6
 TARGETS += rbf7
-TARGETS += lenet5 lenet5_mcu lenet5_mbin
+TARGETS += lenet5 lenet5_mcu lenet5_final
 
 TCLS = $(addsuffix .tcl, $(TARGETS))
 OBJS = $(addsuffix .o, $(TARGETS))
