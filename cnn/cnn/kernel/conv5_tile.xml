@@ -2,9 +2,8 @@
 <cnn><kernelFileName>../cnn/kernel/conv5_tile.cl</kernelFileName>
 <inSize>400</inSize>
 <queueBarrier>10</queueBarrier>
-<layer><kernelName>conv5</kernelName>
-<kernelFileName>../cnn/kernel/conv5_tile.cl</kernelFileName>
-<xclbinFileName>alpha.xclbin</xclbinFileName>
+<layer><type>conv</type>
+<kernelName>conv5</kernelName>
 <workGroupSize><item>1</item>
 <item>1</item>
 <item>10</item>
@@ -19,7 +18,6 @@
 <oHeightTile>1</oHeightTile>
 <oDepthTile>12</oDepthTile>
 <iDepthTile>4</iDepthTile>
-<type>conv</type>
 <weight><oFeatureMap><iFeatureMap><line><item>0.0250557</item>
 <item>0.2154</item>
 <item>0.752068</item>

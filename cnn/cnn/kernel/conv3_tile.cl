@@ -15,9 +15,9 @@ float sigmod(float in) {
 #define ODEPTH_TILE 4
 #define IDEPTH_TILE 1
 #define OUT_SIZE 1600
-#define WORK_GROUP_DIM_0 2
-#define WORK_GROUP_DIM_1 2
-#define WORK_GROUP_DIM_2 4
+#define WORK_GROUP_DIM_0 1
+#define WORK_GROUP_DIM_1 1
+#define WORK_GROUP_DIM_2 1
 #define KERNEL_NAME conv3
 #define KERNEL_PARAM __global float *in, __global float *out,
 __attribute__((reqd_work_group_size(WORK_GROUP_DIM_0, WORK_GROUP_DIM_1, WORK_GROUP_DIM_2)))
@@ -38,7 +38,7 @@ __kernel void KERNEL_NAME(
     __local float inLocal[IN_SIZE];
     __local float weightLocal[IDEPTH * ODEPTH * KERNEL_LEN];
     __local float offsetLocal[ODEPTH];
-    __local float outLocal[OUT_SIZE];
+    // __local float outLocal[OUT_SIZE];
 
     // This the the first work item in the group,
     // Copy the input, output and weight into the local buffer.
@@ -132,22 +132,22 @@ __kernel void KERNEL_NAME(
             __attribute__((xcl_pipeline_loop))
             #endif
             for (int o = oTile; o < oTile + ODEPTH_TILE; ++o, ++oPrivateIdx) {
-                outLocal[(o * OHEIGHT + r) * OWIDTH + c] = sigmod(outPrivate[oPrivateIdx] + offsetLocal[o]);
+                /*outLocal*/out[(o * OHEIGHT + r) * OWIDTH + c] = sigmod(outPrivate[oPrivateIdx] + offsetLocal[o]);
             }
         }
     }
 
-    barrier(CLK_LOCAL_MEM_FENCE);
-    // Copy the output back into the global memory.
-    if (cLocal == WORK_GROUP_DIM_0 - 1 && rLocal == WORK_GROUP_DIM_1 - 1 && oLocal == WORK_GROUP_DIM_2 - 1) {
+    // barrier(CLK_LOCAL_MEM_FENCE);
+    // // Copy the output back into the global memory.
+    // if (cLocal == WORK_GROUP_DIM_0 - 1 && rLocal == WORK_GROUP_DIM_1 - 1 && oLocal == WORK_GROUP_DIM_2 - 1) {
 
-        #ifdef __xilinx__
-        __attribute__((xcl_pipeline_loop))
-        #endif
-        for (int i = 0; i < OUT_SIZE; ++i) {
-            out[i] = outLocal[i];
-        }
-    }
+    //     #ifdef __xilinx__
+    //     __attribute__((xcl_pipeline_loop))
+    //     #endif
+    //     for (int i = 0; i < OUT_SIZE; ++i) {
+    //         out[i] = outLocal[i];
+    //     }
+    // }
 }
 #undef KERNEL_SIZE
 #undef KERNEL_LEN

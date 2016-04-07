@@ -35,15 +35,13 @@ namespace cnn {
             // Get the queue barrier.
             queueBarrier = getSizeT(root, "queueBarrier");
 
-            initOpenCL(isQueueInOrder, inSize);
-
-            //// Initialize the OpenCL.
-            //if (xclbinFile == "NONE") {
-            //    initOpenCL(kernelFileName, isQueueInOrder, inSize);
-            //}
-            //else {
-            //    initOpenCL(xclbinFile, isQueueInOrder, inSize);
-            //}
+            // Initialize the OpenCL.
+            if (xclbinFile == "NONE") {
+                initOpenCL(kernelFileName, false, isQueueInOrder, inSize);
+            }
+            else {
+                initOpenCL(xclbinFile, true, isQueueInOrder, inSize);
+            }
 
             // For every layer.
             bool isFront = true;
@@ -56,7 +54,7 @@ namespace cnn {
                 if (!(layer->next_sibling())) {
                     flag |= BACK;
                 }
-                layers.push_back(createLayer(layer, xclbinFile != "NONE", flag));
+                layers.push_back(createLayer(layer, flag));
             }
 
             delete[] buf;
@@ -66,7 +64,7 @@ namespace cnn {
             for (int i = 0; i < layers.size(); ++i) {
                 delete layers[i];
             }
-            //clReleaseProgram(program);
+            clReleaseProgram(program);
             clReleaseCommandQueue(queue);
             clReleaseContext(context);
         }
@@ -299,7 +297,7 @@ namespace cnn {
         cl_device_id device;
         cl_context context;
         cl_command_queue queue;
-        //cl_program program;
+        cl_program program;
         cl_mem clIn;
 
         size_t queueBarrier;
@@ -322,7 +320,7 @@ namespace cnn {
 
     private:
 
-        void initOpenCL(/*const std::string &kernelFileName*//*, bool isBinary, */bool isQueueInOrder, size_t inSize) {
+        void initOpenCL(const std::string &kernelFileName, bool isBinary, bool isQueueInOrder, size_t inSize) {
             cl_int err;
 
             // Choose the first platform.
@@ -359,14 +357,14 @@ namespace cnn {
             handleError(err, "Failed creating command queue. ");
             clRetainCommandQueue(queue);
 
-            /*if (isBinary) {
+            if (isBinary) {
                 program = buildProgramFromBinary(kernelFileName.c_str(), context, device);
             }
             else {
                 program = buildProgramFromSource(kernelFileName.c_str(), context, device);
             }
             err = clRetainProgram(program);
-            handleError(err, "Failed retaining program. ");*/
+            handleError(err, "Failed retaining program. ");
 
             clIn = clCreateBuffer(
                 context,
@@ -380,7 +378,7 @@ namespace cnn {
         }
 
         // Create a layer.
-        Layer *createLayer(rapidxml::xml_node<> *root, bool isBinary, Flag flag) {
+        Layer *createLayer(rapidxml::xml_node<> *root, Flag flag) {
 
             LayerParam params;
 
@@ -416,20 +414,6 @@ namespace cnn {
             // Create the offset vector.
             cnn::vec offset;
             getAllItem(root->first_node("offset"), offset);
-
-            // Create the program.
-            cl_program program;
-            cl_int err;
-            if (isBinary) {
-                std::string xclbinFileName = getString(root, "xclbinFileName");
-                program = buildProgramFromBinary(xclbinFileName.c_str(), context, device);
-            }
-            else {
-                std::string kernelFileName = getString(root, "kernelFileName");
-                program = buildProgramFromSource(kernelFileName.c_str(), context, device);
-            }
-            /*err = clRetainProgram(program);
-            handleError(err, "Failed retaining program. ");*/
 
             std::string type = getString(root, "type");
             if (type == "conv") {
@@ -472,7 +456,6 @@ namespace cnn {
                 std::cerr << "createLayer: Unsupported layer: " << type << std::endl;
                 exit(-1);
             }
-
         }
 
     };
