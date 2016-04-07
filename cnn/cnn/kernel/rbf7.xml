@@ -2,8 +2,9 @@
 <cnn><kernelFileName>../cnn/kernel/rbf7.cl</kernelFileName>
 <inSize>84</inSize>
 <queueBarrier>10</queueBarrier>
-<layer><type>rbf</type>
-<kernelName>rbf7</kernelName>
+<layer><kernelName>rbf7</kernelName>
+<kernelFileName>../cnn/kernel/rbf7.cl</kernelFileName>
+<xclbinFileName>alpha.xclbin</xclbinFileName>
 <workGroupSize><item>10</item>
 <item>1</item>
 <item>1</item>
@@ -18,6 +19,7 @@
 <oHeightTile>1</oHeightTile>
 <oDepthTile>1</oDepthTile>
 <iDepthTile>1</iDepthTile>
+<type>rbf</type>
 <weight><item>-1</item>
 <item>1</item>
 <item>1</item>

@@ -2,11 +2,12 @@
 <cnn><kernelFileName>../cnn/kernel/conv3_tile.cl</kernelFileName>
 <inSize>1176</inSize>
 <queueBarrier>10</queueBarrier>
-<layer><type>conv</type>
-<kernelName>conv3</kernelName>
-<workGroupSize><item>1</item>
-<item>1</item>
-<item>1</item>
+<layer><kernelName>conv3</kernelName>
+<kernelFileName>../cnn/kernel/conv3_tile.cl</kernelFileName>
+<xclbinFileName>alpha.xclbin</xclbinFileName>
+<workGroupSize><item>2</item>
+<item>2</item>
+<item>4</item>
 </workGroupSize><iWidth>14</iWidth>
 <iHeight>14</iHeight>
 <iDepth>6</iDepth>
@@ -18,6 +19,7 @@
 <oHeightTile>5</oHeightTile>
 <oDepthTile>4</oDepthTile>
 <iDepthTile>1</iDepthTile>
+<type>conv</type>
 <weight><oFeatureMap><iFeatureMap><line><item>0.109928</item>
 <item>0.743126</item>
 <item>0.314066</item>

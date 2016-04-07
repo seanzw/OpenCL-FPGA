@@ -2,8 +2,9 @@
 <cnn><kernelFileName>../cnn/kernel/lenet5.cl</kernelFileName>
 <inSize>1024</inSize>
 <queueBarrier>10</queueBarrier>
-<layer><type>conv</type>
-<kernelName>conv1</kernelName>
+<layer><kernelName>conv1</kernelName>
+<kernelFileName>../cnn/kernel/lenet5.cl</kernelFileName>
+<xclbinFileName>alpha.xclbin</xclbinFileName>
 <workGroupSize><item>7</item>
 <item>7</item>
 <item>2</item>
@@ -18,6 +19,7 @@
 <oHeightTile>4</oHeightTile>
 <oDepthTile>3</oDepthTile>
 <iDepthTile>1</iDepthTile>
+<type>conv</type>
 <weight><oFeatureMap><iFeatureMap><line><item>0.671682</item>
 <item>0.658589</item>
 <item>0.298746</item>
@@ -174,8 +176,9 @@
 <item>0.775506</item>
 <item>0.497604</item>
 <item>0.944914</item>
-</offset></layer><layer><type>pool</type>
-<kernelName>pool2</kernelName>
+</offset></layer><layer><kernelName>pool2</kernelName>
+<kernelFileName>../cnn/kernel/lenet5.cl</kernelFileName>
+<xclbinFileName>alpha.xclbin</xclbinFileName>
 <workGroupSize><item>14</item>
 <item>14</item>
 <item>2</item>
@@ -190,6 +193,7 @@
 <oHeightTile>1</oHeightTile>
 <oDepthTile>1</oDepthTile>
 <iDepthTile>1</iDepthTile>
+<type>pool</type>
 <weight><item>0.421949</item>
 <item>0.0551469</item>
 <item>0.899442</item>
@@ -202,8 +206,9 @@
 <item>0.0379345</item>
 <item>0.89404</item>
 <item>0.718009</item>
-</offset></layer><layer><type>conv</type>
-<kernelName>conv3</kernelName>
+</offset></layer><layer><kernelName>conv3</kernelName>
+<kernelFileName>../cnn/kernel/lenet5.cl</kernelFileName>
+<xclbinFileName>alpha.xclbin</xclbinFileName>
 <workGroupSize><item>2</item>
 <item>2</item>
 <item>4</item>
@@ -218,6 +223,7 @@
 <oHeightTile>5</oHeightTile>
 <oDepthTile>4</oDepthTile>
 <iDepthTile>1</iDepthTile>
+<type>conv</type>
 <weight><oFeatureMap><iFeatureMap><line><item>0.674429</item>
 <item>0.205329</item>
 <item>0.856838</item>
@@ -2634,8 +2640,9 @@
 <item>0.98764</item>
 <item>0.747948</item>
 <item>0.696005</item>
-</offset></layer><layer><type>pool</type>
-<kernelName>pool4</kernelName>
+</offset></layer><layer><kernelName>pool4</kernelName>
+<kernelFileName>../cnn/kernel/lenet5.cl</kernelFileName>
+<xclbinFileName>alpha.xclbin</xclbinFileName>
 <workGroupSize><item>16</item>
 <item>1</item>
 <item>1</item>
@@ -2650,6 +2657,7 @@
 <oHeightTile>1</oHeightTile>
 <oDepthTile>1</oDepthTile>
 <iDepthTile>1</iDepthTile>
+<type>pool</type>
 <weight><item>0.175909</item>
 <item>0.230293</item>
 <item>0.685934</item>
@@ -2682,8 +2690,9 @@
 <item>0.610614</item>
 <item>0.159062</item>
 <item>0.70043</item>
-</offset></layer><layer><type>conv</type>
-<kernelName>conv5</kernelName>
+</offset></layer><layer><kernelName>conv5</kernelName>
+<kernelFileName>../cnn/kernel/lenet5.cl</kernelFileName>
+<xclbinFileName>alpha.xclbin</xclbinFileName>
 <workGroupSize><item>1</item>
 <item>1</item>
 <item>10</item>
@@ -2698,6 +2707,7 @@
 <oHeightTile>1</oHeightTile>
 <oDepthTile>12</oDepthTile>
 <iDepthTile>4</iDepthTile>
+<type>conv</type>
 <weight><oFeatureMap><iFeatureMap><line><item>0.21485</item>
 <item>0.660024</item>
 <item>0.647847</item>
@@ -50818,8 +50828,9 @@
 <item>0.447249</item>
 <item>0.779656</item>
 <item>0.990265</item>
-</offset></layer><layer><type>full</type>
-<kernelName>full6</kernelName>
+</offset></layer><layer><kernelName>full6</kernelName>
+<kernelFileName>../cnn/kernel/lenet5.cl</kernelFileName>
+<xclbinFileName>alpha.xclbin</xclbinFileName>
 <workGroupSize><item>12</item>
 <item>1</item>
 <item>1</item>
@@ -50834,6 +50845,7 @@
 <oHeightTile>1</oHeightTile>
 <oDepthTile>1</oDepthTile>
 <iDepthTile>1</iDepthTile>
+<type>full</type>
 <weight><item>0.261788</item>
 <item>0.656514</item>
 <item>0.586138</item>
@@ -60998,8 +61010,9 @@
 <item>0.758751</item>
 <item>0.0755333</item>
 <item>0.553728</item>
-</offset></layer><layer><type>rbf</type>
-<kernelName>rbf7</kernelName>
+</offset></layer><layer><kernelName>rbf7</kernelName>
+<kernelFileName>../cnn/kernel/lenet5.cl</kernelFileName>
+<xclbinFileName>alpha.xclbin</xclbinFileName>
 <workGroupSize><item>10</item>
 <item>1</item>
 <item>1</item>
@@ -61014,6 +61027,7 @@
 <oHeightTile>1</oHeightTile>
 <oDepthTile>1</oDepthTile>
 <iDepthTile>1</iDepthTile>
+<type>rbf</type>
 <weight><item>1</item>
 <item>1</item>
 <item>1</item>

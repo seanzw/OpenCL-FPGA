@@ -8,5 +8,8 @@ function drawLayerTime(result, fid)
     sum1 = mean(duration, 1);
     sum1 = reshape(sum1(:), [size(result, 2), 3]);
     figure(fid);
-    bar(sum1(:, 3));
+    bar(sum1(:, 3), 0.4, 'r');
+    set(gca,'FontSize',20);
+    xlabel('Event i', 'FontSize', 24);
+    ylabel('Execution Time (s)', 'FontSize', 24);
 end

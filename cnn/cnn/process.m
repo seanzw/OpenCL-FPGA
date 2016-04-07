@@ -1,16 +1,26 @@
-function fid = process(fn, fid)
+function fid = process(fn, fid, axisLimit)
 
     [batchResult, pipelineResult] = resultParser(fn);
-    batchResult = batchResult - 1e9;
-    pipelineResult = pipelineResult - 1e9;
+    batchResult = batchResult / 1e9;
+    pipelineResult = pipelineResult / 1e9;
     batchResult = batchResult - min(batchResult(:));
     pipelineResult = pipelineResult - min(pipelineResult(:));
 
     %% Draw the time line.
-    color = rand([size(pipelineResult, 2), 3]);
-    drawTimeline(batchResult(1 : 10, :, :), fid, color);
+    color = [...
+        127, 0, 0;...
+        255, 0, 0;...
+        255, 127, 0;...
+        255, 255, 0;...
+        0, 255, 0;...
+        0, 0, 255;...
+        75, 0, 130;...
+        127, 0, 255;...
+        0, 0, 0] / 255;
+%     axisLimit = [-inf, max(max(batchResult(1 : 2, :, 4))), -inf, inf];
+    drawTimeline(batchResult(1 : 2, :, :), fid, color, axisLimit);
     fid = fid + 1;
-    drawTimeline(pipelineResult(1 : 10, :, :), fid, color);
+    drawTimeline(pipelineResult(1 : 2, :, :), fid, color, axisLimit);
     fid = fid + 1;
 
     %% Draw the average time for each layer.

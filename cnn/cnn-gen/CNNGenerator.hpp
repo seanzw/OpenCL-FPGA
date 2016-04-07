@@ -21,6 +21,7 @@ public:
     struct LayerParam {
         LayerType type;
         std::string kernelName;
+        std::string xclbinFileName;
         size_t workGroupSize[3];
         size_t iWidth;
         size_t iHeight;
@@ -80,7 +81,7 @@ public:
             if (i == layerNum - 1) {
                 flag |= BACK;
             }
-            genLayer(xml, kernel, params[i], i, flag);
+            genLayer(xml, kernel, kernelFileName, params[i], i, flag);
         }
 
         writeXMLCloseTag(xml, "cnn");
@@ -91,9 +92,10 @@ public:
 
 private:
 
-    static void genLayer(std::ofstream &xml, FILE *kernel, const LayerParam &param, size_t idx, Flag flag) {
+    static void genLayer(std::ofstream &xml, FILE *kernel, const std::string &kernelFileName, const LayerParam &param, size_t idx, Flag flag) {
         writeXMLOpenTag(xml, "layer");
         writeKernelDefine(kernel, param, idx, flag);
+        writeXMLInfo(xml, kernelFileName, param);
         switch (param.type) {
         case CONV:
             genXMLConvLayer(xml, param);
@@ -121,7 +123,7 @@ private:
 
     static void genXMLPoolLayer(std::ofstream &xml, const LayerParam &param) {
         writeXMLTag(xml, "type", "pool");
-        writeXMLInfo(xml, param);
+        //writeXMLInfo(xml, param);
 
         // Randomly write the weight.
         writeXMLOpenTag(xml, "weight");
@@ -140,7 +142,7 @@ private:
 
     static void genXMLFullLayer(std::ofstream &xml, const LayerParam &param) {
         writeXMLTag(xml, "type", "full");
-        writeXMLInfo(xml, param);
+        //writeXMLInfo(xml, param);
 
         // Randomly write the weight.
         writeXMLOpenTag(xml, "weight");
@@ -162,7 +164,7 @@ private:
 
     static void genXMLConvLayer(std::ofstream &xml, const LayerParam &param) {
         writeXMLTag(xml, "type", "conv");
-        writeXMLInfo(xml, param);
+        //writeXMLInfo(xml, param);
 
         // Randomly write the weight.
         writeXMLOpenTag(xml, "weight");
@@ -194,7 +196,6 @@ private:
 
     static void genXMLRBFLayer(std::ofstream &xml, const LayerParam &param) {
         writeXMLTag(xml, "type", "rbf");
-        writeXMLInfo(xml, param);
 
         // Randomly write the weight.
         writeXMLOpenTag(xml, "weight");
@@ -242,8 +243,10 @@ private:
         o << std::endl;
     }
 
-    static void writeXMLInfo(std::ofstream &xml, const LayerParam &param) {
+    static void writeXMLInfo(std::ofstream &xml, const std::string &kernelFileName, const LayerParam &param) {
         writeXMLTag(xml, "kernelName", param.kernelName);
+        writeXMLTag(xml, "kernelFileName", kernelFileName);
+        writeXMLTag(xml, "xclbinFileName", param.xclbinFileName);
         writeXMLOpenTag(xml, "workGroupSize");
         for (size_t i = 0; i < sizeof(param.workGroupSize) / sizeof(size_t); ++i) {
             writeXMLTag(xml, "item", param.workGroupSize[i]);

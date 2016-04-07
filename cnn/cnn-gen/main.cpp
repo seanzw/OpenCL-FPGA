@@ -17,6 +17,7 @@ int main(int argc, char *argv[]) {
         {
             CNNGenerator::CONV,
             "conv1",
+            "alpha.xclbin",
             {7, 7, 2},
             32,
             32,
@@ -33,6 +34,7 @@ int main(int argc, char *argv[]) {
         {
             CNNGenerator::POOL,
             "pool2",
+            "alpha.xclbin",
             { 14, 14, 2 },
             28,
             28,
@@ -49,6 +51,7 @@ int main(int argc, char *argv[]) {
         {
             CNNGenerator::CONV,
             "conv3",
+            "alpha.xclbin",
             { 2, 2, 4 },
             14,
             14,
@@ -65,6 +68,7 @@ int main(int argc, char *argv[]) {
         {
             CNNGenerator::POOL,
             "pool4",
+            "alpha.xclbin",
             { 16, 1, 1 },
             10,
             10,
@@ -81,6 +85,7 @@ int main(int argc, char *argv[]) {
         {
             CNNGenerator::CONV,
             "conv5",
+            "alpha.xclbin",
             { 1, 1, 10 },
             5,
             5,
@@ -97,6 +102,7 @@ int main(int argc, char *argv[]) {
         {
             CNNGenerator::FULL,
             "full6",
+            "alpha.xclbin",
             { 12, 1, 1 },
             1,
             1,
@@ -113,6 +119,7 @@ int main(int argc, char *argv[]) {
         {
             CNNGenerator::RBF,
             "rbf7",
+            "alpha.xclbin",
             { 10, 1, 1 },
             84,
             1,
@@ -136,6 +143,8 @@ int main(int argc, char *argv[]) {
     CNNGenerator::genCNN("../cnn/kernel/full6.xml", "../cnn/kernel/full6.cl", 1, &paramsUntile[5]);
     CNNGenerator::genCNN("../cnn/kernel/rbf7.xml", "../cnn/kernel/rbf7.cl", 1, &paramsUntile[6]);
     CNNGenerator::genCNN("../cnn/kernel/lenet5.xml", "../cnn/kernel/lenet5.cl", 7, paramsUntile);
+    CNNGenerator::genCNN("../cnn/kernel/lenet5_mcu.xml", "../cnn/kernel/lenet5_mcu.cl", 7, paramsUntile);
+    CNNGenerator::genCNN("../cnn/kernel/lenet5_mbin.xml", "../cnn/kernel/lenet5_mbin.cl", 7, paramsUntile);
 
     return 0;
 }
