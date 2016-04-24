@@ -83,7 +83,7 @@ __kernel void KERNEL_NAME(
     for (int r = 0; r < OHEIGHT_TILE; ++r) {
         for (int c = 0; c < OWIDTH_TILE; ++c) {
             for (int o = 0; o < ODEPTH_TILE; ++o, ++oPrivateIdx) {
-                out[(o * OHEIGHT + r + rTile) * OWIDTH + c + cTile] = sigmod(outPrivate[oPrivateIdx] + offsetLocal[o + oTile]);
+                out[((o + oTile) * OHEIGHT + r + rTile) * OWIDTH + c + cTile] = sigmod(outPrivate[oPrivateIdx] + offsetLocal[o + oTile]);
             }
         }
     }

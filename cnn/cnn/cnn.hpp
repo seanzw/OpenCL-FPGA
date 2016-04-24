@@ -29,9 +29,6 @@ namespace cnn {
             doc.parse<0>(buf);
             rapidxml::xml_node<> *root = doc.first_node();
 
-            // Get the kernel file name.
-            std::string kernelFileName(root->first_node("kernelFileName")->value());
-
             // Get the input size.
             size_t inSize = getSizeT(root, "inSize");
 
@@ -78,6 +75,33 @@ namespace cnn {
             }
 
             return totalTime;
+        }
+
+        unsigned long long forwardCPUBatch(const vec &in, vec &out, size_t n, double *averageTime) {
+            // Make sure that input size is correct.
+            size_t inSize = getInSize();
+            size_t outSize = getOutSize();
+            if (in.size() != inSize * n) {
+                std::cerr << "Wrong input size! " << std::endl;
+                exit(-2);
+            }
+
+            clock_t start = clock(), diff;
+
+            // Reserve the output buffer.
+            out.resize(outSize * n);
+
+            for (size_t i = 0; i < n; ++i) {
+                vec inThis(in.begin() + i * inSize, in.begin() + i * inSize + inSize);
+                forwardCPU(inThis);
+                std::copy(layers[layers.size() - 1]->out.begin(), layers[layers.size() - 1]->out.end(), out.begin() + i * outSize);
+            }
+
+            diff = clock() - start;
+            *averageTime = (double)diff / (double)CLOCKS_PER_SEC / (double)n;
+            std::cout << "Average time (CPU): " << *averageTime << "s" << std::endl;
+
+            return diff;
         }
 
         // Forward with OpenCL.

@@ -31,6 +31,7 @@ namespace test {
         vec out;
         double averageTime;
         writeXMLOpenTag(o, "batch");
+        cnn->forwardCPUBatch(in, out, n, &averageTime);
         std::vector<cl_event> events = cnn->forwardCLBatch(in, out, n, &averageTime);
         writeXMLTag(o, "averageTime", (float)averageTime);
         dumpEventsProfile(o, events, n);
