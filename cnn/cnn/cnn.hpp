@@ -59,7 +59,7 @@ namespace cnn {
             for (int i = 0; i < layers.size(); ++i) {
                 delete layers[i];
             }
-            for (auto iter = programs.begin(); iter != programs.end(); ++iter) {
+            for (std::map<std::string, cl_program>::iterator iter = programs.begin(); iter != programs.end(); ++iter) {
                 clReleaseProgram(iter->second);
             }
             clReleaseCommandQueue(queue);
