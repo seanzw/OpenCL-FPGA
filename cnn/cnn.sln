@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cnn", "cnn\cnn.vcxproj", "{
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cnn-gen", "cnn-gen\cnn-gen.vcxproj", "{EC41CECA-D591-48E7-8C24-40B46E4F10DC}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cnn-mat", "cnn-mat\cnn-mat.vcxproj", "{07D1A9FE-FD1A-4651-BC1F-C7D99AAC3B3F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -31,6 +33,14 @@ Global
 		{EC41CECA-D591-48E7-8C24-40B46E4F10DC}.Release|x64.Build.0 = Release|x64
 		{EC41CECA-D591-48E7-8C24-40B46E4F10DC}.Release|x86.ActiveCfg = Release|Win32
 		{EC41CECA-D591-48E7-8C24-40B46E4F10DC}.Release|x86.Build.0 = Release|Win32
+		{07D1A9FE-FD1A-4651-BC1F-C7D99AAC3B3F}.Debug|x64.ActiveCfg = Debug|x64
+		{07D1A9FE-FD1A-4651-BC1F-C7D99AAC3B3F}.Debug|x64.Build.0 = Debug|x64
+		{07D1A9FE-FD1A-4651-BC1F-C7D99AAC3B3F}.Debug|x86.ActiveCfg = Debug|Win32
+		{07D1A9FE-FD1A-4651-BC1F-C7D99AAC3B3F}.Debug|x86.Build.0 = Debug|Win32
+		{07D1A9FE-FD1A-4651-BC1F-C7D99AAC3B3F}.Release|x64.ActiveCfg = Release|x64
+		{07D1A9FE-FD1A-4651-BC1F-C7D99AAC3B3F}.Release|x64.Build.0 = Release|x64
+		{07D1A9FE-FD1A-4651-BC1F-C7D99AAC3B3F}.Release|x86.ActiveCfg = Release|Win32
+		{07D1A9FE-FD1A-4651-BC1F-C7D99AAC3B3F}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
